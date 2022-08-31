@@ -14,7 +14,7 @@
                  sconv,Lenx3,Leny3,Lenz3,xmax3,ymax3,zmax3,    &
                  xmin3,ymin3,zmin3
       logical    iflinx
-      character :: sname*6,cname*6,numbr2*2,numbr1*2  !,numbr0*1
+      character :: sname*6,cname*6,numbr2*2,numbr1*2,numbr0*1
 ! ----------------------------------------------------------
 !                           e(-6) ns0/2 + e(-70/4) 4*ns0/2
       parameter  (ns0=110600,np0=10120,nq0=np0+5*ns0/2)
@@ -22,9 +22,9 @@
       parameter  (sname='Cntemp',cname='cntemp')      ! Cntemp,cntemp
 !
 !     parameter  (kstart=0,kgrp=1)
-!     parameter  (numbr2='Ca',numbr1='Ca')         !,numbr0='C'
+!     parameter  (numbr2='Ca',numbr1='Ca',numbr0='C')
       parameter  (kstart=1,kgrp=1)
-      parameter  (numbr2='Cb',numbr1='Ca')         !,numbr0='C'
+      parameter  (numbr2='Cb',numbr1='Ca',numbr0='C')
 !
 !     parameter  (iflinx=.true.,num_proc=6)        ! 600/6=100
       parameter  (iflinx=.false.,num_proc=96)      ! 768/96=8 <--

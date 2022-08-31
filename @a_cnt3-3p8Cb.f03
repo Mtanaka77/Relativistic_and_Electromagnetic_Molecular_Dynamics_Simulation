@@ -1,17 +1,25 @@
 !*-------------------------------------------------------------------*
-!  3D Coulomb and Electtromagnetic Fields in an Open System
-!    Comp.Phys.Comm. 241, 56-63, 2019
+!
+!  3-D Molecular Dynamics in Relativistic Electromagnetic Fields 
+!    Citation in Comp.Phys.Comm. 241, 56-63, 2019
 !    Motohiko Tanaka, Ph.D.. Professor           Dec.24, 2016
 !
-!  1. @cnt3-3p5aa.f03:  Molecular dynamics simulation code
-!  2. param_em3p8_Cb.h: Common parameters of this simulation
-!  3. Cntemp_config.START5: Configure parameters 
+!  1. @cnt3-3p8Ca.f03:  Molecular dynamics simulation code
+!  2. param_em3p8_Ca.h: Common parameters of this simulation
+!  3. Cntemp_config.STARTC: Configure parameters 
 !  4. p_config_ss.xyz_D150, P135: Pellets files
 !
 !  Fortran 2003 version (real(C_DOUBLE))         Nov.3, 2020
+!
+!  * An explicit code is strictly bound by the Courant condition,
+!  dx(length) / dt(time step) > c, the speed of light.. 
+!
+!  Copyright(C) 2010-2022, Motohiko Tanaka, Ph.D., Graduate School
+!  of Chubu University, Japan. All rights are reserved.
+!
 !*-------------------------------------------------------------------*
 !
-!    MPI+OpenMP: uses /size/ (forces), mp=1836 
+!    MPI+OpenMP: uses /size/ (forces), mp/me=1836 
 !    /READ_CONF/ is used in nZ, nZA, intens, lambda
 !    3D filled H(+) by ranff(0.) filling ... moldyn L.1150
 !    No gap between r>rout and r<rout  ... forces L.920,940,1690,1750
@@ -95,9 +103,9 @@
         ionode= .false.
       end if
 !c
-      suffix2= numbr2  ! in param.h for a new number 
-      suffix1= numbr1  ! the number before in read(12)
-!     suffix0= numbr0  ! Config....START5
+      suffix2= numbr2  ! new files (in param.h) 
+      suffix1= numbr1  ! an old restart file
+      suffix0= numbr0  ! Cntemp_config.STARTx
 !c
 !
       if(ionode) then
@@ -3754,51 +3762,51 @@
       common/sub_proc/ ionode
 !----------------------------------------------------------------
       OPEN (unit=08,file=praefixs//'_config.START'//suffix0,   &
-                                           form='formatted')
+                                               form='formatted')
 !
       if(ionode) then
         write(11,*) 'READ_CONF: Parameter read... start'
       end if
 !*
-      read (8,'(a40,a6)') text1, praefix8   ! String der simulationserkennung
-      read (8,'(a40,i12)')   text1,ifrefl   ! =0,1,2 reflection at open/close/1d open
-      read (8,'(a40,f12.0)') text1,cptot    ! Maximum cpu time for each run (min)
-      read (8,'(a40,d20.0)') text1,tmax     ! Zeit zum Abbruch, 1.d-15 sec
-      read (8,'(a40,d20.0)') text1,dt       ! Zeitschritt, in 1.d-15 sec
-      read (8,'(a40,d20.0)') text1,dtwr     ! Write out interval for IWRT1, 1.d-15 sec 
-      read (8,'(a40,d20.0)') text1,dtwr2    ! Write out for IWRT2
-      read (8,'(a40,d20.0)') text1,dtwr3    ! Write out for IWRT3
-      read (8,'(a40,i12)')   text1,itabs    ! Particle table update interval
+      read (08,'(a40,a6)') text1, praefix8   ! String der simulationserkennung
+      read (08,'(a40,i12)')   text1,ifrefl   ! =0,1,2 reflection at open/close/1d open
+      read (08,'(a40,f12.0)') text1,cptot    ! Maximum cpu time for each run (min)
+      read (08,'(a40,d20.0)') text1,tmax     ! Zeit zum Abbruch, 1.d-15 sec
+      read (08,'(a40,d20.0)') text1,dt       ! Zeitschritt, in 1.d-15 sec
+      read (08,'(a40,d20.0)') text1,dtwr     ! Write out interval for IWRT1, 1.d-15 sec 
+      read (08,'(a40,d20.0)') text1,dtwr2    ! Write out for IWRT2
+      read (08,'(a40,d20.0)') text1,dtwr3    ! Write out for IWRT3
+      read (08,'(a40,i12)')   text1,itabs    ! Particle table update interval
 !
-      read (8,'(a40,i12)')   text1,np       ! Number of protons
+      read (08,'(a40,i12)')   text1,np       ! Number of protons
 !
-      read (8,'(a40,f12.0)') text1,fchar    ! carbon: charge state
-      read (8,'(a40,f12.0)') text1,fcharA   ! Au: charge state: 20 to 80 
+      read (08,'(a40,f12.0)') text1,fchar    ! carbon: charge state
+      read (08,'(a40,f12.0)') text1,fcharA   ! Au: charge state: 20 to 80 
         if(ionode) then
           write(11,*) 'cptot=',cptot
           write(11,*) 'tmax=',tmax
           write(11,*) 'fchar=',fchar
         end if
 !
-      read (8,'(a40,i12)')   text1,nZ       ! large lump as nZ=1 
-      read (8,'(a40,i12)')   text1,nZA      ! large lump as nZA=4 
-      read (8,'(a40,d20.0)') text1,massi    ! mass ratio: mp/me
+      read (08,'(a40,i12)')   text1,nZ       ! large lump as nZ=1 
+      read (08,'(a40,i12)')   text1,nZA      ! large lump as nZA=4 
+      read (08,'(a40,d20.0)') text1,massi    ! mass ratio: mp/me
 !
-      read (8,'(a40,d20.0)') text1,intens   ! intensity W/cm2; 6.d17
-      read (8,'(a40,d20.0)') text1,lambda   ! wavelength 800 nm= 8.d-7 cm
+      read (08,'(a40,d20.0)') text1,intens   ! intensity W/cm2; 6.d17
+      read (08,'(a40,d20.0)') text1,lambda   ! wavelength 800 nm= 8.d-7 cm
 !  
-      read (8,'(a40,d20.0)') text1,R_sp     ! in R_sp, cm
-      read (8,'(a40,d20.0)') text1,D_sp
+      read (08,'(a40,d20.0)') text1,R_sp     ! in R_sp, cm
+      read (08,'(a40,d20.0)') text1,D_sp
 !   --------------------
 !     R_sp= R_sp/1.d-4
 !   --------------------
 !
-      read (8,'(a40,d20.0)') text1,rcut_Clf ! Coulomb cutoff in Angstrom
-      read (8,'(a40,d20.0)') text1,rcutLJ   ! Lennard-Jones cutoff in Angstgrom
-      read (8,'(a40,d20.0)') text1,epsCLJ   ! LJ potential between C in eV
-      read (8,'(a40,d20.0)') text1,epsLJ    ! LJ potential otherwise in eV
-      read (8,'(a40,d20.0)') text1,Temp     ! Electron temperature in eV
-      read (8,'(a40,d20.0)') text1,rgmax
+      read (08,'(a40,d20.0)') text1,rcut_Clf ! Coulomb cutoff in Angstrom
+      read (08,'(a40,d20.0)') text1,rcutLJ   ! Lennard-Jones cutoff in Angstgrom
+      read (08,'(a40,d20.0)') text1,epsCLJ   ! LJ potential between C in eV
+      read (08,'(a40,d20.0)') text1,epsLJ    ! LJ potential otherwise in eV
+      read (08,'(a40,d20.0)') text1,Temp     ! Electron temperature in eV
+      read (08,'(a40,d20.0)') text1,rgmax
 !
 ! -------------------------------
 ! Convert from Angstrom to micron
