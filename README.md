@@ -4,7 +4,7 @@ of relativistic and electromagnetic fields in three dimensions as
 for nanoscale phenomena. Maxwell equations are solved with Gauss's law
 for necessary corrections. Each of relativistic particles are advanced in time. 
 
-An explicit simulation code must require the Courant condition, 
+All explicit simulation code must satisfy the Courant condition, that is, 
 Dx(length)/Dt(time step) > c, the speed of light.  
 
 Ref: Molecular dynamics, M. Tanaka, Computer Physics Communicatios, vol.241, 56 (2019);
