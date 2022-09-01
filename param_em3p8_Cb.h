@@ -1,4 +1,4 @@
-!  param_em3p8_Cb.h
+!  param_em3p8_Ca.h
 !    -> parameter  (kstart=1,kgrp=1)
 !
 !  restart: numbr2, numbr1 
