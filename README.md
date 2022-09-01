@@ -1,5 +1,5 @@
 # molecular_dynamics
-A molecular dynamics simulation code is created for applications 
+A molecular dynamics simulation code has been created for applications 
 of relativistic and electromagnetic fields in three dimensions as 
 for nanoscale phenomena. Maxwell equations are solved with Gauss's law
 for necessary corrections. Each of relativistic particles are advanced in time. 
