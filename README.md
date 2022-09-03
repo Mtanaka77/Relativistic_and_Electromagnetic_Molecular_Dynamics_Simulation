@@ -2,18 +2,17 @@
 molecular_dynamics
 
 A molecular dynamics simulation code has been created 
-for applications of relativistic and electromagnetic fields 
-in three dimensions, as for nanoscale phenomena. 
-Maxwell equations are solved with Gauss's law for necessary 
-corrections. Relativistic particles are then advanced in time.
+for relativistic and electromagnetic fields in three dimensions, 
+such as nanoscale phenomena. Maxwell equations are solved with Gauss's 
+law for necessary corrections. Relativistic particles are then advanced 
+in time.
 
-The CGS units are used in this code: a_unit= 1.0000d+00 cm, 
-m_unit= 0.9110d-27 g (electron), electron mass 
-e_unit= 4.8032d-10 esu, and t_unit= 1.0000d+00 sec.
-One finds four files in the simulation: 1) @cnt3-3p8Ca.f03: 
+The CGS units are used in this code: a_unit= 1.00d+00 cm, t_unit= 1.00d+00 sec, 
+electron mass m_unit= 0.9110d-27 g and its charge e_unit= 4.8032d-10 esu.
+One needs four files in the simulation: 1) @cnt3-3p8Ca.f03: 
 Molecular dynamics simulation code, 2) param_em3p8_Ca.h: 
 Common parameters of this simulation, 3) Cntemp_config.STARTC: 
-nfigure parameters, 4) p_config_ss.xyz_D150, P135: Pellets 
+figure parameters, 4) p_config_ss.xyz_D150, P135: Pellets 
 electrons and ions.
 
 All explicit simulation code must satisfy the Courant condition, 
