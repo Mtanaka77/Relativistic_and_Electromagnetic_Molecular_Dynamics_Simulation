@@ -2,7 +2,7 @@
 !
 !  # 3-D Molecular Dynamics in Relativistic Electromagnetic Fields #
 !    Reference in Computer Physics Comm., 241, 56-63, 2019.
-!    Motohiko Tanaka, Ph.D.. Professor           Dec.24, 2016
+!                                                Dec.24, 2016
 !
 !  1. @cnt3-3p8Ca.f03:  Molecular dynamics simulation code
 !  2. param_em3p8_Ca.h: Common parameters of this simulation
@@ -14,17 +14,18 @@
 !  * An explicit code is strictly bound by the Courant condition,
 !  dx(length) / dt(time step) > c, the speed of light.. 
 !
-!  Author and maintenance by Motohiko Tanaka, Ph.D., Professor,
-!  Graduate School of Chubu University, Japan.  2022/09/01
+!   Author and maintenance by Motohiko Tanaka, Ph.D., Professor,
+!   Graduate School of Chubu University, Japan.  2022/09/01
 !
 !*-------------------------------------------------------------------*
 !
-!    MPI+OpenMP: uses /size/ (forces), mp/me=1836 
-!    CGS units: 
-!      a_unit= 1.0000d+00   ! cm
-!      m_unit= 0.9110d-27   ! g, electron mass
-!      e_unit= 4.8032d-10   ! esu, unit charge
-!      t_unit= 1.0000d+00   ! sec
+!    MPI+OpenMP: uses /forces/, mp/me=1836, real masses
+!    The CGS units: 
+!      a_unit= 1.0000d-08 cm, Angstrom
+!      t_unit= 1.0000d-15 sec, ato second
+!      m_unit= 0.9110d-27 g, electron mass
+!      e_unit= 4.8032d-10 esu, unit charge
+!
 !    /READ_CONF/ is used in nZ, nZA, intens, lambda
 !    3D filled H(+) by ranff(0.) filling ... in /moldyn/ 
 !    No gap between r>rout and r<rout  ... in /forces/ 
