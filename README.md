@@ -7,7 +7,7 @@ such as nanoscale phenomena. Maxwell equations are solved with Gauss's
 law for necessary corrections. Relativistic particles are then advanced 
 in time.
 
-The CGS units are used in this code: a_unit= 1.00d+00 cm, t_unit= 1.00d+00 sec, 
+The CGS units are used in this code: a_unit= 1.00d-08 cm, t_unit= 1.00d-15 sec, 
 electron mass m_unit= 0.9110d-27 g and its charge e_unit= 4.8032d-10 esu.
 One needs four files in the simulation: 1) @cnt3-3p8Ca.f03: 
 Molecular dynamics simulation code, 2) param_em3p8_Ca.h: 
