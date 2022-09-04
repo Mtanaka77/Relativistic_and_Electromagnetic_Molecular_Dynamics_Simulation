@@ -9,6 +9,7 @@ in time.
 
 The CGS units are used in this code: a_unit= 1.00d-08 cm, t_unit= 1.00d-15 sec, 
 electron mass m_unit= 0.9110d-27 g and its charge e_unit= 4.8032d-10 esu.
+The mass of hydrogen, for example, is 1.6726d-24.
 One needs four files in the simulation: 1) @cnt3-3p8Ca.f03: 
 Molecular dynamics simulation code, 2) param_em3p8_Ca.h: 
 Common parameters of this simulation, 3) Cntemp_config.STARTC: 
