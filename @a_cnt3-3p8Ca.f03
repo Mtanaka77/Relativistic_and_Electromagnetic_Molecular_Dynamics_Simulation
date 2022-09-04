@@ -1,21 +1,24 @@
 !*-------------------------------------------------------------------*
 !
 !  # 3-D Molecular Dynamics in Relativistic Electromagnetic Fields #
-!    Reference in Computer Physics Comm., 241, 56-63, 2019.
+!    Reference: Computer Physics Comm., 241, 56-63, 2019.
 !                                                Dec.24, 2016
 !
+!  # Fortran 2003 version (real(C_DOUBLE))       Nov. 3, 2020
+!
+!  Files
 !  1. @cnt3-3p8Ca.f03:  Molecular dynamics simulation code
 !  2. param_em3p8_Ca.h: Common parameters of this simulation
 !  3. Cntemp_config.STARTC: Configure parameters 
-!  4. p_config_ss.xyz_D150, P135: Pellets files
-!
-!  Fortran 2003 version (real(C_DOUBLE))         Nov.3, 2020
+!  4. p_config_ss.xyz_D150, P135: Pellet files of H,C,Au
 !
 !  * An explicit code is strictly bound by the Courant condition,
-!  dx(length) / dt(time step) > c, the speed of light.. 
+!   dx(length) / dt(time step) > c, the speed of light.. 
 !
-!   Author and maintenance by Motohiko Tanaka, Ph.D., Professor,
+!   Author and code maintenance by Motohiko Tanaka, Ph.D., Professor,
 !   Graduate School of Chubu University, Japan.  2022/09/01
+!
+!   https://github.com/Mtanaka77/molecular_dynamics
 !
 !*-------------------------------------------------------------------*
 !
