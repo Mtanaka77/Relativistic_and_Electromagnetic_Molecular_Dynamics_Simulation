@@ -19,7 +19,7 @@ electrons and H, C and Au ions.
 All explicit simulation code must satisfy the Courant condition, 
 that is, Dx(length)/Dt(time step) > c, the speed of light. 
 Simulations of ejecting nanotube accelerator is discussed 
-in the later half of CPC 2019 paper.
+in the latter half of CPC (2019) simulation paper.
 
 References:
 1. M. Tanaka and M. Murakami, Relativistic and electromagnetic 
