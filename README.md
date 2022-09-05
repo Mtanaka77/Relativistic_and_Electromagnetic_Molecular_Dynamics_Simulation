@@ -14,7 +14,7 @@ One needs four files in the simulation: 1) @cnt3-3p8Ca.f03:
 Molecular dynamics simulation code, 2) param_em3p8_Ca.h: 
 Common parameters of this simulation, 3) Cntemp_config.STARTC: 
 figure parameters, 4) p_config_ss.xyz_D150, P135: Pellets 
-electrons and ions.
+electrons and H, C and Au ions.
 
 All explicit simulation code must satisfy the Courant condition, 
 that is, Dx(length)/Dt(time step) > c, the speed of light. 
