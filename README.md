@@ -24,7 +24,12 @@ half of CPC simulation paper (2019).
 
 References:
 
-M. Tanaka and M. Murakami, Relativistic and electromagnetic molecular dynamics simulations for a carbon-gold nanotube accelerator, Computer Physics Communications, 241, 56-63 (2019).
-M. Tanaka, A simulation of low-frequency electromagnetic phenomena in kinetic plasmas of three dimensions, J.Comput. Phys., 107, 124-145 (1993).
-M. Murakami and M. Tanaka, Generation of high-quality mega-electron volt proton beams with intense-laser-driven nanotube accelerator, Applied Phys. Letters, 102, 163101 (2013).
+1. M. Tanaka and M. Murakami, Relativistic and electromagnetic molecular dynamics simulations 
+for a carbon-gold nanotube accelerator, Computer Physics Communications, 241, 56-63 (2019).
+
+2. M. Tanaka, A simulation of low-frequency electromagnetic phenomena in kinetic plasmas of 
+three dimensions, J.Comput. Phys., 107, 124-145 (1993).
+
+3. M. Murakami and M. Tanaka, Generation of high-quality mega-electron volt proton beams with 
+intense-laser-driven nanotube accelerator, Applied Phys. Letters, 102, 163101 (2013).
 
