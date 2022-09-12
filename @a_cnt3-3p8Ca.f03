@@ -1,27 +1,28 @@
 !*-------------------------------------------------------------------*
-!
-!  # 3-D Molecular Dynamics in Relativistic Electromagnetic Fields #
-!    Reference: Computer Physics Comm., 241, 56-63, 2019.
-!                                                Dec.24, 2016
-!  # Fortran 2003 version (real(C_DOUBLE))       Nov. 3, 2020
-!
-!  Files
-!  1. @cnt3-3p8Ca.f03:  Molecular dynamics simulation code
-!  2. param_em3p8_Ca.h: Common parameters of this simulation
-!  3. Cntemp_config.STARTC: Configure parameters 
-!  4. p_config_ss.xyz_D150, P135: Pellet files of H,C,Au
-!
-!  * An explicit code is strictly bound by the Courant condition,
-!   dx(length) / dt(time step) > c, the speed of light.. 
-!  * Gauss's law must be corrected as errors in divergence term 
-!   accumulate in time. This is true if a finite difference scheme
-!   of any kind is utilized.
-!
-!   Author and code maintenance by Motohiko Tanaka, Ph.D., Professor,
-!   Graduate School of Chubu University, Japan.  2022/09/01
-!
-!   https://github.com/Mtanaka77/molecular_dynamics
-!
+!                                                                    !
+!  # 3-D Molecular Dynamics in Relativistic Electromagnetic Fields # !
+!    Reference: Computer Physics Comm., 241, 56-63, 2019.            !
+!                                                Dec.24, 2016        !
+!  # Fortran 2003 version (real(C_DOUBLE))       Nov. 3, 2020        !
+!                                                                    !
+!  Files                                                             !
+!  1. @cnt3-3p8Ca.f03:  Molecular dynamics simulation code           !
+!  2. param_em3p8_Ca.h: Common parameters of this simulation         !
+!  3. Cntemp_config.STARTC: Configure parameters                     !
+!  4. p_config_ss.xyz_D150, P135: Pellet files of e,H,C,Au           !             
+!                                                                    !
+!  * An explicit code is strictly bound by the Courant condition,    !
+!   dx(length) / dt(time step) > c, the speed of light..             !
+!  * Gauss's law must be corrected as errors in divergence term      !
+!   accumulate in time. This is true if a finite difference scheme   !
+!   of any kind is utilized.                                         !
+!                                                                    !
+!     The author and maintainer of these simulation codes are        !
+!   Motohiko Tanaka, Ph.D./Professor, Graduate School of Engineering,!
+!   Chubu University, Kasugai 487-8501, Japan.   2022/09/01          !
+!                                                                    !
+!   https://github.com/Mtanaka77/molecular_dynamics                  !
+!                                                                    !
 !*-------------------------------------------------------------------*
 !
 !    MPI+OpenMP: uses /forces/, mp/me=1836, real masses
@@ -69,7 +70,7 @@
 !    L.1026  write() it,dcpu   <- comment out
 !    cntemp...1: cpu time  1.  <- 243.0
 !    Exec time= 1 min          <- run7.sh: =240m
-!*-------------------------------------------------- Nov.10, 2020 ---*
+!*-------------------------------------------------------------------*
 ! Fortran 2003 version
 !
       program  cnt3emp
