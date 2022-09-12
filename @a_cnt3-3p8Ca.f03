@@ -3,7 +3,6 @@
 !  # 3-D Molecular Dynamics in Relativistic Electromagnetic Fields #
 !    Reference: Computer Physics Comm., 241, 56-63, 2019.
 !                                                Dec.24, 2016
-!
 !  # Fortran 2003 version (real(C_DOUBLE))       Nov. 3, 2020
 !
 !  Files
@@ -14,6 +13,9 @@
 !
 !  * An explicit code is strictly bound by the Courant condition,
 !   dx(length) / dt(time step) > c, the speed of light.. 
+!  * Gauss's law must be corrected as errors in divergence term 
+!   accumulate in time. This is true if a finite difference scheme
+!   of any kind is utilized.
 !
 !   Author and code maintenance by Motohiko Tanaka, Ph.D., Professor,
 !   Graduate School of Chubu University, Japan.  2022/09/01
