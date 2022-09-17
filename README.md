@@ -2,11 +2,11 @@ Molecular dynamics
 
 A molecular dynamics simulation code has been created for relativistic and 
 electromagnetic fields in three dimensions, and is used such as 
-nanoscale phenomena. 
-Maxwell equations are solved, where the Gauss's equation must be corrected
-as finite errors accumulate in divergence term. 
-This is true if a finite discrete scheme in any method is utilized.
-Relativistic particles are then advanced in time.
+nanoscale particle phenomena. 
+Maxwell equations are solved, and relativistic particles are then advanced in time.
+But, it is noted that the Gauss's equation must be corrected as finite errors accumulate 
+in the divergence term. 
+This is true if a discrete coordinated scheme is utilized in any method.
 
 Four physical CGS units are used in this code: a_unit= 1.00d-08 cm, 
 t_unit= 1.00d-15 sec, electron mass m_unit= 0.9110d-27 g and its charge 
