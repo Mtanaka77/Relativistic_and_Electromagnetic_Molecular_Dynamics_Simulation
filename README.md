@@ -13,7 +13,8 @@ the negative direction toward the origin and then go out to
 the positive direction. The pellets at the origin are irradiated 
 by these waves and are ejected to an open space.
 The final energies are around 30-40 MeV in 20-40 fs, which is shown 
-by animation movies. It is discussed in the latter half of CPC paper (2019).
+by animation movies at my homepage. It is discussed in the latter half 
+of CPC paper (2019).
 
 References:
 
