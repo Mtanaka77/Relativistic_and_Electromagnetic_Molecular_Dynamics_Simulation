@@ -10,7 +10,7 @@ Electromagnetic monochromatic waves at the wavelength 800 nm are travelling from
 It is discussed in the latter half of CPC paper (2019).
 
 Finally, the machine run time depends on the physical time and cpu's architecture. 
-For simulating physical time 1 10^(-15) s, it was circa (3 hours x 100 cpu) on NEC's Supercomputer.   
+For simulating physical time 1 fs, the run consumes circa (3 hours x 100 cpu) on NEC's Supercomputer.   
 
 
 References:
