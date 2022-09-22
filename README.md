@@ -11,7 +11,7 @@ It is discussed in the latter half of CPC paper (2019).
 
 Finally, the machine run time depends on the physical time and cpu's architecture. 
 For the elapsed time of parallel execution was 4.0 sec/step for 52 ranks and 4.0 10^5 particles, or
-1 fs for (185 minutes and 52 ranks) by Fujitsu FX100 Supercomputer.  
+1 fs for 185 minutes and 52 ranks by Fujitsu FX100 Supercomputer.  
 
 
 References:
