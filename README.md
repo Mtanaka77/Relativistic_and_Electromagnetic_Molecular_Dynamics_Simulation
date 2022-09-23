@@ -9,10 +9,8 @@ A simulation of the nanotube accelerator is set up by putting pellets of H, C an
 Electromagnetic monochromatic waves at the wavelength 800 nm are travelling from the negative direction toward the origin and then go out to the positive direction. The pellets at the origin are irradiated by these waves and are ejected to ion perpenducular and electron parallel directions toward an open space. The final energies for laser intensity 10^22 W/cm^2 are around 30-40 MeV in 20-40 fs, which is shown by animation movies at my homepage. 
 It is discussed in the latter half of CPC paper (2019).
 
-The parallel simulation code is made for now the one-dimensiomal case in the z-direction.
-Finally, the machine run time depends on the physical time and cpu's architecture. 
-For the elapsed time of parallel execution was 4.0 sec/step for 52 ranks and 4.0 10^5 particles
-(or 1 fs for elapsed circa 3 hours) by Fujitsu FX100 Supercomputer.  
+The parallel simulation code is designed for now the one-dimensional case (the z-direction) where the long axis of pellets is open to eject heavy ions in that derection. 
+Finally, the machine run time depends on the physical time and cpu's architecture. For the elapsed time of parallel execution was 4.0 sec/step for 52 ranks and 4.0 10^5 particles (or 1 fs for elapsed circa 3 hours) by Fujitsu FX100 Supercomputer.  
 
 
 References:
