@@ -1,29 +1,29 @@
-!*-------------------------------------------------------------------*
-!                                                                    !
-!  # 3-D Molecular Dynamics in Relativistic Electromagnetic Fields # !
-!    Reference: Computer Physics Comm., 241, 56-63, 2019.            !
-!                                                Dec.24, 2016        !
-!  # Fortran 2003 version (real(C_DOUBLE))       Nov. 3, 2020        !
-!                                                                    !
-!  Files are the followings:                                         !
-!  1. @cnt3-3p8Ca.f03:  Molecular dynamics simulation code           !
-!  2. param_em3p8_Ca.h: Common parameters of this simulation         !
-!  3. Cntemp_config.STARTC: Configure parameters                     !
-!  4. p_config_ss.xyz_D150, P135: Pellet files of H,C,Au and e       !             
-!                                                                    !
-!  * An explicit code is strictly bound by the Courant condition,    !
-!   dx(length) / dt(time step) > c, the speed of light..             !
-!  * Gauss's law must be corrected as errors in divergence term      !
-!   accumulate in time. This is true if a finite difference scheme   !
-!   of any kind is utilized.                                         !
-!                                                                    !
-!     The author and maintainer of these simulation codes are        !
-!   Motohiko Tanaka, Ph.D./Professor, Graduate School of Engineering,!
-!   Chubu University, Kasugai 487-8501, Japan.   2022/09/01          !
-!                                                                    !
-!   https://github.com/Mtanaka77/molecular_dynamics                  !
-!                                                                    !
-!*-------------------------------------------------------------------*
+!*--------------------------------------------------------------------*
+!                                                                     !
+!  # 3-D Molecular Dynamics in Relativistic Electromagnetic Fields #  !
+!    Reference: Computer Physics Comm., 241, 56-63, 2019.             !
+!                                                Dec.24, 2016         !
+!  # Fortran 2003 version (real(C_DOUBLE))       Nov. 3, 2020         !
+!                                                                     !
+!  Files                                                              !
+!  1. @cnt3-3p8Ca.f03:  Molecular dynamics simulation code            !
+!  2. param_em3p8_Ca.h: Common parameters of this simulation          !
+!  3. Cntemp_config.STARTC: Configure parameters                      !
+!  4. p_config_ss.xyz_D150, P135: Pellet files of H,C,Au and e        !             
+!                                                                     !
+!  * An explicit code is strictly bound by the Courant condition,     !
+!   dx(length) / dt(time step) > c, the speed of light..              !
+!  * Gauss's law must be corrected as errors in divergence term       !
+!   accumulate in time. This is true if a finite difference scheme    !
+!   of any kind is utilized.                                          !
+!                                                                     !
+!     The author and maintainer of these simulation codes are         !
+!   Motohiko Tanaka, Ph.D./Professor, Graduate School of Engineering, !
+!   Chubu University, Kasugai 487-8501, Japan.   2022/09/01           !
+!                                                                     !
+!   https://github.com/Mtanaka77/molecular_dynamics                   !
+!                                                                     !
+!*--------------------------------------------------------------------*
 !
 !    MPI+OpenMP: uses /forces/, mp/me=1836, real masses
 !    The CGS units: 
@@ -258,7 +258,7 @@
 !
 !
       integer(C_INT) i,it,is,istop1,istop2,iwa,iwb,iwc,iwd,   &
-                     ifrefl,nframe,ierror,ns1,np1,ns2,        &
+                     ifrefl,nframe,ns1,np1,ns2,        &
                      nh1,nh2,istop7,istop8
       common/parm1/  it,is
       common/abterm/ istop1,istop2,istop7,istop8
@@ -704,7 +704,7 @@
 !     mol = 6.0220d23
       eV  = e_unit/299.79d0   ! eV to erg, 1.6022d-12
 !
-      pref_LJ = 48.0d0*epsLJ*eV
+      pref_LJ  = 48.0d0*epsLJ*eV
       prefC_LJ = 48.0d0*epsCLJ*eV
 !***
       Lx3= xmax3 -xmin3  ! EM length in cm
@@ -991,14 +991,15 @@
                          ifrefl,ns,np,nq,nCLp)
 !------------------------++ ++ ++ ++ +++ -----i-------------------------
 !* Main loop of molecular dynamics
+!
       use, intrinsic :: iso_c_binding 
       use omp_lib
       implicit none
 !
       include 'param_em3p8_Ca.h'
-      include 'fftw3.f03'     ! general FFTW
-!     include 'aslfftw3.f03'  ! for NEC only
       include 'mpif.h'
+      include 'fftw3.f03'     ! more general
+!     include 'aslfftw3.f03'  ! for NEC
 
       type(C_PTR),save :: plan,pinv,pla1,pla2,pla3,pin1,pin2,pin3 
       real(C_DOUBLE)  walltime0,walltime1
@@ -1010,7 +1011,7 @@
 !
       integer(C_INT),dimension(100) :: nz0,nz1,nz2,nz3,i0,i1
       common/parall/ nz0,nz1,nz2,nz3,i0,i1
-      integer(C_INT) nw,nu,i00,rank,iterft
+      integer(C_INT) nw,nu,rank,iterft
       integer(C_INT) npp(7),nqq(7),nppa
 !
       real(C_DOUBLE),dimension(mx,my,3) :: senv,recv
@@ -1022,7 +1023,6 @@
 !
       real(C_DOUBLE),dimension(npq0,3) :: xyz,ppp,vvv,qqq 
       real(C_DOUBLE),dimension(npq0)   :: ch,am,ag
-      real(C_DOUBLE) vsq,vcc
       common/mainda/ xyz,ppp,ch,am,ag
 !
       real(C_DOUBLE),dimension(npq0,3) :: ffr
@@ -1040,7 +1040,7 @@
       parameter     (npio=ns0+np0+nq0)
       real(C_float),dimension(npio) :: x4,y4,z4,ch4,am4,ag4
 !
-      real(C_float)  t,teql,xp_leng,Rgy0,Rgy1,Rgy2,Rgy3
+      real(C_float)  t,xp_leng,Rgy0,Rgy1,Rgy2,Rgy3
       character(len=8) label,date_now*10
       common/HEADR1/ label,date_now
       common/HEADR2/ t,xp_leng
@@ -1058,7 +1058,7 @@
       integer*8      ix,iy,iz,ll,mm,nn,l,m,n
       integer(C_INT) i,j,k,kk,jj,ibox,neigh,it,is,iwa,iwb,iwc,iwd,    &
                     iwrt1,iwrt2,iwrt3,iwrta,iwrtb,iwrtc,   &
-                    iwrtd,nskip,nsk,ncoe,wrt2,istop1,istop2,     &
+                    nskip,nsk,ncoe,wrt2,istop1,istop2,     &
                     istop7,istop8
       common/parm1/ it,is
       common/imemo/ iwa,iwb,iwc,iwd
@@ -1069,9 +1069,7 @@
                     a_unit,m_unit,e_unit,t_unit,c1,c2,Wrest,     &
                     r2,rcut2,                                    &
                     E_C_s,E_C_PME,E_C_r,E_LJ,E_elas,             &
-                    E_C_r1,E_C_r2,E_LJ2,                         &
-                    vxav,vyav,vzav,rr1,rr0,ph0,ranff
-      real(C_DOUBLE) cpu0,cpu1,walltm0,walltm1
+                    E_C_r1,E_C_r2,E_LJ2,rr1,rr0,ph0,ranff
       common/parm2/ pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax
       common/physc/ a_unit,m_unit,e_unit,t_unit,c1,c2,Wrest
       common/ENERGY/ E_C_s,E_C_PME,E_C_r,E_LJ,E_elas
@@ -1079,8 +1077,7 @@
       real(C_float) phi,tht,dtwr,dtwr2,dtwr3,cptot,          &
                     fchar4,fcharA4,Temp4,rgmax,              & 
                     xmax4,ymax4,zmax4,dx,dy,dz,              &
-                    vm,s0,s1,s2,rcore,rr,r1,ani,ane,         &
-                    vmax2,dgaus2
+                    s0,s1,s2,rcore,rr,r1,ani,ane
       real(C_DOUBLE) dcpu
       common/parm4/ phi,tht,dtwr,dtwr2,dtwr3,rgmax
       common/parm9/ cptot
@@ -1088,7 +1085,9 @@
       real(C_DOUBLE) Temp,epsCLJ,epsLJ,m_gamma,Pot0,W_1p,Nele0,   &
                      R_sp,D_sp,N_sp,Lambda_D,massi,               &
                      ch_ion,wt_ion,rd_CP,rd_HP,ch_el,wt_el,rd_el, &
-                     R_cn1,R_cn2,Z_cn,Z_cn1,Z_cn2,rcut_Clf,rcutlj
+                     rcut_Clf,rcutlj
+!                    R_cn1,R_cn2,rcut_Clf,rcutlj
+!                    R_cn1,R_cn2,Z_cn,Z_cn1,Z_cn2,rcut_Clf,rcutlj
       common/ELSTA/  Temp,epsCLJ,epsLJ
       common/energ0/ W_1p,Nele0
       common/ionsiz/ R_sp,D_sp,N_sp,massi,Lambda_D,              &
@@ -1111,15 +1110,15 @@
       integer(C_INT),dimension(nbxs,n00) :: lipl0
       common/srflst0/ cr_table,itab,nipl0,lipl0
 !
-      real(C_DOUBLE) intens,lambda,E0,ak,ct,omega,Eta,Bta,tp,taup,  &
+      real(C_DOUBLE) intens,lambda,E0,ak,ct,omega,Eta,tp,taup,  &
                      ff,p_xyz,yg0,yg02,xz0,xz02
       common/electr/ intens,lambda
       common/swaves/ E0,ak,ct,omega
 !
 !+++++
-      integer(C_INT) ifeh,item3ab,item3,npar3,ierror,wrt7
+      integer(C_INT) item3ab,item3,ierror
       real(C_DOUBLE) Lx3,Ly3,Lz3,hx2,hy2,hz2,hx,hy,hz,p4dt,dV,cdt,  &
-                     xx0,yy0,zz0,xx,yy,zz,prho,fnml,akx,aky,akz
+                     xx,yy,zz,prho,fnml,akx,aky,akz
       common/itre/ item3ab,item3
       common/hx2l/ Lx3,Ly3,Lz3,hx2,hy2,hz2,hx,hy,hz,p4dt,dV,cdt
 !
@@ -1136,12 +1135,12 @@
 !
 !     integer(C_INT) mxyza  ! <- parameter
       real(C_DOUBLE) etxi,etyi,etzi,btxi,btyi,btzi,              &
-                     dd(3),ta(3),r,rscCL,rCL,ccj,pp1,pp2,pp3,    &
+                     r,pp1,pp2,pp3,    &
                      chvx,chvy,chvz,unifem1(4),unifem2(4)
 !
       real(C_float)  setx,setz,sbtx,sbtz,psi2,delV
       real(C_DOUBLE) wall1,wall2,wall3,wall4,wall5,wall6,wall7,  &
-                     wall8,wall9
+                     wall8
 !+++++
       logical ::  first11=.true.,first06=.true.,     &
                   first_es=.true.,read_10=.true.,    &
@@ -2087,12 +2086,15 @@
 !  Momentum: p(n+1)= p(n)+ffr(n+1/2) and etx(n+1/2), btx(n+1/2), but v(n) ??
 !  *fields:  statV/cm
 !
-      ppp(i,1)= ppp(i,1) +dt*(ffr(i,1)                                 &
-                         +ch(i)*(etxi +(vvv(i,2)*btzi-vvv(i,3)*btyi)/c1))
-      ppp(i,2)= ppp(i,2) +dt*(ffr(i,2)                                 &
-                         +ch(i)*(etyi +(vvv(i,3)*btxi-vvv(i,1)*btzi)/c1))
-      ppp(i,3)= ppp(i,3) +dt*(ffr(i,3)                                 &
-                         +ch(i)*(etzi +(vvv(i,1)*btyi-vvv(i,2)*btxi)/c1))
+      ppp(i,1)= ppp(i,1) &
+                    +dt*(ffr(i,1)                                      &
+                        +ch(i)*(etxi +(vvv(i,2)*btzi-vvv(i,3)*btyi)/c1))
+      ppp(i,2)= ppp(i,2) &
+                    +dt*(ffr(i,2)                                      &
+                        +ch(i)*(etyi +(vvv(i,3)*btxi-vvv(i,1)*btzi)/c1))
+      ppp(i,3)= ppp(i,3) &
+                    +dt*(ffr(i,3)                                      &
+                        +ch(i)*(etzi +(vvv(i,1)*btyi-vvv(i,2)*btxi)/c1))
 !
 !  Velocity vx(n+1) from px(n+1)
 !
@@ -2448,6 +2450,13 @@
                   'sbtx       sbtz       E_tot      elx        ',    &
                   'Rgyi       Rgye       Rgy_C     wall(min)')
         end if
+!
+!    do i= ns+np+1,nCLp   ! all electrons
+!    s2= s2 +(ppp(i,1)**2+ppp(i,2)**2+ppp(i,3)**2)/(2.d0*am(i))
+!    end do
+!    s0= s0/ns
+!    s1= s1/np
+!    s2= s2/(nCLp-(ns+np))
 !
         write(11,710) time(is),ekin(is),ekn1(is),ekn2(is),ecr(is), &
                       elj(is),sex(is),sez(is),sbx(is),sbz(is),     &
@@ -2867,7 +2876,7 @@
                      rsi,snt,rcl,rsccl,rsclj,preflj,          &
                      rcut,rcut2,unif1(3),unif2(3)
 !-----------
-      integer(C_INT) it,is,wrt2
+      integer(C_INT) it,is
       common/parm1/ it,is
 !
       logical :: first=.true.,if_pc,ionode
@@ -3423,7 +3432,7 @@
 !+++++
       real(C_DOUBLE),dimension(mx,my,0:mza+1) :: &
                                srx,sry,srz,ssx,ssy,ssz
-      real(C_DOUBLE),dimension(mx,my,3) :: senv,recv
+!     real(C_DOUBLE),dimension(mx,my,3) :: senv,recv
       real(C_DOUBLE)  del,c0,c1,c2,c3,tot
 !
       integer(C_INT) ipar,rank,nw,l,m,n,kk,reg_top,reg_bot, &
@@ -3861,8 +3870,7 @@
       real(C_DOUBLE) intens,lambda
       common/electr/ intens,lambda
 !
-      integer(C_INT) ns,np,nCLp
-      INTEGER(C_INT) N_LP,v_G,N_SMol,v_SP,v_SM,Seed
+      integer(C_INT) np
 !
       real(C_DOUBLE) rcutlj,rcut_Clf,SKIN
       real(C_DOUBLE) Temp,epsCLJ,epsLJ
@@ -3887,37 +3895,37 @@
       OPEN (unit=07,file=praefixe//'_config.ENDE'//suffix2,  &
                                           form='formatted')
 !*********************************************************************
-      write(07,'(34H# Praefix-String................: ,a6)')praefixe
-      write(07,'(34H# Boundary condition.. 0 is open: ,i16)')ifrefl
-      write(07,'(34H# Maximum cpu time of run.......: ,f16.2)')cptot
-      write(07,'(34H# Physikalische Endzeit.........: ,d20.6)')tmax
-      write(07,'(34H# Diskretisierungs-Schritt......: ,d20.6)')dt
-      write(07,'(34H# Write out interval for IWRT1..: ,d20.6)')dtwr 
-      write(07,'(34H# Write out interval for IWRT2..: ,d20.6)')dtwr2
-      write(07,'(34H# Write out interval for IWRT3..: ,d20.6)')dtwr3
+      write(07,'("# Praefix-String................: ",a6)')praefixe
+      write(07,'("# Boundary condition.. 0 is open: ",i16)')ifrefl
+      write(07,'("# Maximum cpu time of run.......: ",f16.2)')cptot
+      write(07,'("# Physikalische Endzeit.........: ",d20.6)')tmax
+      write(07,'("# Diskretisierungs-Schritt......: ",d20.6)')dt
+      write(07,'("# Write out interval for IWRT1..: ",d20.6)')dtwr 
+      write(07,'("# Write out interval for IWRT2..: ",d20.6)')dtwr2
+      write(07,'("# Write out interval for IWRT3..: ",d20.6)')dtwr3
 !
-      write(07,'(34H# Number of ita..bs.............: ,i16)')itabs
-      write(07,'(34H# Number of np..................: ,i16)')np
+      write(07,'("# Number of ita..bs.............: ",i16)')itabs
+      write(07,'("# Number of np..................: ",i16)')np
 !
-      write(07,'(34H# carbon: charge state..........: ,f16.2)')fchar
-      write(07,'(34H# Gold:   charge state..........: ,f16.2)')fcharA
+      write(07,'("# carbon: charge state..........: ",f16.2)')fchar
+      write(07,'("# Gold:   charge state..........: ",f16.2)')fcharA
 !
-      write(07,'(34H# Number of nZ..................: ,i16)')nZ
-      write(07,'(34H# Number of nZA.................: ,i16)')nZA
-      write(07,'(34H# Mass ratio: proton/electron...: ,d20.6)')massi
+      write(07,'("# Number of nZ..................: ",i16)')nZ
+      write(07,'("# Number of nZA.................: ",i16)')nZA
+      write(07,'("# Mass ratio: proton/electron...: ",d20.6)')massi
 !
-      write(07,'(34H# Laser intensity W/cm^2........: ,d20.6)')intens
-      write(07,'(34H# Wavelength lambda 8.d-7 cm....: ,d20.6)')lambda
+      write(07,'("# Laser intensity W/cm^2........: ",d20.6)')intens
+      write(07,'("# Wavelength lambda 8.d-7 cm....: ",d20.6)')lambda
 !  
-      write(07,'(34H# Size of target (cm)...........: ,d20.6)')R_sp
-      write(07,'(34H# Density of target (cm^-3).....: ,d20.6)')D_sp
+      write(07,'("# Size of target (cm)...........: ",d20.6)')R_sp
+      write(07,'("# Density of target (cm^-3).....: ",d20.6)')D_sp
 !   --------------------
-      write(07,'(34H# Ortsraum-Cutoff (Ang).........: ,d20.6)')rcut_Clf
-      write(07,'(34H# LJ-Cutoff (Ang)...............: ,d20.6)')rcutlj
-      write(07,'(34H# epsLJ of C (eV)...............: ,d20.6)')epsCLJ
-      write(07,'(34H# epsLJ of others (eV)..........: ,d20.6)')epsLJ
-      write(07,'(34H# Electron temperature..........: ,d20.6)')Temp
-      write(07,'(34H# Size of rgmax.................: ,d20.6)')rgmax
+      write(07,'("# Ortsraum-Cutoff (Ang).........: ",d20.6)')rcut_Clf
+      write(07,'("# LJ-Cutoff (Ang)...............: ",d20.6)')rcutlj
+      write(07,'("# epsLJ of C (eV)...............: ",d20.6)')epsCLJ
+      write(07,'("# epsLJ of others (eV)..........: ",d20.6)')epsLJ
+      write(07,'("# Electron temperature..........: ",d20.6)')Temp
+      write(07,'("# Size of rgmax.................: ",d20.6)')rgmax
 !*********************************************************************
       close(07)
 !
