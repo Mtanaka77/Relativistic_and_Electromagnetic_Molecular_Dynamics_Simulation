@@ -1,5 +1,4 @@
 !  param_em3p8_Ca.h
-!    -> parameter  (kstart=0,kgrp=1)
 !
 !  restart: numbr2, numbr1 
 !  EM parallel: num_proc
@@ -19,22 +18,27 @@
 !                           e(-6) ns0/2 + e(-70/4) 4*ns0/2
       parameter  (ns0=110600,np0=10120,nq0=np0+5*ns0/2)
 !
-      parameter  (sname='Cntemp',cname='cntemp')   ! Cntemp,cntemp
+      parameter  (sname='Cntemp',cname='cntemp')      ! cntemp
       parameter  (kstart=0,kgrp=1)
-      parameter  (numbr2='Ca',numbr1='Ca',numbr0='C')
+!       parameter  (kstart=1,kgrp=1)
+      parameter  (numbr2='Ca',numbr1='Ca',numbr0='C') ! .Ca
 !
-!     parameter  (kstart=1,kgrp=1)  ! Restart
-!     parameter  (numbr2='Cb',numbr1='Ca',numbr0='C')
+      parameter  (iflinx=.true.,num_proc=12)   ! 600/12=50
+!       parameter  (iflinx=.false.,num_proc=96)  ! 768/96= 8 
 !
-!     parameter  (iflinx=.true.,num_proc=6)        ! 600/6=100
-      parameter  (iflinx=.false.,num_proc=96)      ! 768/96=8 <-- mza
-!
-      parameter  (isizeX=50,isizeY=50,isizeZ=192)  ! isizeX 10 Ang !
-      parameter  (mx=201,my=201,mz=768)            ! Grid: 2.5 Ang, mz=768
-      parameter  (Lenx3=500.d0,Leny3=500.d0,Lenz3=1920.d0)
-      parameter  (mza=8)                           ! mz=768, 96 ranks --> mza=8
+      parameter  (isizeX=50,isizeY=50,isizeZ=150)  ! isizeX 10 Ang !
+      parameter  (mx=201,my=201,mz=600)            ! Grid: 2.5 Ang, mz=600
+      parameter  (Lenx3=500.d0,Leny3=500.d0,Lenz3=1500.d0)
+      parameter  (mza=50)                          ! mz=600, 12 ranks 
       parameter  (mxyza=mx*my*mza)
-      parameter  (mxh=101,myh=101,mzh=384)
+      parameter  (mxh=101,myh=101,mzh=300)
+!
+!     parameter  (isizeX=50,isizeY=50,isizeZ=192)  ! isizeX 10 Ang !
+!     parameter  (Lenx3=500.d0,Leny3=500.d0,Lenz3=1920.d0)
+!     parameter  (mza=8)                           ! mz=768, 96 ranks
+!     parameter  (mx=201,my=201,mz=768)            ! Grid: 2.5 Ang, mz=768
+!     parameter  (mxyza=mx*my*mza)
+!     parameter  (mxh=101,myh=101,mzh=384)
 ! ----------------------------------------------------------
       parameter  (lxy3= 3*mx*my)
       parameter  (sconv=1.0d-8)
@@ -47,17 +51,20 @@
 !
 ! zero at ymin3< 0 <ymax3
 !  E*B direction is -y
-      parameter  (xmax3= (100/200.d0)*sconv*Lenx3, & ! EM field 200*768 meshes
+      parameter  (xmax3= (100/200.d0)*sconv*Lenx3, & ! EM field 200*400 meshes
                   xmin3=-(100/200.d0)*sconv*Lenx3, & ! 
                   ymax3= (100/200.d0)*sconv*Leny3, & !  E*H field
                   ymin3=-(100/200.d0)*sconv*Leny3, & ! 
-                  zmax3= (384/768.d0)*sconv*Lenz3, & !  axial direction 
-                  zmin3=-(384/768.d0)*sconv*Lenz3)   ! 
+                  zmax3= (300/600.d0)*sconv*Lenz3, & !  axial direction 
+                  zmin3=-(300/600.d0)*sconv*Lenz3)   ! 
+!                   zmax3= (384/768.d0)*sconv*Lenz3, & !  axial direction 
+!                   zmin3=-(384/768.d0)*sconv*Lenz3)   ! 
 !
       character  praefixs*33,praefixc*24,praefixe*24,    &
                  praefixi*24,suffix2*2,suffix1*2,suffix0*1
-!     character  praefixs*33,praefixc*32,praefixe*32,    & ! /lv01/mtanaka
-!                praefixi*32,suffix2*2,suffix1*2,suffix0*1 ! on Linux
+!       character  praefixs*33,praefixc*32,praefixe*32,    &
+!                  praefixi*32,suffix2*2,suffix1*2,suffix0*1
       common/filname/ praefixs,praefixc,praefixe,        &
-                 suffix2,suffix1,suffix0
+                      suffix2,suffix1,suffix0
       common/filnam2/ praefixi
+!
