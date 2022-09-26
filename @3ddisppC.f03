@@ -3,7 +3,7 @@
 !*  on the screen. They are quite useful when the simulation  *
 !*  results are analyzed and to write papers.                 *
 !*                                                            * 
-!*  M. Tanaka, Computer Physics Commun, vol.241, 56 (2019).   *
+!*  M. Tanaka, Computer Physics Commun., vol.241, 56 (2019).  *
 !*  Dr. Motohiko Tanaka, Ph.D., Chubu University, Japan.      * 
 !*                                           Jan. 9, 2016     * 
 !**************************************************************
@@ -34,7 +34,6 @@
       common/headr3/ cnam1,commt
       namelist/inp1/ tmin,tmax
 !
-!  pgf95 @3ddisppA.f03
       label= 'cnt-em3p'
       cnam1= cname//'.'//numbr1
       call date_and_time_7 (date_now,ctime)
@@ -47,10 +46,8 @@
       knum1= 1  ! it is 1 every time
 !
 !*  pgf95 @3ddisppC.f03 
-!  cntemp.12Ca
-!  /lv01/mtanaka/MPI_cnt
       praefixs='/lv01/mtanaka/MPI_cnt'
-      knum_num= 7  ! 1
+      knum_num= 7  ! 1 for testing
 !
       knum(1)= 'a'
       knum(2)= 'b'
@@ -86,7 +83,6 @@
       write(6,*) 'ns, np, nq=',ns,np,nq
       write(6,*) 'nz, nza=',nz,nza
 !
-!*  pgf95 @3ddisppA.f03
   100 read(13,end=700) t,x4,y4,z4
       write(6,*) 'it, time (sec)=',it,t
 !
@@ -104,7 +100,6 @@
       end if
       go to 100
 !
-!*  pgf95 @3ddisppA.f03
   700 knum1= knum1 +1
       if(knum1.gt.knum_num) go to 800
 !
@@ -120,7 +115,7 @@
 !
       close (77)
       write(6,*) 'write: ',cname//'.77'//numbr1//'sa.ps'
-      write(6,*) 'pgf95 @3ddisppA.f03 (small endian)'
+      write(6,*) 'pgf95 @3ddisppC.f03 (small endian)'
 !
       stop
       end

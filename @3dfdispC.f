@@ -1,14 +1,19 @@
-c**************************************************************
-c*                                           Jan. 9, 2016     * 
-c  pgf95 -byteswapio @3dfdispC.f                              *
-c**************************************************************
+!**************************************************************
+!*  Post processing by Llinux: pgf95 @3dfdispC.f and plots    *
+!*  on the screen. They are quite useful when the simulation  *
+!*  results are analyzed and to write papers.                 *
+!*                                                            * 
+!*  M. Tanaka, Computer Physics Commun., vol.241, 56 (2019).  *
+!*  Dr. Motohiko Tanaka, Ph.D., Chubu University, Japan.      * 
+!*                                           Jan. 9, 2016     * 
+!**************************************************************
+!
       implicit none
 c
       integer*4   ns0,np0,nq0,npq0,knum_num
       character   sname*6,cname*6,numbr1*1,fig_label*32
 c 
       parameter  (ns0=110600,np0=10120,nq0=np0+5*ns0/2,  ! 'a,t' series
-c     parameter  (ns0=550296,np0=10120,nq0=np0+1*ns0,    ! 'n' series
      *            npq0=ns0+np0+nq0)
       real*8      xg(npq0),yg(npq0),zg(npq0),vx(npq0),vy(npq0),vz(npq0),
      *            am(npq0),ch(npq0),ag(npq0),massi,fchar,fcharA,
@@ -17,18 +22,6 @@ c     parameter  (ns0=550296,np0=10120,nq0=np0+1*ns0,    ! 'n' series
       real*8      xyz(npq0,3),ppp(npq0,3),vvv(npq0,3),m_gamma
       character   sg*1(npq0)
 c
-c     parameter  (sname='Cntems',cname='cntems',numbr1='1')
-C     parameter  (sname='Cntems',cname='cntems',numbr1='2')
-c     parameter  (sname='Cntems',cname='cntems',numbr1='3')
-c     parameter  (sname='Cntems',cname='cntems',numbr1='4')
-c     parameter  (sname='Cntemn',cname='cntemn',numbr1='1')
-c     parameter  (sname='Cntemt',cname='cntemt',numbr1='1')
-c     parameter  (sname='Cntemt',cname='cntemt',numbr1='2')
-c     parameter  (sname='Cntemt',cname='cntemt',numbr1='3')
-c     parameter  (sname='Cntemt',cname='cntemt',numbr1='4')
-c     parameter  (sname='Cntemu',cname='cntemu',numbr1='4')
-c     parameter  (sname='Cntemg',cname='cntemg',numbr1='3')
-c     parameter  (sname='Cntemq',cname='cntemq',numbr1='3')
       parameter  (sname='Cntemp',cname='cntemp',numbr1='C')
 c
       character     praefixs*27,suffix*3,knum(20)*1
@@ -53,8 +46,6 @@ c
       write(6,*) 'Type &inp1 tmax, itskp...'
 c     read(5,inp1)
 c--------------------------------------------------
-c     praefixs='/home2/mtanaka/cnt3/'
-c     praefixs='/home2/mtanaka/cntem3/'
       praefixs='/lv01/mtanaka/cntem3_para3/'
 c               1        01        01
       write(6,*) ' Type cname(6) and numbr1(1)...'
@@ -79,28 +70,16 @@ c
       OPEN (unit=77,file=cname//'.77'//numbr1//'fb.ps',
      *                    status='unknown')
 c
-      nframe= 1 ! 4
+      nframe= 1 ! or 4 by page but small !
       call gopen (nframe)
 c
       it= 0
       is= 0
 c
-c  pgf95 -byteswapio @3dfdisq3.f                             *
-c      knum_num= 10 +1  ! s1
-c      knum_num= 1 +1  ! six to plots
-c      knum_num= 3 +1  ! six to plots
-c      knum_num= 2 +1  ! six to plots
-c      knum_num= 10 +1  ! t1
-c      knum_num= 7 +1  ! t2
-c      knum_num= 5 +1  ! t3
-c      knum_num= 7 +1  ! t4
-!      knum_num= 8 +1  ! u4 large
-c      knum_num= 11 +1  ! q3 large
-       knum_num= 7 +1  ! C large
-        itskp= 5 ! 2 ! 1 ! 2 
+      knum_num= 7 +1  ! C large
+      itskp= 5 ! 2 ! 1  
  
-c      tmin=  29.7d-15 ! cntema.7 10^24W/cm2
-       tmin=  0.0d-15 ! cntema.7 10^24W/cm2
+       tmin=   0.0d-15 
        tmax=  30.3d-15 ! cntema.7 10^24W/cm2
 c
       tiwrt1= 0.d0
@@ -133,10 +112,8 @@ c
       c1= 2.9979d+10
       c2= 2.9979d+10**2
 c
-c  pgf95 -byteswapio @3dfdisq3.f                             *
 c     sec, cm, cm/sec
   100 read(23,end=700) t,xyz,vvv
-c 100 read(23,end=700) t,xg,yg,zg,vx,vy,vz
       write(6,*) 'time=',t
 c
       it= it +1
@@ -171,7 +148,6 @@ c
         call pplot2 (xg,yg,zg,vx,vy,vz,am,ch,ag,fchar,fcharA,
      *               nZ,nZA,npq0,ns,np,nq,nCLp,is)
 c
-c  pgf95 -byteswapio @3dfdisq3.f                             *
         write(6,*) 't,it=',t,it
         write(6,400) (i,xg(i),yg(i),zg(i),vx(i),vy(i),vz(i),   
      *                ssg(i),sg(i),
@@ -188,7 +164,6 @@ c
 c
   700 knum1= knum1 +1
       if(knum1.eq.knum_num) go to 800
-c     if(knum1.eq.4) go to 800
 c
       write(6,*) 'Read: ',cname//'.23'//numbr1
       OPEN (unit=23,file=cname//'.23'//numbr1//knum(knum1), ! 'a'
