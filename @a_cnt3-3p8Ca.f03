@@ -998,8 +998,8 @@
 !
       include 'param_em3p8_Ca.h'
       include 'mpif.h'
-      include 'fftw3.f03'     ! more general
-!     include 'aslfftw3.f03'  ! for NEC
+      include 'fftw3.f03'     ! more general case
+!     include 'aslfftw3.f03'  ! for NEC only
 
       type(C_PTR),save :: plan,pinv,pla1,pla2,pla3,pin1,pin2,pin3 
       real(C_DOUBLE)  walltime0,walltime1
@@ -2481,10 +2481,14 @@
         ifskip_p= .false.
 !       ifskip_p= .true.
 !   ppl3 -- bug ??
+!  3D position xyz( ,3)
+!
         call ppl3da (xyz,ch,ag,Rgyi(is),Rgye(is),ns,np,nq,  &
                      nCLp,igrp,ifskip_e,ifskip_p)
         call ppl3dz (xyz,ch,ag,Rgyi(is),Rgye(is),ns,np,nq,  &
                      nCLp,igrp)
+!
+!  From momentum ppp( ,3) -> to velocity vvv( ,3)
 !
         do i= 1,npq0
         m_gamma= sqrt(am(i)**2 +(ppp(i,1)**2+ppp(i,2)**2+ppp(i,3)**2)/c2)
