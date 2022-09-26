@@ -1,7 +1,11 @@
 !**************************************************************
-!*  plot: at linux, pgf90 -byteswapio @edist.f                *
-!*                                           jan. 9, 2016     * 
-!*  pgf95 @3ddisppC.f03
+!*  Post processing by Llinux: pgf95 @3ddisppC.f03 and plots  *
+!*  on the screen. They are quite useful when the simulation  *
+!*  results are analyzed and to write papers.                 *
+!*                                                            * 
+!*  M. Tanaka, Computer Physics Commun, vol.241, 56 (2019).   *
+!*  Dr. Motohiko Tanaka, Ph.D., Chubu University, Japan.      * 
+!*                                           Jan. 9, 2016     * 
 !**************************************************************
       implicit none
 !
