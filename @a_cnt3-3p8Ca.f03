@@ -5,7 +5,7 @@
 !                                                Dec.24, 2016         !
 !  # Fortran 2003 version (real(C_DOUBLE))       Nov. 3, 2020         !
 !                                                                     !
-!  Files                                                              !
+!  Files of this simulation:                                          !
 !  1. @cnt3-3p8Ca.f03:  Molecular dynamics simulation code            !
 !  2. param_em3p8_Ca.h: Common parameters of this simulation          !
 !  3. Cntemp_config.STARTC: Configure parameters                      !
@@ -66,10 +66,8 @@
 !       end of label 1000
 !
 !  C) Many subroutines including /edges/, /sendrecv1,2/, /filt3/...
+!  D) Post processing programs for graphic output
 !
-!    L.1026  write() it,dcpu   <- comment out
-!    cntemp...1: cpu time  1.  <- 243.0
-!    Exec time= 1 min          <- run7.sh: =240m
 !*-------------------------------------------------------------------*
 ! Fortran 2003 version
 !
