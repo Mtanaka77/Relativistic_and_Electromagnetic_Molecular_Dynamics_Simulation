@@ -1,4 +1,4 @@
-Relativistic and Electromagnetic Molecular Dynamics Simulations
+Relativistic and Electromagnetic Molecular Dynamics Simulation for Nano-Scale Phenomena
 
 A molecular dynamics simulation code has been created for relativistic and electromagnetic fields in three dimensions, and is used such as nanoscale particle phenomena. Maxwell equations are solved, and the momentum equations of relativistic particles are then advanced in time. But, it is noted that the Gauss's equation must be corrected as finite errors accumulate in the divergence term. This is true if a discrete coordinate scheme in any method is utilized.
 
