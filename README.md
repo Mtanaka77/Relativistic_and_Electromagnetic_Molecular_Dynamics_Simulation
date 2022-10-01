@@ -8,8 +8,8 @@ Four physical CGS units are used in this code: a_unit= 1.00d-08 cm, t_unit= 1.00
 A simulation of the nanotube accelerator is set up by putting pellets of H, C and Au atoms and associated electrons at null velocity. 
 Electromagnetic monochromatic waves at the wavelength 800 nm are travelling from the negative direction toward the origin and then go out to the positive direction. The pellets at the origin are irradiated by these waves and are ejected to ion perpenducular and electron parallel directions toward an open space. The final energies for laser intensity 10^22 W/cm^2 are around 30-40 MeV in 20-40 fs, which is shown by animation movies at my homepage. 
 
-To analize simulation results, some programs are provided here as post processing. They are @3dfdisp.f and
-@3ddisp.f03, as examples, for which the velocity distributions in parallel and perperdicular directions
+To analyze simulation results, some programs are provided here as post processing. They are @3dfdisp.f and
+@3ddisp.f03, as examples, for which the velocity distributions in parallel and perpendicular directions
 are plotted in time and the time sequential plots of ions and electrons. 
 They are discussed in the latter half of the CPC paper in 2019 (Ref. 1 below).
 
