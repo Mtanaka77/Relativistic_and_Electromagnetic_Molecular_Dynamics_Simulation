@@ -1,0 +1,20 @@
+"name": "@{Mtanaka77}/{molecular_dynamics}”, 
+"version": "0.0.1",
+ "description": "GitHub Package for dynamics",
+ "main": "dist/main.js",
+ "types": "dist/main.d.ts",
+ "publishConfig": {
+   "access": "restricted",　　
+   "registry": "https://npm.pkg.github.com/"
+ },
+ "repository": {
+   "type": "git",
+   "url": "git://github.com/{Mtanaka77}/{molecular_dynamics}.git"
+ },
+ "author": "{Motohiko Tanaka, Nagoya, Japan}",
+ "license": "UNLICENSED",
+ "devDependencies": {
+   "typescript": "^4.2.3"
+ }
+}
+
