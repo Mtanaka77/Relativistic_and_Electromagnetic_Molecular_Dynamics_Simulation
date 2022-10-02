@@ -1,7 +1,7 @@
 { 
  "name": "@{Mtanaka77}/{molecular_dynamics}",
  "version": "0.0.1",
- "description": "GitHub Package for dynamics",
+ "description": "GitHub Package for molecular_dynamics",
  "main": "dist/main.js",
  "types": "dist/main.d.ts",
  "publishConfig": {
