@@ -1,4 +1,5 @@
- "name": "{Mtanaka77}/{molecular_dynamics}”,
+{ 
+ "name": "@{Mtanaka77}/{molecular_dynamics}”,
  "version": "0.0.1",
  "description": "GitHub Package for dynamics",
  "main": "dist/main.js",
