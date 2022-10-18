@@ -1,10 +1,14 @@
 !**************************************************************
-!*  Post processing by Llinux: pgf95 @3ddisppC.f03 and plots  *
-!*  on the screen. They are quite useful when the simulation  *
-!*  results are analyzed and to write papers.                 *
+!*  Post processing by Linux: pgf95 @3ddisppC.f03             *
+!*    call rdistr (x4,y4,z4,...) makes scatter plots of       *
+!*    H,C,Au and electrons at sequential times.               * 
+!*                                                            * 
+!*  Make ps to pdf conversin, and do plots on the PC screen.  *
+!*  They are quite useful when the simulation results are     *
+!*  analyzed which is written in papers.                      *
 !*                                                            * 
 !*  M. Tanaka, Computer Physics Commun., vol.241, 56 (2019).  *
-!*  Dr. Motohiko Tanaka, Ph.D., Chubu University, Japan.      * 
+!*  Dr. Motohiko Tanaka, Professor, Chubu University, Japan.  * 
 !*                                           Jan. 9, 2016     * 
 !**************************************************************
       implicit none
@@ -47,7 +51,7 @@
 !
 !*  pgf95 @3ddisppC.f03 
       praefixs='/lv01/mtanaka/MPI_cnt'
-      knum_num= 7  ! 1 for testing
+      knum_num= 9  ! 1 for testing
 !
       knum(1)= 'a'
       knum(2)= 'b'
@@ -59,11 +63,11 @@
       knum(8)= 'h'
       knum(9)= 'i'
 !
-      write(6,*) 'read: ',cname//'.13'//numbr1//'a'
+      write(06,*) 'read: ',cname//'.13'//numbr1//'a'
       open (unit=13,file=cname//'.13'//numbr1//'a', & ! 'a'
             status='old',form='unformatted') 
 !
-      write(6,*) 'write: ',cname//'.77'//numbr1//'sa.ps'
+      write(06,*) 'write: ',cname//'.77'//numbr1//'sa.ps'
       open (unit=77,file=cname//'.77'//numbr1//'sa.ps')
       nframe= 1
       call gopen (nframe)
@@ -114,8 +118,9 @@
       call plote
 !
       close (77)
-      write(6,*) 'write: ',cname//'.77'//numbr1//'sa.ps'
-      write(6,*) 'pgf95 @3ddisppC.f03 (small endian)'
+      write(06,*) 'write: ',cname//'.77'//numbr1//'sa.ps'
+      write(06,*) '  Convert sa.ps to sa.pdf, and make plots'
+      write(06,*) 'pgf95 @3ddisppC.f03 (small endian)'
 !
       stop
       end
