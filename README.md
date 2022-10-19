@@ -11,6 +11,7 @@ Electromagnetic monochromatic waves at the wavelength 800 nm are travelling from
 To analyze simulation results, some programs are provided here as post processing. They are @3dfdisp.f and
 @3ddisp.f03, as examples, for which the velocity distributions in parallel and perpendicular directions
 are plotted in time and the time sequential plots of ions and electrons. 
+@3fdispC.f03 is time sequential plots of H, C, Au and electrons in side and top views.
 They are discussed in the latter half of the CPC paper in 2019 (Ref. 1 below).
 
 The parallel simulation code is designed for now the one-dimensional case (the z-direction) where the long axis of pellets is open to eject heavy ions in that derection. 
