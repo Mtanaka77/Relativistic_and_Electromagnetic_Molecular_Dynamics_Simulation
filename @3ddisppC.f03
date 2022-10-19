@@ -1,9 +1,10 @@
 !**************************************************************
 !*  Post processing by Linux: pgf95 @3ddisppC.f03             *
-!*    call rdistr (x4,y4,z4,...) makes scatter plots of       *
-!*    H,C,Au and electrons at sequential times.               * 
 !*                                                            * 
-!*  Make ps to pdf conversin, and do plots on the PC screen.  *
+!*    call rdistr (x4,y4,z4,...) makes scatter plots of       *
+!*    H,C,Au and electrons at sequential time interval.       * 
+!*                                                            * 
+!*   Make the ps to pdf conversin, and plot on a PC screen.   *
 !*  They are quite useful when the simulation results are     *
 !*  analyzed which is written in papers.                      *
 !*                                                            * 
@@ -11,33 +12,37 @@
 !*  Dr. Motohiko Tanaka, Professor, Chubu University, Japan.  * 
 !*                                           Jan. 9, 2016     * 
 !**************************************************************
+!
       implicit none
 !
       integer*4   ns0,np0,nq0,npq0
       character   sname*6,cname*6,numbr1*1,fig_label*32
 !
+!  the specific run of sname, cname and the number like a,A,1,.....
       parameter  (sname='cntemp',cname='cntemp',numbr1='C')
-      parameter  (ns0=110600,np0=10120,nq0=np0+5*ns0/2, & ! 'A' series
+!  the number of particles C+Au, that of H, and that of electrons,
+      parameter  (ns0=110600,np0=10120,nq0=np0+5*ns0/2, & ! 'C' series
                   npq0=ns0+np0+nq0)
-!
-      real*4        x4(npq0),y4(npq0),z4(npq0),             &
-                    ch4(npq0),am4(npq0),ag4(npq0),          &
-                    fchar4,fchara4,temp4,xmax4,ymax4,zmax4
+!  position x,y,z (real*4), charge, mass and size
+      real*4      x4(npq0),y4(npq0),z4(npq0),             &
+                  ch4(npq0),am4(npq0),ag4(npq0),          &
+                  fchar4,fchara4,temp4,xmax4,ymax4,zmax4
 !
       real*8         lx,ly,lz,xmin,ymin,zmin,a_unit
       common/xyzmin/ lx,ly,lz,xmin,ymin,zmin
 !
-      character     praefixs*21,suffix*3,knum*1(30)
-      integer*4     knum1,knum_num
+      character   praefixs*21,suffix*3,knum*1(30)
+      integer*4   knum1,knum_num
 !
-      real*4        t,tmin,tmax,axis,time,xp_leng,hh
-      integer*4     ns,np,nq,nclp,it,is,nz,nza,nframe
+      real*4      t,tmin,tmax,axis,time,xp_leng,hh
+      integer*4   ns,np,nq,nclp,it,is,nz,nza,nframe
       character*8    label,date_now*10,cnam1*8,commt*10,cdate*10,ctime*8
       common/headr1/ label,date_now
       common/headr2/ time,xp_leng
       common/headr3/ cnam1,commt
       namelist/inp1/ tmin,tmax
 !
+!*  pgf95 @3ddisppC.f03 
       label= 'cnt-em3p'
       cnam1= cname//'.'//numbr1
       call date_and_time_7 (date_now,ctime)
@@ -47,11 +52,10 @@
 !
       tmin=   0.0d-15
       tmax=  60.1d-15
-      knum1= 1  ! it is 1 every time
+      knum1= 1  ! it starts at 1 every time
 !
-!*  pgf95 @3ddisppC.f03 
       praefixs='/lv01/mtanaka/MPI_cnt'
-      knum_num= 9  ! 1 for testing
+      knum_num= 9  ! the number of sequential runs
 !
       knum(1)= 'a'
       knum(2)= 'b'
@@ -63,10 +67,12 @@
       knum(8)= 'h'
       knum(9)= 'i'
 !
+!  the input in FT 13 files followed by numbr1 and a
       write(06,*) 'read: ',cname//'.13'//numbr1//'a'
       open (unit=13,file=cname//'.13'//numbr1//'a', & ! 'a'
             status='old',form='unformatted') 
 !
+!  the output of the run, this time cname.77 followed by sa.ps
       write(06,*) 'write: ',cname//'.77'//numbr1//'sa.ps'
       open (unit=77,file=cname//'.77'//numbr1//'sa.ps')
       nframe= 1
@@ -80,6 +86,7 @@
     1 continue
       read(13) ns,np,nq,fchar4,fchara4,temp4,xmax4,ymax4,zmax4
       read(13) ch4,am4,ag4
+!
       nclp= ns +np +nq
       nz=  1
       nza= 4
@@ -88,27 +95,29 @@
       write(6,*) 'nz, nza=',nz,nza
 !
   100 read(13,end=700) t,x4,y4,z4
-      write(6,*) 'it, time (sec)=',it,t
+      write(06,*) 'it, time (sec)=',it,t
 !
       if(t.lt.tmin) go to 100
       if(t.gt.tmax) go to 700
 !
       it= it +1
 !
-      if(mod(it,50).eq.1) then
+!  the plot in every 50 steps - this can be changed
+      if(mod(it,50).eq.1) then  
         is= is +1
         time= t
-        write(6,*) 'it,is,t (sec)=',it,is,t
+        write(06,*) 'it,is,t (sec)=',it,is,t
 !
         call rdistr (x4,y4,z4,ag4,t,nz,nza,ns,np,nclp)
       end if
       go to 100
 !
+!  for knum1 > knum_num, then goto 800, otherwise goto 1
   700 knum1= knum1 +1
       if(knum1.gt.knum_num) go to 800
 !
-      write(6,*) 'knum1=',knum1
-      write(6,*) 'read: ',cname//'.13'//numbr1//knum(knum1)
+      write(06,*) 'knum1=',knum1
+      write(06,*) 'read: ',cname//'.13'//numbr1//knum(knum1)
 !
       open (unit=13,file=cname//'.13'//numbr1//knum(knum1), &!
             status='old',form='unformatted') 
@@ -120,19 +129,19 @@
       close (77)
       write(06,*) 'write: ',cname//'.77'//numbr1//'sa.ps'
       write(06,*) '  Convert sa.ps to sa.pdf, and make plots'
-      write(06,*) 'pgf95 @3ddisppC.f03 (small endian)'
+      write(06,*) '  pgf95 @3ddisppC.f03 (small endian)'
 !
       stop
       end
 !
 !
+!  Radial distributions at sequential times
 !-------------------------------------------------------------
       subroutine rdistr (x,y,z,ag,t,nz,nza,ns,np,nclp)
 !-------------------------------------------------------------
       implicit none
 !
-      integer*4  npq0,nz,nza,ns,np,nclp,i,              &
-                 npt1,npt2,npt3,npt4
+      integer*4  npq0,nz,nza,ns,np,nclp,i,npt1,npt2,npt3,npt4
       real*4     x(npq0),y(npq0),z(npq0),ag(npq0),t,    &
                  r1,r2,y1,y2,z1,z2,zr,zm,xx,yy,zz,dd,   &
                  hal1,hal,ha2,val,va2,h0,hl,hl2,vd,vd2, &
@@ -149,7 +158,7 @@
       common/headr3/ cnam1,commt
 !
 !-------------------------
-!* radial distributions
+!* Radial distributions
 !-------------------------
 !
       hh= 0.80
@@ -223,13 +232,15 @@
 !
       ps= 0.5*13.*10 *1.d+4
 !
-!* kakudai
+!* Enlarged plots
       npt1= (ns/2)/1000
       npt2= (ns/2)/1000
       npt3= np/1000
       npt4= (nz+nza)*(ns/2)/1000
 !*
-      do 100 i= 1,ns/2
+!* Side view of H, C and Au
+! C atoms
+      do 100 i= 1,ns/2  
       if(mod(i,npt1).ne.1) goto 100
 !
       dd= 7*ps*ag(i) ! 0.08      !  r  g  b
@@ -250,7 +261,8 @@
       call circle (hl+xx-0.12,yy-0.12 +vd,dd,2)
   100 continue
 !*     
-      do 200 i= ns/2+1,ns
+! Au atoms
+      do 200 i= ns/2+1,ns  
       if(mod(i-ns/2,npt2).ne.1) goto 200
 !
       dd= 7*ps*ag(i) ! 0.08      !  r  g  b
@@ -271,6 +283,7 @@
       call circle (hl+xx-0.12,yy-0.12 +vd,dd,2)
   200 continue
 !*
+! H atoms
       do 300 i= ns+1,ns+np
       if(mod(i-ns,npt3).ne.1) goto 300
 !
@@ -292,6 +305,7 @@
       call circle (hl+xx-0.12,yy-0.12 +vd,dd,2)
   300 continue
 !*
+! electrons (1)
       do 400 i= ns+np+1,ns+2*np
       if(mod(i-(ns+np),npt3).ne.1) goto 400
 !
@@ -313,6 +327,7 @@
       call circle (hl+xx-0.12,yy-0.12 +vd,dd,2)
   400 continue
 !*      
+! electrons (2)
       do 500 i= ns+2*np+1,nclp
       if(mod(i-(ns+np),npt4).ne.1) goto 500
 !
@@ -337,8 +352,9 @@
 !* zentai
 !     all goto lines must be local 
 !
-!*  pgf95 -byteswapio @3ddisppA.f                               *
 !**************************************************************
+!* Top view of H, C and Au
+!
       hal= 3.5 ! hiraku 2.5 ! 1.5 ! 0.5 ! small1 1.5 ! large4 0.5 
       hl2= 18. ! 22. ! migi-limit  17. ! 25.
       vd=   5.0  ! ue  5.  ! 4. ! 0. ! topward
@@ -354,6 +370,7 @@
       y20= 2.66667e-4
       if(y2.lt.y20) y2= y20
 !                         +++++
+! C atoms
       do 600 i= 1,ns/2
       if(mod(i,npt1).ne.1) goto 600
       yy= hal*y(i)/y2   ! (-hal,hal) +hal
@@ -367,6 +384,7 @@
       call circle (hl2+yy-0.11,zz-0.01 +vd,dd,2)
   600 continue
 !*
+! Au atoms
       do 620 i= ns/2+1,ns
       if(mod(i-ns/2,npt2).ne.1) goto 620
       yy= hal*y(i)/y2   ! (-hal,hal) +hal
@@ -380,7 +398,7 @@
       call circle (hl2+yy-0.11,zz-0.01 +vd,dd,2)
   620 continue
 !*
-!*
+!* y-z view of electrons
       xmx= 0
       ymx= 0
       zmx= 0
@@ -401,8 +419,7 @@
       call circle (hl2+yy-0.11,zz-0.01+vd,dd,2)
   700 end do
 !      
-!* special      
-!*  pgf95 -byteswapio @3ddisppA.f                               *
+!* y-x view of electrons
       do i= ns+np+1,nclp
       ymx= amax1(ymx,abs(y(i)))
       xmx= amax1(xmx,abs(x(i)))  ! cm
@@ -428,7 +445,7 @@
       call symbol (18.0,1.1,hh,'y2=',0.,3)
       call number (999.0,999.0,hh,y2,0.,9)
 
-!  sita
+!  bottom part
       call symbol (hl2+3.5,vd+2.0,hh,'yz ',0.,3)
       call newcolor (0,1.,0.,0.)
       call plot (hl2-hal,vd-0.1,3)
@@ -437,7 +454,7 @@
       call plot (hl2,vd+hal,2)
       call plot (hl2,vd+hal,3)
 !     
-!  ue     
+!  upper part     
       call symbol (hl2+3.5,vd2+2.0,hh,'yx ',0.,3)
       call newcolor (0,1.,0.,0.)
       call plot (hl2-hal,vd2-0.1,3)
