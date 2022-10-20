@@ -1,8 +1,9 @@
 !**************************************************************
-!*  Post processing by Linux: pgf95 @3dfdispc.f03             *
+!*  CGS system                                                *
+!*  Post processing by Linux: pgf95 @3dfv2c.f03               *
 !*                                                            * 
-!*    call pplot2 (xg,yg,zg,vx,vy,vz,...) makes sequential    *
-!*    plots of velocity distributions of h,c,au and electrons * 
+!*    call vdistr (xg,yg,zg,vx,vy,vz,...) makes sequential    *
+!*    velocity plots of particles of H,C,Au and electrons     *
 !*                                                            * 
 !*  Make the ps to pdf conversin, and plot on the PC screen.  *
 !*  They are quite useful when the simulation results are     *
@@ -13,8 +14,8 @@
 !*                                           Jan. 9, 2016     * 
 !**************************************************************
 !*-------------------------------------------------------------
-!*  Fortran 2003 handles such technique as continuity and 
-!*  lower cases, They are:
+!* Fortran 2003 handles such technique as continuity and 
+!* lower cases, They are:
 !*  :s%/^C/!/
 !*  :s%/^c/!/
 !*  tr 'A-Z' 'a-z' <@mrg3.f >@mrg37.f03
@@ -29,55 +30,45 @@
       integer*4   ns0,np0,nq0,npq0,knum_num
       character   sname*6,cname*6,numbr1*1,fig_label*32
 ! 
-!  The number C+Au atoms, and H atoms. Electrons are equal iin number
-!  to C+Au+H. npq0 is the total number of particles.
-      parameter  (ns0=110600,np0=10120,nq0=np0+5*ns0/2, & ! 'a,t' series
+      parameter  (ns0=110600,np0=10120,nq0=np0+5*ns0/2, &  ! 's,p,t' series
                   npq0=ns0+np0+nq0)
-!
-!  position x,y,z, velocity vx,vy,vz, mass am. ch charge, shape ag
-!  c1, c2: speed of light, and its square
+!     parameter  (ns0=55296,np0=10120,nq0=np0+1*ns0,     ! 'n' series
+!    *            npq0=ns0+np0+nq0)
       real*8      xg(npq0),yg(npq0),zg(npq0),vx(npq0),vy(npq0),vz(npq0),&
-                  am(npq0),ch(npq0),ag(npq0),massi,fchar,fchara,        &
-                  c1,c2,rd_cp,rd_hp,rd_el,ssg(npq0),tiwrt1
+                  px(npq0),py(npq0),pz(npq0),xyz(npq0,3),vvv(npq0,3),  &
+                  am(npq0),ch(npq0),ag(npq0),massi,fchar,fchara,       &
+                  rd_cp,rd_hp,rd_el,s1,s2,s3,s4,s5,s6,spx,spy,spz,sam, &
+                  ek_MeV(10,700),s_ek(10,700),gamma,c2,h1,h2,          &
+                  MeV,n1,n2,n3,n4,n5,n6,ss1(10,700),nn1(10,700),       &
+                  max_e1,max_e2,max_e3,max_e4,max_e5,max_e6,dtiwrt1
+      integer*4   kk
 !
-!  position in 1D xyz, momentum in 1D ppp, velocity in 1D vvv 
-!  relativistic gamma factor
-      real*8      xyz(npq0,3),ppp(npq0,3),vvv(npq0,3),m_gamma
-      character   sg*1(npq0)
+      parameter  (sname='cntemp',cname='cntemp',numbr1='c')
 !
-!  run name: sname, cnam, the run number like a,A,1,...
-      parameter  (sname='cntemp',cname='cntemp',numbr1='C')
+      character     praefixs*27,suffix*3,knum(30)*1
 !
-      character     praefixs*27,suffix*3,knum(20)*1
-!
-!  t: time, tmin,tmax: minimum and maximum of physical run time
-!  ns,np,nq: number of C+Au, H and electrons, nCLp: total number of particles
-!  it: time steps, is: the number of sequential plots
-      integer*4     ns,np,nq,nCLp,it,is,itskp,nZ,nZa,nframe,knum1,i
-      real*4        t,time,tmin,tmax,xp_leng
-      character*8   label,date_now*10,cnam1*8,commt*10,cdate*10,ctime*8
-!
+      real*4        t,tmin,tmax,axis,time,xp_leng,hh,tiwrt1
+      integer*4     ns,np,nq,nclp,it,is,itskp,nz,nza,nframe,knum1,i,k
+      character*8    label,date_now*10,cnam1*8,commt*10,cdate*10,ctime*8
       common/headr1/ label,date_now
       common/headr2/ time,xp_leng
       common/headr3/ cnam1,commt
       namelist/inp1/ tmin,tmax,itskp
 !
-!  maximum plot (3d)
+!  Maximum plot (3D)
       label='cnt-em3q'
       cnam1=cname//'.'//numbr1
       call date_and_time_7 (date_now,ctime)
 !
-      write(6,*) 'type &inp1 tmax, itskp...'
+      tmin=   0.0d-15
+      tmax=  60.1d-15
+      itskp= 1 ! 1 ! 2 
+!
+      write(06,*) 'type &inp1 tmax, itskp...'
 !     read(5,inp1)
 !--------------------------------------------------
-      praefixs='/lv01/mtanaka/cntem3_para3/'
-!
-      knum_num= 9 +1  ! files to plots 
-      itskp= 5 ! 2 ! 1  
-!
-      tmin=   0.0d-15
-      tmax=  30.1d-15
-!
+      praefixs='/home2/mtanaka/cntem3_data/'
+!               1        01        01
       write(6,*) ' type cname(6) and numbr1(1)...'
 !     read(5,10) cname,numbr1
 !  10 format(a6,a1)
@@ -91,22 +82,39 @@
       knum(8)= 'h'
       knum(9)= 'i'
 !
+      knum_num= 9 +1  ! C series, 9 sequence runs
+        dtiwrt1= 0.5d-15
+        itskp= 1
+!       ... tiwrt1 +0.5d-15
+!
+!     ***********
+       h1= 6.
+!      h2= 20./4
+!      h2= 40./4
+!      h2= 60./4
+       h2= 70./4
+!
+       nz=  1
+!     ***********
+!
       knum1= 1
       write(6,*) 'read: ',cname//'.23'//numbr1
-      open (unit=23,file=cname//'.23'//numbr1//'a',      & ! 'a'
+      open (unit=23,file=cname//'.23'//numbr1//'a', & ! 'a'
                           status='old',form='unformatted') 
 !
-      write(6,*) 'write: ',cname//'.77'//numbr1//'fb.ps'
-      open (unit=77,file=cname//'.77'//numbr1//'fb.ps',  &
+      write(6,*) 'write: ',cname//'.77'//numbr1
+      open (unit=77,file=cname//'.77'//numbr1//'ffa.ps', &
                           status='unknown')
 !
-      nframe= 1 ! or 4 by page but small !
+      nframe= 1 ! 4
       call gopen (nframe)
 !
       it= 0
       is= 0
+      tiwrt1= 0.e0
 !
-      tiwrt1= 0.d0
+      c2= (2.998d+10)**2
+      tmin=  0.d-15
 !
     3 write(6,*) '*initial ns,np,nq '
       read(23) ns,np,nq
@@ -114,50 +122,27 @@
       read(23) am,ch               ! g, esu
 !
 ! ag( )
-      nCLp= ns +np +nq
-      nZ=  1
-      nZa= 4
-         write(6,*) 'ns, np, nq=',ns,np,nq
-         write(6,*) 'nZ, nZa=',nZ,nZa
+      nclp= ns +np +nq
 !
-      rd_cp = 0.92d-8  ! c(+z)
-      rd_hp = 0.50d-8  ! h(+)
-      rd_el = 0.50d-8
-      do i= 1,ns
-      ag(i)= rd_cp
-      end do
-      do i= ns+1,ns+np
-      ag(i)= rd_hp
-      end do
-      do i= ns+np+1,nCLp
-      ag(i)= rd_el
-      end do
-!
-      c1= 2.9979d+10
-      c2= 2.9979d+10**2
+      max_e1= 0
+      max_e2= 0
+      max_e3= 0
+      max_e4= 0
+      max_e5= 0
+      max_e6= 0
 !
 !     sec, cm, cm/sec
+! 100 read(23,end=700) t,xg,yg,zg,vx,vy,vz
   100 read(23,end=700) t,xyz,vvv
-      write(6,*) 'time=',t
+      write(6,*) 'it,time=',it,t
 !
       it= it +1
 !
       if(t.lt.tmin) go to 100
       if(t.gt.tmax) go to 700
 !
-!     if(itskp.eq.1 .or. mod(it,itskp).eq.1) then
       if(itskp.eq.1 .or. t.ge.tiwrt1) then
-        tiwrt1= tiwrt1 +0.50d-15
-        write(6,*) 't,tiwrt1=',t,tiwrt1
-!
-        is= is +1
-        time= t
-!
-        do i= 1,npq0
-        ssg(i)= (vx(i)**2 +vy(i)**2 +vz(i)**2)/c2
-        sg(i)= ' '
-        if(ssg(i).gt.0.9) sg(i)= '*'
-        end do
+        tiwrt1= tiwrt1 +dtiwrt1
 !
         do i= 1,npq0
         xg(i)= xyz(i,1)
@@ -167,21 +152,102 @@
         vx(i)= vvv(i,1)
         vy(i)= vvv(i,2)
         vz(i)= vvv(i,3)
+        end do       
+!
+        is= is +1
+        time= t
+           write(6,*) 'vdistr is,t=',is,t
+        call vdistr (xg,yg,zg,vx,vy,vz,npq0,ns,np,nclp)
+!
+        s1= 0
+        s2= 0
+        s3= 0
+        s4= 0
+        s5= 0
+        s6= 0
+!
+        n1= 0
+        n2= 0
+        n3= 0
+        n4= 0
+        n5= 0
+        n6= 0
+!
+        do i= 1,nclp
+        gamma= 1/sqrt(1 -(vx(i)**2 +vy(i)**2 +vz(i)**2)/c2)
+        px(i)= gamma*am(i)*vx(i)
+        py(i)= gamma*am(i)*vy(i)
+        pz(i)= gamma*am(i)*vz(i)
         end do
 !
-           write(6,*) 'pplot2 t=',t
-        call pplot2 (xg,yg,zg,vx,vy,vz,am,ch,ag,fchar,fchara, &
-                     nZ,nZa,npq0,ns,np,nq,nCLp,is)
+        do i= 1,ns/2
+        s1= s1 +(px(i)**2 +py(i)**2 +pz(i)**2)/(2*am(i))
+        n1= n1 +1
+        max_e1= dmax1(max_e1,(px(i)**2 +py(i)**2 +pz(i)**2)/(2*am(i)))
+        end do
 !
-        write(6,*) 't,it=',t,it
-        write(6,400) (i,xg(i),yg(i),zg(i),vx(i),vy(i),vz(i),  & 
-                      ssg(i),sg(i),i=1,nCLp,50000)                           
-  400   format(i6,1p6e11.3,2x,e11.3,a1)
+        do i= ns/2+1,ns
+        s2= s2 +(px(i)**2 +py(i)**2 +pz(i)**2)/(2*am(i))
+        n2= n2 +1
+        max_e2= dmax1(max_e2,(px(i)**2 +py(i)**2 +pz(i)**2)/(2*am(i)))
+        end do
 !
-        write(32,*) 't,it=',t,it
-        write(32,410) (i,xg(i),yg(i),zg(i),vx(i),vy(i),vz(i), &
-                       ssg(i),sg(i),i=1,nCLp)
-  410   format(i6,1p6e11.3,2x,e11.3,a1)
+        do i= ns+1,ns+np
+        s3= s3 +(px(i)**2 +py(i)**2 +pz(i)**2)/(2*am(i))
+        n3= n3 +1
+        max_e3= dmax1(max_e3,(px(i)**2 +py(i)**2 +pz(i)**2)/(2*am(i)))
+        end do
+!
+        do i= ns+np+1,ns+2*np
+        s4= s4 +(px(i)**2 +py(i)**2 +pz(i)**2)/(2*am(i))
+        n4= n4 +1
+        max_e4= dmax1(max_e4,(px(i)**2 +py(i)**2 +pz(i)**2)/(2*am(i)))
+        end do
+!
+        do i= ns+2*np+1,ns+2*np+nz*(ns/2)
+        spx= px(i)/h1
+        spy= py(i)/h1
+        spz= pz(i)/h1
+        sam= am(i)/h1
+!
+        s5= s5 +h1*(spx**2 +spy**2 +spz**2)/(2*sam)
+        n5= n5 +h1
+        max_e5= dmax1(max_e5,(spx**2 +spy**2 +spz**2)/(2*sam))
+        end do
+!
+        do i= ns+2*np+nz*(ns/2)+1,nclp
+        spx= px(i)/h2
+        spy= py(i)/h2
+        spz= pz(i)/h2
+        sam= am(i)/h2
+!
+        s6= s6 +h2*(spx**2 +spy**2 +spz**2)/(2*sam)
+        n6= n6 +h2
+        max_e6= dmax1(max_e6,(spx**2 +spy**2 +spz**2)/(2*sam))
+        end do
+        
+!
+        MeV= 1.6e-6 ! per MeV
+        ek_MeV(1,is)= s1/(n1*MeV) 
+        ek_MeV(2,is)= s2/(n2*MeV)
+        ek_MeV(3,is)= s3/(n3*MeV)
+        ek_MeV(4,is)= (s4+s5+s6)/((n4+n5+n6)*MeV)
+!
+        ek_MeV(5,is)= s4/(n4*MeV)
+        ek_MeV(6,is)= s5/(n5*MeV)
+        ek_MeV(7,is)= s6/(n6*MeV)
+!
+        s_ek(1,is)= s1/MeV
+        s_ek(2,is)= s2/MeV
+        s_ek(3,is)= s3/MeV
+        s_ek(4,is)= (s4+s5+s6)/MeV
+!
+        ss1(5,is)= s4
+        ss1(6,is)= s5
+        ss1(7,is)= s6
+        nn1(5,is)= n4
+        nn1(6,is)= n5
+        nn1(7,is)= n6
       end if
       go to 100
 !
@@ -189,205 +255,254 @@
       if(knum1.eq.knum_num) go to 800
 !
       write(6,*) 'read: ',cname//'.23'//numbr1
-      open (unit=23,file=cname//'.23'//numbr1//knum(knum1), &  ! 'a'
+      open (unit=23,file=cname//'.23'//numbr1//knum(knum1), & ! 'a'
                     status='old',form='unformatted',err=800) 
       go to 3
 !
   800 close (23)
+!
+      write(6,*) 'ekin of c, au, h, electron...'
+      write(6,*) '  mostly those of c and au; h is small'
+!
+      write(6,*)
+      write(6,*) 'kk, n1,n2,n3,n4+n5+n6'
+      kk= 1
+      write(6,660) kk,n1,n2,n3,n4+n5+n6
+      write(16,660) kk,n1,n2,n3,n4+n5+n6
+  660 format(' is=',i3,1p4e11.3)
+!
+      write(6,*)
+      write(6,*) 'average <p**2/2*am> MeV: c, au, h, el...'
+      do kk= 1,is
+      write(6,670) kk,ek_MeV(1,kk),ek_MeV(2,kk),ek_MeV(3,kk), &
+                   ek_MeV(4,kk),                              &
+                   s_ek(1,kk),s_ek(2,kk),s_ek(3,kk),s_ek(4,kk)
+      write(16,670) kk,ek_MeV(1,kk),ek_MeV(2,kk),ek_MeV(3,kk),&
+                   ek_MeV(4,kk),                              &
+                   s_ek(1,kk),s_ek(2,kk),s_ek(3,kk),s_ek(4,kk)
+  670 format(' is=',i3,1p4e11.3,2x,4e11.3)
+      end do
+!
+      max_e1= max_e1/MeV
+      max_e2= max_e2/MeV
+      max_e3= max_e3/MeV
+      max_e4= max_e4/MeV
+      max_e5= max_e5/MeV
+      max_e6= max_e6/MeV
+!
+      write(6,673) max_e1,max_e2,max_e3,max_e4,max_e5,max_e6
+  673 format('     max_e=',1p6e10.3)
+!
       call plote
 !
       close (77)
-      write(06,*) 'write: ',cname//'.77'//numbr1//'fb.ps'
-      write(06,*) '  pgf95 @3dfdispc.f, and ps -> pdf convesion'
+      write(06,*) 'write: ',praefixs//cname//'.77'//numbr1//'ffa'
+      write(06,*) '  final time=',t
 !
       stop
       end
 !
 !
-!  Parallel and perpendicular velocity distrubations
-!  for H,C,Au and electrons
 !-------------------------------------------------------------
-      subroutine pplot2 (x,y,z,vx,vy,vz,am,ch,ag,fchar,fchara, &
-                         nZ,nZa,npq0,ns,np,nq,nCLp,is)
+      subroutine vdistr (xg,yg,zg,vx,vy,vz,npq0,ns,np,nclp)
 !-------------------------------------------------------------
       implicit none
 !
-      integer*4  ns,np,nq,npq0,nCLp,nZ,nZa,npt1,npt2,npt3,npt4,     &
-                 is,iplot,i
-      real*8     x(npq0),y(npq0),z(npq0),vx(npq0),vy(npq0),vz(npq0),& 
-                 am(npq0),ch(npq0),ag(npq0),fchar,fchara
-      real*8     c
-      real*8     r1,r2,z1,z2
-      real*4     t,dd,hal0,hal1,hal2,hal(10),val0,val,val2,ps,yy,zz
-      common/abspos/ r1,r2,z1,z2,hal1,hal2,hal,val,val2
-      logical    ifabs
-      data  ifabs/.true./
+      integer*4  npq0,ns,np,nclp,iln,i,k,ix,iy,iz,dd
+      real*8     xg(npq0),yg(npq0),zg(npq0),   &
+                 vx(npq0),vy(npq0),vz(npq0),vv
 !
-      real*4     time,xp_leng,hh
-      character*8    label,date_now*10,cnam1*8,commt*10
-      common/headr1/ label,date_now
-      common/headr2/ time,xp_leng
-      common/headr3/ cnam1,commt
+      real*4     fvx(101),fvy(101),fvz(101),fvs(101),xsc(101),& 
+                 vmax2,aiv,fmax1,fmin1
 !
 !-------------------------
-!* Radial distributions
+!* Velocity distribution
 !-------------------------
+!* protons
 !
-      call newcolor (0,1.,0.,0.)
-      iplot= mod(is,6)
-      if(mod(is,6).eq.0) iplot= 6
-!        +++++++++
+      vv= 0
+      do i= ns+1,ns+np
+      vv= dmax1(vv,vx(i)**2+vy(i)**2+vz(i)**2)
+      end do
 !
-      hh= 0.80
+      vmax2= dmax1(sqrt(vv),1.d-5)  ! cm/sec
+      aiv= 50/vmax2
 !
-      if(iplot.eq.6) then  ! .or. iplot.eq.4) then
-        call symbol (0.1,17.0,hh,label,0.,8)
-        call symbol (5.1,17.0,hh,date_now, 0.,10)
-!
-!       call symbol (10.1,17.0,hh,'     ',0.,8) ! cnam1
-        call symbol (16.9,0.1,hh,'t=',0.,2)
-        call number (999.0,999.0,hh,time,0.,5)
-!
-        call symbol ( 2.0,15.0,hh,'vy-vz plot',0.,10)
-      end if
-!
-      if(ifabs) then
-!       ifabs= .false.  ! enlarge at the first glance
-!
-        r1= 0
-        z1= 0
-!
-        do i= 1,ns+np      ! cm/sec
-        r1= dmax1(r1, sqrt(vx(i)**2 +vy(i)**2)) ! horizontal
-        z1= dmax1(z1, abs(vz(i)))
-        end do
-!
-        r2= 0
-        z2= 0
-        do i= ns+np+1,nCLp
-        r2= dmax1(r2, sqrt(vx(i)**2 +vy(i)**2)) ! horizontal
-        z2= dmax1(z2, abs(vz(i)))
-        end do
+      do k= 1,101
+      xsc(k)= (k -51)/aiv
+      fvx(k)= 0
+      fvy(k)= 0
+      fvz(k)= 0
+      end do
 ! 
-        write(6,*) 'vx1,vz1 (cm/sec)=',r1,z1
-        write(6,*) 'vx2,vz2 (cm/sec)=',r2,z2
+      do i= ns+1,ns+np
+      ix= aiv*vx(i) +51.
+      iy= aiv*vy(i) +51.
+      iz= aiv*vz(i) +51.
+!
+      if(iabs(ix-51).le.50) fvx(ix)= fvx(ix) +1. 
+      if(iabs(iy-51).le.50) fvy(iy)= fvy(iy) +1. 
+      if(iabs(iz-51).le.50) fvz(iz)= fvz(iz) +1. 
+      end do
+!
+!* average over x,y,z
+      do k= 1,101
+      fvs(k)= (fvx(k) +fvy(k))/2.
+      end do
+!
+      call lplmax (fvs,fmax1,fmin1,101)
+      iln= 1
+      call hplot1 (2,4,101,xsc,fvs,fmax1,fmin1,iln,'fvxy(h+)',8,& 
+                   '  vr    ',8,'        ',8)
+!
+      call lplmax (fvz,fmax1,fmin1,101)
+      call hplot1 (3,4,101,xsc,fvz,fmax1,fmin1,iln,'fvz(h+) ',8,& 
+                   '  vz    ',8,'        ',8)
+!
+!* electrons
+      vv= 0 
+      do i= ns+np+1,nclp
+      vv= dmax1(vv,vx(i)**2+vy(i)**2+vz(i)**2)
+      end do
+!
+      vmax2= dmax1(sqrt(vv),1.d-5)  ! cm/sec
+      aiv= 50/vmax2 
+!
+      do k= 1,101
+      xsc(k)= (k -51)/aiv
+      fvx(k)= 0
+      fvy(k)= 0
+      fvz(k)= 0
+      end do
+!
+      do i= ns+np+1,nclp
+      ix= aiv*vx(i) +51.
+      iy= aiv*vy(i) +51.
+      iz= aiv*vz(i) +51.
+!
+      if(iabs(ix-51).le.50) fvx(ix)= fvx(ix) +1. 
+      if(iabs(iy-51).le.50) fvy(iy)= fvy(iy) +1. 
+      if(iabs(iz-51).le.50) fvz(iz)= fvz(iz) +1. 
+      end do
+!
+!* average over x,y
+      do k= 1,101
+      fvs(k)= (fvx(k) +fvy(k))/2.
+      end do
+!
+      call lplmax (fvs,fmax1,fmin1,101)
+      iln= 1
+      call hplot1 (2,5,101,xsc,fvs,fmax1,fmin1,iln,'fvxy(el)',8,&
+                   '  vr    ',8,'        ',8)
+!
+      call lplmax (fvz,fmax1,fmin1,101)
+      call hplot1 (3,5,101,xsc,fvz,fmax1,fmin1,iln,'fvz(el) ',8,& 
+                   '  vz    ',8,'        ',8)
+!
+!  c
+      vv= 0 
+      do i= 1,ns
+!     do i= 1,ns/2
+      vv= dmax1(vv,vx(i)**2+vy(i)**2+vz(i)**2)
+      end do
+!
+      vmax2= dmax1(sqrt(vv),1.d-5)
+      aiv= 50/vmax2  ! no dimension
+!
+      do k= 1,101
+      xsc(k)= (k -51)/aiv
+      fvx(k)= 0
+      fvy(k)= 0
+      fvz(k)= 0
+      end do
+!
+      do i= 1,ns
+!     do i= 1,ns/2
+      ix= aiv*vx(i) +51.
+      iy= aiv*vy(i) +51.
+      iz= aiv*vz(i) +51.
+!
+      if(iabs(ix-51).le.50) fvx(ix)= fvx(ix) +1. 
+      if(iabs(iy-51).le.50) fvy(iy)= fvy(iy) +1. 
+      if(iabs(iz-51).le.50) fvz(iz)= fvz(iz) +1. 
+      end do
+!
+!* average over x,y
+      do k= 1,101
+      fvs(k)= (fvx(k) +fvy(k))/2.
+      end do
+!
+      call lplmax (fvs,fmax1,fmin1,101)
+      iln= 1
+      call hplot1 (2,6,101,xsc,fvs,fmax1,fmin1,iln,'fvxy(ca)',8,&
+                   '  vr    ',8,'        ',8)
+!
+      call lplmax (fvz,fmax1,fmin1,101)
+      call hplot1 (3,6,101,xsc,fvz,fmax1,fmin1,iln,'fvz(cau)',8,&  
+                   '  vz    ',8,'        ',8)
+!  c
+! au
+      if(.false.) then
+      vv= 0 
+      do i= ns/2+1,ns
+      vv= dmax1(vv,vx(i)**2+vy(i)**2+vz(i)**2)
+      end do
+!
+      vmax2= dmax1(sqrt(vv),1.d-5)
+      aiv= 50/vmax2  ! no dimension
+!
+      do k= 1,101
+      xsc(k)= (k -51)/aiv
+      fvx(k)= 0
+      fvy(k)= 0
+      fvz(k)= 0
+      end do
+!
+      do i= ns/2+1,ns
+      ix= aiv*vx(i) +51.
+      iy= aiv*vy(i) +51.
+      iz= aiv*vz(i) +51.
+!
+      if(iabs(ix-51).le.50) fvx(ix)= fvx(ix) +1. 
+      if(iabs(iy-51).le.50) fvy(iy)= fvy(iy) +1. 
+      if(iabs(iz-51).le.50) fvz(iz)= fvz(iz) +1. 
+      end do
+!
+!* average over x,y
+      do k= 1,101
+      fvs(k)= (fvx(k) +fvy(k))/2.
+      end do
+!
+      call lplmax (fvs,fmax1,fmin1,101)
+      iln= 1
+      call hplot1 (2,6,101,xsc,fvs,fmax1,fmin1,iln,'fvxy(au)',8,&
+                   '  vr    ',8,'        ',8)
+!
+      call lplmax (fvz,fmax1,fmin1,101)
+      call hplot1 (3,6,101,xsc,fvz,fmax1,fmin1,iln,'fvz(au) ',8,&  
+                   '  vz    ',8,'        ',8)
       end if
-!*
-!     hal1= 200. ! 100. ! 40.0 ! 30.0 
-      hal1= 100. 
-      val=  12.0 !11.0 
 !
-      hal0=  100. ! 40.0
-      val0=  7.5
+!    ------------
+      call chart
+!    ------------
+      return
+      end
 !
-      hal2= 1.5 ! 1.0
-      val2=  3.0 
 !
-      hal(1)=   3.0 
-      hal(2)=   7.0 
-      hal(3)=  11.0 
-      hal(4)=  15.0 
-      hal(5)=  19.0 
-      hal(6)=  23.0 
+!------------------------------------------------------
+      subroutine lplmax (f,fmax,fmin,is)
+!------------------------------------------------------
+      dimension  f(7000)
 !
-      hh= 0.7
-      call newcolor (0,1.,0.,0.)
-      call plot (hal(iplot)-1.5, val, 3)
-      call plot (hal(iplot)+1.5, val, 2)
-      call plot (hal(iplot), val-1.5, 3)
-      call plot (hal(iplot), val+1.5, 2)
-      call plot (hal(iplot), val+1.5, 3)
+      fmax= -1.e10
+      fmin=  1.e10
 !
-      call plot (hal(iplot)-1.5, val0, 3)
-      call plot (hal(iplot)+1.5, val0, 2)
-      call plot (hal(iplot), val0-1.5, 3)
-      call plot (hal(iplot), val0+1.5, 2)
-      call plot (hal(iplot), val0+1.5, 3)
-!
-      call plot (hal(iplot)-1.5, val2, 3)
-      call plot (hal(iplot)+1.5, val2, 2)
-      call plot (hal(iplot), val2-1.5, 3)
-      call plot (hal(iplot), val2+1.5, 2)
-      call plot (hal(iplot), val2+1.5, 3)
-      call newcolor (0,1.,0.,0.)
-!
-      if(iplot.eq.6 .or. iplot.eq.4) then
-      call symbol ( 2.0,14.0,hh,'   ',0.,3) ! 'vx='
-      call number (999.0,999.0,hh,hal1,0.,9)  ! 5 digit
-      call symbol ( 8.0,14.0,hh,'proton',0.,6)
-      call symbol ( 6.0, 9.5,hh,'c & au',0.,6)
-!
-      call symbol ( 2.0, 5.0,hh,'vx=',0.,3)
-      call number (999.0,999.0,hh,hal2,0.,9)  ! 5 digit
-      call symbol ( 7.0, 5.0,hh,'electron',0.,8)
-      end if
-!
-!   --------------------------
-      c= 2.998d+10  ! speed of light in CGS unit
-      ps= 0.5*13.*10 *1.d+4 !! ??
-!   --------------------------
-!
-!* Specified plotted particles: C,Au,H and electrons 
-      npt1= (ns/2)/1000
-      npt2= (ns/2)/1000
-      npt3= np/1000 
-      npt4= (nZ+nZa)*(ns/2)/1000
-!*
-      do 100 i= ns+1,ns+np,npt3
-      dd= 7*ps*ag(i)  ! cm, 0.08  !  r  g  b
-      call newcolor (3,0.,0.,1.)  ! blue
-!
-      yy= hal1*vy(i)/c +hal(iplot)  ! cm/sec
-      zz= hal1*vz(i)/c +val 
-!  
-      if(yy.lt.0. .or. yy.gt.29.) go to 100
-      if(zz.lt.0. .or. zz.gt.20.) go to 100
-      call circle (yy-0.02,zz-0.02,dd,2)
+      do 100 i= 1,is
+      fmax= amax1(fmax,f(i))
+      fmin= amin1(fmin,f(i))
   100 continue
-!*     
-      do 150 i= 1,ns/2,npt1
-      dd= 7*ps*ag(i)  ! 0.08      !  r  g  b
-      call newcolor (3,0.,1.,0.)  ! green
 !
-      yy= hal0*vy(i)/c +hal(iplot)
-      zz= hal0*vz(i)/c +val0
-!  
-      if(yy.lt.0. .or. yy.gt.29.) go to 150
-      if(zz.lt.0. .or. zz.gt.20.) go to 150
-      call circle (yy-0.02,zz-0.02,dd,2)
-  150 continue
-!*     
-      do 170 i= ns/2+1,ns,npt2
-      dd= 7*ps*ag(i)  ! 0.08      !  r  g  b
-      call newcolor (3,1.,1.,0.)  ! gold
-!
-      yy= hal0*vy(i)/c +hal(iplot)
-      zz= hal0*vz(i)/c +val0
-!  
-      if(yy.lt.0. .or. yy.gt.29.) go to 170
-      if(zz.lt.0. .or. zz.gt.20.) go to 170
-      call circle (yy-0.02,zz-0.02,dd,2)
-  170 continue
-!*     
-!
-      do 200 i= ns+np,nCLp,npt4
-      dd= 7*ps*ag(i)  ! 0.08      !  r  g  b
-      call newcolor (3,1.,0.,0.)  ! red
-!
-      yy= hal2*vy(i)/c +hal(iplot)  ! cm/sec
-      zz= hal2*vz(i)/c +val2 
-!  
-      if(yy.lt.0. .or. yy.gt.29.) go to 200
-      if(zz.lt.0. .or. zz.gt.20.) go to 200
-      call circle (yy-0.02,zz-0.02,dd,2)
-  200 continue
-!*     
-      call newcolor (0,1.,0.,0.)  ! black
-!
-      if(mod(iplot,6).eq.0) then
-        call chart
-      end if
-      
       return
       end
 !
@@ -406,13 +521,13 @@
                ipresent_time(1),ipresent_time(2),ipresent_time(3)
 !
       return
-      end 
+      end
 !
-!
+!                                                     **************
 !------------------------------------------------------
       subroutine averg1 (q,qav,is)
 !------------------------------------------------------
-      dimension  q(5000)
+      dimension  q(7000)
 !
       qav= 0.
 !
@@ -421,23 +536,6 @@
   100 continue
 !
       qav= qav/10.
-!
-      return
-      end
-!
-!
-!------------------------------------------------------
-      subroutine lplmax (f,fmax,fmin,is)
-!------------------------------------------------------
-      dimension  f(7000)
-!
-      fmax= -1.e10
-      fmin=  1.e10
-!
-      do 100 i= 1,is
-      fmax= amax1(fmax,f(i))
-      fmin= amin1(fmin,f(i))
-  100 continue
 !
       return
       end

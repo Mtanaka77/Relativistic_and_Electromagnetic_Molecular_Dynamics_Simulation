@@ -12,8 +12,19 @@
 !*  Dr. Motohiko Tanaka, Professor, Chubu University, Japan.  * 
 !*                                           Jan. 9, 2016     * 
 !**************************************************************
-!
+!*-------------------------------------------------------------
+!*  Fortran 2003 handles such technique as continuity and 
+!*  lower cases, They are:
+!*  :s%/^C/!/
+!*  :s%/^c/!/
+!*  tr 'A-Z' 'a-z' <@mrg3.f >@mrg37.f03
+!*
+!* $ mpif90 -mcmodel=medium -fast @mrg37.f03 -I/opt/pgi/fftw3/include &
+!*    -L/opt/pgi/fftw3/lib -lfftw3
+!* $ mpiexec -n 6 a.out &
+!*-------------------------------------------------------------
       implicit none
+!
 !
       integer*4   ns0,np0,nq0,npq0
       character   sname*6,cname*6,numbr1*1,fig_label*32
