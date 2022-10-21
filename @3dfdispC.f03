@@ -14,10 +14,11 @@
 !**************************************************************
 !*-------------------------------------------------------------
 !*  Fortran 2003 handles such technique as continuity and 
-!*  lower cases, They are:
-!*  :s%/^C/!/
-!*  :s%/^c/!/
-!*  tr 'A-Z' 'a-z' <@mrg3.f >@mrg37.f03
+!*  lower cases, They are used within each file::
+!*   :s%/^C/!/
+!*   :s%/^c/!/
+!*  and outside the file:
+!*   tr 'A-Z' 'a-z' <@mrg3.f >@mrg37.f03
 !*
 !* $ mpif90 -mcmodel=medium -fast @mrg37.f03 -I/opt/pgi/fftw3/include &
 !*    -L/opt/pgi/fftw3/lib -lfftw3

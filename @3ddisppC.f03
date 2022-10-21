@@ -1,5 +1,5 @@
 !**************************************************************
-!*  Post processing by Linux: pgf95 @3ddisppC.f03             *
+!*  Post processing output by Linux: pgf95 @3ddisppC.f03      *
 !*                                                            * 
 !*    call rdistr (x4,y4,z4,...) makes scatter plots of       *
 !*    H,C,Au and electrons at sequential time interval.       * 
@@ -14,17 +14,18 @@
 !**************************************************************
 !*-------------------------------------------------------------
 !*  Fortran 2003 handles such technique as continuity and 
-!*  lower cases, They are:
-!*  :s%/^C/!/
-!*  :s%/^c/!/
-!*  tr 'A-Z' 'a-z' <@mrg3.f >@mrg37.f03
+!*  lower cases, They are used within each file::
+!*   :s%/^C/!/
+!*   :s%/^c/!/
+!*  and outside the file:
+!*   tr 'A-Z' 'a-z' <@mrg3.f >@mrg37.f03
 !*
 !* $ mpif90 -mcmodel=medium -fast @mrg37.f03 -I/opt/pgi/fftw3/include &
 !*    -L/opt/pgi/fftw3/lib -lfftw3
 !* $ mpiexec -n 6 a.out &
 !*-------------------------------------------------------------
-      implicit none
 !
+      implicit none
 !
       integer*4   ns0,np0,nq0,npq0
       character   sname*6,cname*6,numbr1*1,fig_label*32
