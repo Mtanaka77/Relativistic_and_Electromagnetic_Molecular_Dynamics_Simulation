@@ -1,4 +1,4 @@
-## Relativistic and Electromagnetic Molecular Dynamics Simulation for Nano-Scale Phenomena ##
+# Relativistic and Electromagnetic Molecular Dynamics Simulation for Nano-Scale Phenomena #
 
 ## Molecular Dynamics Simulation and Necessary Files ##
 
