@@ -19,7 +19,7 @@ To analyze simulation results, some programs are provided here as the post-proce
 ### Parallelization of Fields ###
 
 The heavy load of particles is generally divided into parallel processors which is easily coded.
-On the other hand, the electromagnetic fields are parallelized for now the one-dimensional case (the z-direction) where the long axis of pellets is open to eject heavy ions in that derection. Finally, the machine run time depends on the physical time and cpu's architecture. For the elapsed time of parallel simulation it executed in 3.2 sec/step for 52 ranks and 4.0 10^5 particles (equal to 1 fs for elapsed 1.8 hours) by Fujitsu FX100 Supercomputer.
+On the other hand, the electromagnetic fields are parallelized for now the one-dimensional case (the z-direction) where the long axis of pellets is open to eject heavy ions in that direction. Finally, the machine run time depends on the physical time and cpu's architecture. For the elapsed time of parallel simulation it executed in 3.2 sec/step for 52 ranks and 4.0 10^5 particles (equal to 1 fs for elapsed 1.8 hours) by Fujitsu FX100 Supercomputer.
 
 ### References: ###
 
