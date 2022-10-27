@@ -16,9 +16,10 @@ A simulation of the nanotube accelerator is set up by putting pellets of H, C an
 
 To analyze simulation results, some programs are provided here as the post-processing tool. They are named @3dfdisp.f03 and @3ddisp.f03, for examples. The velocity distributions in parallel and perpendicular directions, @3dfdispC.f03, are plotted in sequential times of ions and electrons. The @3ddisppC.f03 program is time sequential plots of H, C, Au and electrons in side and top views with energy histories as well at the end. These graphic outputs by PDF files are shown on the PC screen, either cntemp.77Cfb.pdf or cntemp.77Csa.pdf. They are discussed in the latter half of the CPC paper in 2019 (Ref. 1 below).
 
-### Parallelization ###
+### Parallelization of Fields ###
 
-The parallel simulation code is designed for now the one-dimensional case (the z-direction) where the long axis of pellets is open to eject heavy ions in that derection. Finally, the machine run time depends on the physical time and cpu's architecture. For the elapsed time of parallel simulation it executed in 3.2 sec/step for 52 ranks and 4.0 10^5 particles (equal to 1 fs for elapsed 1.8 hours) by Fujitsu FX100 Supercomputer.
+The heavy load of particles is generally divided into parallel processors which is easily coded.
+On the other hand, the electromagnetic fields are parallelized for now the one-dimensional case (the z-direction) where the long axis of pellets is open to eject heavy ions in that derection. Finally, the machine run time depends on the physical time and cpu's architecture. For the elapsed time of parallel simulation it executed in 3.2 sec/step for 52 ranks and 4.0 10^5 particles (equal to 1 fs for elapsed 1.8 hours) by Fujitsu FX100 Supercomputer.
 
 ### References: ###
 
