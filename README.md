@@ -14,7 +14,7 @@ A simulation of the nanotube accelerator is set up by putting pellets of H, C an
 
 ### Execution Scripts ###
 
-Linux: mpif90 needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150  
+Linux(PGI): MPI and FFTW by PGI forran, mpif90 needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150  
 
 % mpif90 -byteswapio -mcmodel=medium -fast @a_cnt3-3p8Ca.f03 -I/opt/pgi/fftw3/include -L/opt/pgi/fftw3/lib -lfftw3
 
