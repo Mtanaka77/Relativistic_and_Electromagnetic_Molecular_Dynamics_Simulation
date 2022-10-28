@@ -20,13 +20,10 @@ env CC=pgcc FC=pgfortran F77=pgfortran CXX=pgcpp CFLAGS=-fast FCFLAGS=-fast FFLA
 
 env CC=pgcc CFLAGS="-fast -Minfo -fPIC" F77=pgfortran FFLAGS="-fast -Minfo" MPICC=mpicc ./configure --enable-threads --enable-sse2 --enable-openmp --enable-shared --enable-mpi --prefix=/opt/pgi/fftw3
 
-mpif90 needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150  
-
+mpif90 needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150.   
 % mpif90 -byteswapio -mcmodel=medium -fast @a_cnt3-3p8Ca.f03 -I/opt/pgi/fftw3/include -L/opt/pgi/fftw3/lib -lfftw3
 
-Execution: Only for a test
-
-% mpiexec -n 6 a.out &
+Execution: Only for a test. % mpiexec -n 6 a.out &
 
 
 ### Simulation Analysis ###
