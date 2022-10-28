@@ -12,6 +12,13 @@ Also, all explicit simulation code must satisfy the Courant condition, that is, 
 
 A simulation of the nanotube accelerator is set up by putting pellets of H, C and Au atoms and associated electrons at null velocity. Electromagnetic monochromatic waves at the wavelength 800 nm are travelling from the negative direction toward the origin and then go out to the positive direction. The pellets at the origin are irradiated by these waves and are ejected to ion perpenducular and electron parallel directions toward an open space. The final energies for laser intensity 10^22 W/cm^2 are around 30-40 MeV in 20-40 fs, which is shown by animation movies at my homepage.
 
+### Scripts ###
+
+Linux: mpif90 needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150  
+
+% mpif90 -byteswapio -mcmodel=medium -fast @a_cnt3-3p8Ca.f03 -I/opt/pgi/fftw3/include -L/opt/pgi/fftw3/lib -lfftw3
+
+
 ### Simulation Analysis ###
 
 To analyze simulation results, some programs are provided here as the post-processing tool. They are named @3dfdisp.f03 and @3ddisp.f03, for examples. The velocity distributions in parallel and perpendicular directions, @3dfdispC.f03, are plotted in sequential times of ions and electrons. The @3ddisppC.f03 program is time sequential plots of H, C, Au and electrons in side and top views with energy histories as well at the end. These graphic outputs by PDF files are shown on the PC screen, either cntemp.77Cfb.pdf or cntemp.77Csa.pdf. They are discussed in the latter half of the CPC paper in 2019 (Ref. 1 below).
