@@ -16,15 +16,9 @@ A simulation of the nanotube accelerator is set up by putting pellets of H, C an
 
 Linux(PGI): MPI and FFTW by PGI fortan,
 
-#!/bin/csh -f
-setenv CXX pgCC
-setenv CC  pgcc
-setenv FC  pgf95
-setenv CCFLAGS "-mcmodel=medium -Mnolarge_arrays -O2 -Mvect"
-setenv CFLAGS  "-mcmodel=medium -Mnolarge_arrays -O2 -Mvect -Msignextend -DUSE_U_INT_FOR_XDR -DHAVE_RPC_RPC_H=1"
-setenv FFLAGS  "-mcmodel=medium -Mnolarge_arrays -O2 -Mvect=sse,noassoc -Mscalarsse -Mflushz -Mcache_align"
-./configure --enable-fortran=yes --disable-shared -prefix=/opt/pgi/mpich-3.2
-exit 0 
+env CC=pgcc FC=pgfortran F77=pgfortran CXX=pgcpp CFLAGS=-fast FCFLAGS=-fast FFLAGS=-fast CXXFLAGS=-fast ./configure --prefix=/opt/pgi/mpich-3.2 --disable-cxx & configure.log
+
+env CC=pgcc CFLAGS="-fast -Minfo -fPIC" F77=pgfortran FFLAGS="-fast -Minfo" MPICC=mpicc ./configure --enable-threads --enable-sse2 --enable-openmp --enable-shared --enable-mpi --prefix=/opt/pgi/fftw3
 
 mpif90 needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150  
 
