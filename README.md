@@ -14,7 +14,7 @@ A simulation of the nanotube accelerator is set up by putting pellets of H, C an
 
 ### Execution Scripts ###
 
-Linux(PGI): MPI and FFTW by PGI fortan,
+Linux(PGI): MPI and FFTW by PGI fortan; configure, make, make install.
 
 env CC=pgcc FC=pgfortran F77=pgfortran CXX=pgcpp CFLAGS=-fast FCFLAGS=-fast FFLAGS=-fast CXXFLAGS=-fast ./configure --prefix=/opt/pgi/mpich-3.2 --disable-cxx & configure.log
 
