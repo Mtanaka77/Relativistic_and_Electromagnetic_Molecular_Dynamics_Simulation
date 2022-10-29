@@ -29,6 +29,8 @@ env CC=gcc FC=/opt/mpich-3.2/bin/mpifort F77=gfortran CXX=gcpp CFLAGS=-O2 FCFLAG
 
 CC=gcc FC=gfortran F90=mpifort ./configure --prefix=/opt/fftw3
 
+% mpif90 @a_cnt3-3p8Ca.f03 -I/opt/fftw3/include -L/opt/fftw3/lib -lfftw3
+
 Execution: Only for a test. % mpiexec -n 6 a.out &
 
 
