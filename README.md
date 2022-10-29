@@ -24,8 +24,9 @@ fftw3-3.3.10: ./configure --disable-shared --enable-maintainer-mode --enable-thr
 
 (Old) fftw-3.3.5: env CC=pgcc CFLAGS="-fast -Minfo -fPIC" F77=pgfortran FFLAGS="-fast -Minfo" MPICC=mpicc ./configure --enable-threads --enable-sse2 --enable-openmp --enable-shared --enable-mpi --prefix=/opt/pgi/fftw3
 
-mpif90 needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150.   
-% mpif90 -byteswapio -mcmodel=medium -fast @a_cnt3-3p8Ca.f03 -I/opt/pgi/fftw3/include -L/opt/pgi/fftw3/lib -lfftw3
+>mpif90 needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150.   
+
+>% mpif90 -byteswapio -mcmodel=medium -fast @a_cnt3-3p8Ca.f03 -I/opt/pgi/fftw3/include -L/opt/pgi/fftw3/lib -lfftw3
 
 ### (2) Linux (gfortran); configure, make, and make install.
 
@@ -33,9 +34,9 @@ mpich-4.0.2: ./configure --prefix=/opt/mpich-4.0.2 2>&1 | tee conf.txt
 
 fftw3-3.3.10: ./configure --disable-shared --enable-maintainer-mode --enable-threads --prefix=/opt/fftw3
 
-% mpif90 @a_cnt3-3p8Ca.f03 -I/opt/fftw3/include -L/opt/fftw3/lib -lfftw3
+>% mpif90 @a_cnt3-3p8Ca.f03 -I/opt/fftw3/include -L/opt/fftw3/lib -lfftw3
 
-Execution: Only for a test. % mpiexec -n 6 a.out &
+>Execution: Only for a test. % mpiexec -n 6 a.out &
 
 
 ### Simulation Analysis ###
