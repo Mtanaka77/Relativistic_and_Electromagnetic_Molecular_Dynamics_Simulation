@@ -25,7 +25,8 @@ mpif90 needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_
 
 (2) Linux (gfortran); configure, make, and make install.
 
-env CC=gcc FC=/opt/mpich-3.2/bin/mpifort F77=gfortran CXX=gcpp CFLAGS=-O2 FCFLAGS=-O2 FFLAGS=-O2 CXXFLAGS=-O2 ./configure --prefix=/opt/mpich-3.2 --disable-cxx & conf.log
+configure-openmpi-3.1: 
+CC=gcc FC=gfortran FCFLAGS=  ./configure --prefix=/opt/openmpi-3.1
 
 env CC=gcc FC=gfortran F90=mpifort ./configure --prefix=/opt/fftw3
 
