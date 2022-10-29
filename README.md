@@ -14,7 +14,7 @@ A simulation of the nanotube accelerator is set up by putting pellets of H, C an
 
 ### Execution Scripts ###
 
-Linux(PGI): MPI and FFTW by PGI fortan; configure, make, make install.
+(1) Linux (PGI): MPI and FFTW by PGI fortan; configure, make, make install.
 
 env CC=pgcc FC=pgfortran F77=pgfortran CXX=pgcpp CFLAGS=-fast FCFLAGS=-fast FFLAGS=-fast CXXFLAGS=-fast ./configure --prefix=/opt/pgi/mpich-3.2 --disable-cxx & configure.log
 
@@ -22,6 +22,12 @@ env CC=pgcc CFLAGS="-fast -Minfo -fPIC" F77=pgfortran FFLAGS="-fast -Minfo" MPIC
 
 mpif90 needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150.   
 % mpif90 -byteswapio -mcmodel=medium -fast @a_cnt3-3p8Ca.f03 -I/opt/pgi/fftw3/include -L/opt/pgi/fftw3/lib -lfftw3
+
+(2) Linux (gfortran); configure, make, and make install.
+
+env CC=gcc FC=/opt/mpich-3.2/bin/mpifort F77=gfortran CXX=gcpp CFLAGS=-O2 FCFLAGS=-O2 FFLAGS=-O2 CXXFLAGS=-O2 ./configure --prefix=/opt/mpich-3.2 --disable-cxx & conf.log
+
+CC=gcc FC=gfortran F90=mpifort ./configure --prefix=/opt/fftw3
 
 Execution: Only for a test. % mpiexec -n 6 a.out &
 
