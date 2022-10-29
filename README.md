@@ -27,7 +27,7 @@ mpif90 needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_
 
 openmpi-3.1: CC=gcc FC=gfortran FCFLAGS=  ./configure --prefix=/opt/openmpi-3.1
 
-fftw3-3.3.10: ./configure --disable-shared --enable-maintainer-mode --enable-threads --prefix=/opt/fftw3-3.3.10
+fftw3-3.3.10: ./configure --disable-shared --enable-maintainer-mode --enable-threads --prefix=/opt/fftw3
 
 % mpif90 @a_cnt3-3p8Ca.f03 -I/opt/fftw3/include -L/opt/fftw3/lib -lfftw3
 
