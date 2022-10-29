@@ -27,7 +27,7 @@ mpif90 needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_
 
 env CC=gcc FC=/opt/mpich-3.2/bin/mpifort F77=gfortran CXX=gcpp CFLAGS=-O2 FCFLAGS=-O2 FFLAGS=-O2 CXXFLAGS=-O2 ./configure --prefix=/opt/mpich-3.2 --disable-cxx & conf.log
 
-CC=gcc FC=gfortran F90=mpifort ./configure --prefix=/opt/fftw3
+env CC=gcc FC=gfortran F90=mpifort ./configure --prefix=/opt/fftw3
 
 % mpif90 @a_cnt3-3p8Ca.f03 -I/opt/fftw3/include -L/opt/fftw3/lib -lfftw3
 
