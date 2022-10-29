@@ -24,7 +24,7 @@ A simulation of the nanotube accelerator is set up by putting pellets of H, C an
 
 (Old) fftw-3.3.5: env CC=pgcc CFLAGS="-fast -Minfo -fPIC" F77=pgfortran FFLAGS="-fast -Minfo" MPICC=mpicc ./configure --enable-threads --enable-sse2 --enable-openmp --enable-shared --enable-mpi --prefix=/opt/pgi/fftw3
 
->mpif90 needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150.   
+>mpif90 @a_cnt3-3p8Ca.f03 needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150.   
 
 >% mpif90 -byteswapio -mcmodel=medium -fast @a_cnt3-3p8Ca.f03 -I/opt/pgi/fftw3/include -L/opt/pgi/fftw3/lib -lfftw3
 
