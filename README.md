@@ -36,6 +36,8 @@ A simulation of the nanotube accelerator is set up by putting pellets of H, C an
 
 >% mpif90 @a_cnt3-3p8Ca.f03 -I/opt/fftw3/include -L/opt/fftw3/lib -lfftw3
 
+Two different fortrans, PGI and gfotran, are incompatible on the processor of the same name of different characters. 
+
 >Execution: Only for a test. % mpiexec -n 6 a.out &
 
 
