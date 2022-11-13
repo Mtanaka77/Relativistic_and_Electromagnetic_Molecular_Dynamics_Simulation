@@ -5,7 +5,7 @@
 A molecular dynamics simulation code is implemented for relativistic and electromagnetic fields in three dimensions. It is applied to nanoscale particle phenomena such as nanotube accelerators. Maxwell equations are solved, and momentum equations of relativistic particles are then advanced in time. 
 Four physical CGS units are used in this code: a_unit= 1.00d-08 cm, t_unit= 1.00d-15 sec, electron mass m_unit= 0.9110d-27 g and its charge e_unit= 4.8032d-10 esu. The mass of hydrogen, for example, is 1.6726d-24 g. One needs files in the simulation: 1) @cnt3-3p8Ca.f03: Molecular dynamics simulation code, 2) param_em3p8_Ca.h: Common parameters of this simulation, 3) Cntemp_config.STARTC: figure parameters, 4) p_config_ss.xyz_D150 and P135 of pellet electrons, H, C and Au ions. The program is written in Fortran 2003 and MPI of ver.3 for parallelization.
 
-### Courant Condition and Simulation ###
+### Courant Condition and Real Mass Simulation ###
 
 It is noted, however, that the Gauss's equation must be corrected for t>0 time steps as finite errors accumulate in the divergence term. This is true if a discrete coordinate space is used in any method.
 Also, all explicit simulation code must satisfy the Courant condition, that is, Dx(length)/Dt(time step) > c, the speed of light. Otherwise, a simulation is overflown shortly. 
@@ -41,7 +41,7 @@ Two different fortrans, PGI and gfotran, are incompatible on the processor of th
 >Execution: Only for a test. % mpiexec -n 6 a.out &
 
 
-### Simulation Analysis ###
+### Post-processing Simulation Analysis ###
 
 To analyze simulation results, this program provides the post-processing tool. They are named @3dfdisp.f03 and @3ddisp.f03, for examples. The velocity distributions in parallel and perpendicular directions, @3dfdispC.f03, are plotted in sequential times of ions and electrons. The @3ddisppC.f03 program is time sequential plots of H, C, Au and electrons in side and top views with energy histories as well at the end. These graphic outputs by PDF files are shown on the PC screen, either cntemp.77Cfb.pdf or cntemp.77Csa.pdf. They are discussed in the latter half of the CPC paper in 2019 (Ref. 1 below).
 
