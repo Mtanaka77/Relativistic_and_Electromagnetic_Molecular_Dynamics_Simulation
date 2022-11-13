@@ -3,7 +3,9 @@
 ### Molecular Dynamics Simulation: CGS Units and Necessary Files ###
 
 A molecular dynamics simulation code is implemented for relativistic and electromagnetic fields in three dimensions. It is applied to nanoscale particle phenomena such as nanotube accelerators. Maxwell equations are solved, and momentum equations of relativistic particles are then advanced in time. 
-Four physical CGS units are used in this code: a_unit= 1.00d-08 cm, t_unit= 1.00d-15 sec, electron mass m_unit= 0.9110d-27 g and its charge e_unit= 4.8032d-10 esu. The mass of hydrogen, for example, is 1.6726d-24 g. One needs files in the simulation: 1) @cnt3-3p8Ca.f03: Molecular dynamics simulation code, 2) param_em3p8_Ca.h: Common parameters of this simulation, 3) Cntemp_config.STARTC: figure parameters, 4) p_config_ss.xyz_D150 and P135 of pellet electrons, H, C and Au ions. The program is written in Fortran 2003 and MPI of ver.3 for parallelization.
+Four physical CGS units are used in this code: a_unit= 1.00d-08 cm, t_unit= 1.00d-15 sec, electron mass m_unit= 0.9110d-27 g and its charge e_unit= 4.8032d-10 esu. The mass of hydrogen, for example, is 1.6726d-24 g. 
+
+One needs files in the simulation: 1) @cnt3-3p8Ca.f03: Molecular dynamics simulation code, 2) param_em3p8_Ca.h: Common parameters of this simulation, 3) Cntemp_config.STARTC: figure parameters, 4) p_config_ss.xyz_D150 and P135 of pellet electrons, H, C and Au ions. The program is written in Fortran 2003 and MPI of ver.3 for parallelization.
 
 ### Courant Condition and Real Mass Simulation ###
 
