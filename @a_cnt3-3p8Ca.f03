@@ -1055,7 +1055,7 @@
                     sbx,sbz,slx,time
       equivalence  (ekin(1),ekin20(1))
 !
-      integer(kind=8) ix,iy,iz,ll,mm,nn,l,m,n  ! 8 byte
+      integer*8      ix,iy,iz,ll,mm,nn,l,m,n
       integer(C_INT) i,j,k,kk,jj,ibox,neigh,it,is,iwa,iwb,iwc,iwd,    &
                     iwrt1,iwrt2,iwrt3,iwrta,iwrtb,iwrtc,   &
                     nskip,nsk,ncoe,wrt2,istop1,istop2,     &
@@ -4323,13 +4323,13 @@
       fvs(k)= (fvx(k) +fvy(k))/2.
       end do
 !
-      call lplmax101 (fvs,fmax1,fmin1,101)
+      call lplmax (fvs,fmax1,fmin1,101)
       ILN= 1
-!                          101 101
+! 
       call hplot1 (2,4,101,xsc,fvs,fmax1,fmin1,ILN,'FVxy(H+)',8, &
                    '  VR    ',8,'        ',8)
 !
-      call lplmax101 (fvz,fmax1,fmin1,101)
+      call lplmax (fvz,fmax1,fmin1,101)
       call hplot1 (3,4,101,xsc,fvz,fmax1,fmin1,ILN,'FVz(H+) ',8, &
                    '  VZ    ',8,'        ',8)
  1000 continue
@@ -4365,12 +4365,12 @@
       fvs(k)= (fvx(k) +fvy(k))/2.
       end do
 !
-      call lplmax101 (fvs,fmax1,fmin1,101)
+      call lplmax (fvs,fmax1,fmin1,101)
       ILN= 1
       call hplot1 (2,5,101,xsc,fvs,fmax1,fmin1,ILN,'FVxy(el)',8, &
                    '  VR    ',8,'        ',8)
 !
-      call lplmax101 (fvz,fmax1,fmin1,101)
+      call lplmax (fvz,fmax1,fmin1,101)
       call hplot1 (3,5,101,xsc,fvz,fmax1,fmin1,ILN,'FVz(el) ',8, &
                    '  VZ    ',8,'        ',8)
 !
@@ -4405,12 +4405,12 @@
       fvs(k)= (fvx(k) +fvy(k))/2.
       end do
 !
-      call lplmax101 (fvs,fmax1,fmin1,101)
+      call lplmax (fvs,fmax1,fmin1,101)
       ILN= 1
       call hplot1 (2,6,101,xsc,fvs,fmax1,fmin1,ILN,'FVxy(CA)',8, &
                    '  VR    ',8,'        ',8)
 !
-      call lplmax101 (fvz,fmax1,fmin1,101)
+      call lplmax (fvz,fmax1,fmin1,101)
       call hplot1 (3,6,101,xsc,fvz,fmax1,fmin1,ILN,'FVz(CAu)',8, &
                    '  VZ    ',8,'        ',8)
 !    ------------
@@ -4481,8 +4481,8 @@
       if(ix.gt.0 .and. ix.le.101) fe(ix)= fe(ix) +1.
       end do
 !
-      call lplmax101 (fi,fmax1,fmin1,101)
-      call lplmax101 (fe,fmax2,fmin2,101)
+      call lplmax (fi,fmax1,fmin1,101)
+      call lplmax (fe,fmax2,fmin2,101)
 !
       ILN= 1
       call hplot1 (2,2,101,vsc1,fi,fmax1,fmin1,ILN,'F(H+)   ',8, &
@@ -4559,8 +4559,8 @@
       if(ix.gt.0 .and. ix.le.101) fe(ix)= fe(ix) +1.
       end do
 !
-      call lplmax101 (fi,fmax1,fmin1,101)
-      call lplmax101 (fe,fmax2,fmin2,101)
+      call lplmax (fi,fmax1,fmin1,101)
+      call lplmax (fe,fmax2,fmin2,101)
 !
       ILN= 1
       call hplot1 (3,2,101,vsc1,fi,fmax1,fmin1,ILN,'Log.FH+ ',8, &
@@ -4687,9 +4687,9 @@
       common/HEADR2/ t,xp_leng
       common/parm1/  it,is
 !
-      real(C_float) emax0,emin0,emax1,emin1,emax2,emin2,            &
-                    pmax,pmin,elmax,elmin,emax,etot0,               &
-                    etmax,etmin,Rgyi1,Rgyi2,RTmax,RTmin,rmax,rmin,  &
+      real(C_float) emax0,emin0,emax1,emin1,emax2,emin2,          &
+                    pmax,pmin,elmax,elmin,emax,etot0,             &
+                    etmax,etmin,Rgyi1,Rgyi2,RTmax,RTmin,rmax,rmin,&
                     e1max,e1min,e2max,e2min,e3max,e3min,e4max,e4min,&
                     e5max,e5min,emax3,emin3,e_mx 
       integer(C_INT) ILN,ILG,i
@@ -4704,7 +4704,7 @@
       call lplmax (ekin,emax0,emin0,is)
       call lplmax (ekn1,emax1,emin1,is)
       call lplmax (ekn2,emax2,emin2,is)
-      call lplmax ( ecr, pmax,pmin, is)
+      call lplmax ( ecr, pmax,pmin,is)
       call lplmax ( elj,elmax,elmin,is)
       emax= amax1(emax0,emax1,emax2)
       e_mx= amax1(pmax,elmax)
@@ -4816,7 +4816,7 @@
       use, intrinsic :: iso_c_binding 
       implicit none
 !
-      real(C_float) f(3000),fmax,fmin  !<-- lplot1 in lplmax(3000)
+      real(C_float) f(is),fmax,fmin
       integer(C_INT) is,i
 !
       fmax= -1.e10
@@ -4829,27 +4829,6 @@
 !
       return
       end subroutine lplmax
-!
-!
-!------------------------------------------------------
-      subroutine lplmax101 (f,fmax,fmin,is)
-!------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
-      implicit none
-!
-      real(C_float) f(101),fmax,fmin
-      integer(C_INT) is,i
-!
-      fmax= -1.e10
-      fmin=  1.e10
-!
-      do 100 i= 1,is
-      fmax= amax1(fmax,f(i))
-      fmin= amin1(fmin,f(i))
-  100 continue
-!
-      return
-      end subroutine lplmax101
 !
 !
 !------------------------------------------------------------------
@@ -5555,7 +5534,6 @@
       end
 !
 !
-!     call lplot1 (2,4,is,time,ekin,emax0,0.0,ILN,'KIN/C+Au',8, &
 !-----------------------------------------------------------------------
       subroutine lplot1 (ix,iy,npt1,x,y,ymax,ymin,IL,lab1,n1,lab2,n2,  &
                          lab3,n3)
@@ -5567,11 +5545,21 @@
 !   il=1................ linear plot of (x,y)
 !   il=2................ log10 plot of (x,log y)
 !***********************************************************************
-!     call hplot1 (2,4,101,xsc,fvs,fmax1,fmin1,ILN,'FVxy(H+)',8, &
+      use, intrinsic :: iso_c_binding 
+      implicit none
 !
-      dimension  x(3000),y(3000),u(3000),v(3000)  !<- lplot1 (3000)
-      dimension  xsc(101),fvs(101)
-      dimension  xcm(6),ycm(6),pl(6),pr(6),ql(6),qr(6)
+      real(C_float),dimension(3000) :: x,y
+      real(C_float),dimension(101) :: xh,yh
+      real(C_float) u(3000),v(3000)
+      real(C_float) xcm(6),ycm(6),pl(6),pr(6),ql(6),qr(6)
+!
+      real(C_float)  ymax,ymin,time,xp_leng,pl1,pr1,ql1,qr1,xmin1,xmax1, &
+                     xmax,xmin,ymin1,ymax1,hh,hhs,dx,dy,scx,scy,      &
+                     x0,x1,x2,x3,x4,y0,y1,y2,y3,y4,xc,xl,xu,xd,       &
+                     yc,yl,yu,yr
+!                    
+      integer(C_INT) IL,ix,iy,npt1,n1,n2,n3,npt,nfine,iplot,i1,j1,i,j,k, &
+                     isc
 !
       character(len=8) lab1,lab2,lab3
       character(len=8) label,date_now*10,cax*1
@@ -5596,10 +5584,10 @@
       iplot=1
       go to 1
 !
-!                  x,y(7000) -> xsc,fvs(101)
-!     call hplot1 (2,4,101,xsc,fvs,fmax1,fmin1,ILN,'FVxy(H+)',8, &
+!                  x,y(7000)->xh,yh(101)
+!    entry hplot1 (ix,iy,npt1,x,y,ymax,ymin,il,lab1,n1,lab2,n2,lab3,n3)
 !-----------------------------------------------------------------------
-      entry hplot1 (ix,iy,npt1,xsc,fvs,ymax,ymin,IL,lab1,n1,lab2,n2, &
+      entry hplot1 (ix,iy,npt1,xh,yh,ymax,ymin,IL,lab1,n1,lab2,n2, &
                     lab3,n3)
 !-----------------------------------------------------------------------
       iplot=2
@@ -5637,33 +5625,32 @@
       call number (999.0,999.0,hh,time,0.,5)
 !
    10 continue
+!                                ************
+!                                ** lplot1 **
+!                                ************
+      if(iplot.eq.1) then
 !
       do i=1,npt
       u(i)= x(i)
       end do
-      xmax= u(npt)
       xmin= u(1)
+      xmax= u(npt)
 !                             ************************************
-!                             ** three-point average if il > 0  **
+!                             ** three-point average if IL > 0  **
 !                             ************************************
-      if(iplot.eq.1) then
-!**
-      if(il.gt.0) then
+      if(IL.eq.1) then
         v(1)=   y(1)
         v(npt)= y(npt)
+!
         do i=2,npt-1
         v(i)= y(i)
 !       v(i)= 0.33333*(y(i-1)+y(i)+y(i+1))
-        end do
-      else
-        do i=1,npt
-        v(i)= y(i)
         end do
       end if
 !                                                *****************
 !                                                **  log. scale **
 !                                                *****************
-      if(iabs(il).eq.2) then
+      if(IL.eq.2) then
          do i=1,npt
          if(v(i).gt.0.) then
             v(i)= alog10(v(i))
@@ -5673,25 +5660,20 @@
          end do
       end if
       end if
-!                                                *****************
-!                                                **  iplot=2    **
-!                                                *****************
+!                                ************
+!                                ** hplot1.**
+!                                ************
       if(iplot.eq.2) then
-        do i=1,npt
-        u(i)= xsc(i)
-        v(i)= fvs(i)
-        end do
-      end if
-!                                **************************************
-!                                ** set a new scale and draw a frame.**
-!                                **************************************
-      if(iplot.eq.2) then
+         do i= 1,npt
+         u(i)= xh(i)
+         end do
+!
          ymax= -1.e10
          ymin=  1.e10
 !
          do i= 1,npt
-         ymax= amax1(ymax,v(i))
-         ymin= amin1(ymin,v(i))
+         ymax= amax1(ymax,yh(i))
+         ymin= amin1(ymin,yh(i))
          end do
 !
          if(ymin.ge.0.) then
@@ -5703,10 +5685,11 @@
          end if
       end if
 !
-      if(ymax.le.ymin) ymax= ymin+1.0
-      if(iabs(il).eq.2) then
-         if(ymax.gt.0.0) ymax= ymax+1.0
-      end if
+!     if(ymax.le.ymin) ymax= ymin+1.0
+!     if(iabs(il).eq.2) then
+!        if(ymax.gt.0.0) ymax= ymax+1.0
+!     end if
+!**
 !
       dx= (xmax-xmin)/xcm(i1)
       dy= (ymax-ymin)/ycm(j1)
