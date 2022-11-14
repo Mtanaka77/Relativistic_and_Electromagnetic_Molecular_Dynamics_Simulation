@@ -2493,8 +2493,8 @@
         vvv(i,3)= ppp(i,3)/m_gamma
         end do
 !
-        call vdistr (xyz,vvv,ns,np,nCLp) 
-        call edistr (vvv,am,ns,np,nCLp)
+!       call vdistr (xyz,vvv,ns,np,nCLp) 
+!       call edistr (vvv,am,ns,np,nCLp)
         close (77)
 !
         OPEN (unit=23,file=praefixc//'.23'//suffix2,               &
