@@ -2493,8 +2493,8 @@
         vvv(i,3)= ppp(i,3)/m_gamma
         end do
 !
-!       call vdistr (xyz,vvv,ns,np,nCLp) 
-!       call edistr (vvv,am,ns,np,nCLp)
+        call vdistr (xyz,vvv,ns,np,nCLp) 
+        call edistr (vvv,am,ns,np,nCLp)
         close (77)
 !
         OPEN (unit=23,file=praefixc//'.23'//suffix2,               &
@@ -5666,14 +5666,15 @@
       if(iplot.eq.2) then
          do i= 1,npt
          u(i)= xh(i)
+         v(i)= yh(i)
          end do
 !
          ymax= -1.e10
          ymin=  1.e10
 !
          do i= 1,npt
-         ymax= amax1(ymax,yh(i))
-         ymin= amin1(ymin,yh(i))
+         ymax= amax1(ymax,v(i))
+         ymin= amin1(ymin,v(i))
          end do
 !
          if(ymin.ge.0.) then
@@ -5796,7 +5797,7 @@
       call plotl (u(npt),v(npt),isc,3)
 !
       return
-      end
+      end subroutine lplot1
 !
 !
 !-----------------------------------------------------------------------
