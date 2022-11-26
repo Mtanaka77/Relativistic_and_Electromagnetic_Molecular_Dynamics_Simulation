@@ -26,6 +26,8 @@ A simulation of the nanotube accelerator is set up by putting pellets of H, C an
 
 (Old) fftw-3.3.5: env CC=pgcc CFLAGS="-fast -Minfo -fPIC" F77=pgfortran FFLAGS="-fast -Minfo" MPICC=mpicc ./configure --enable-threads --enable-sse2 --enable-openmp --enable-shared --enable-mpi --prefix=/opt/pgi/fftw3
 
+Compilation by mpif90
+
 >mpif90 @a_cnt3-3p8Ca.f03 needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150.   
 
 >% mpif90 -byteswapio -mcmodel=medium -fast @a_cnt3-3p8Ca.f03 -I/opt/pgi/fftw3/include -L/opt/pgi/fftw3/lib -lfftw3
@@ -38,9 +40,9 @@ A simulation of the nanotube accelerator is set up by putting pellets of H, C an
 
 >% mpif90 @a_cnt3-3p8Ca.f03 -I/opt/fftw3/include -L/opt/fftw3/lib -lfftw3
 
-Two different fortrans, PGI and gfotran, are incompatible on the processor of the same name of different characters. 
+Two different fortrans, PGI and gfotran, are incompatible with processors of the same name of different styles. 
 
->Execution: Only for a test. % mpiexec -n 6 a.out &
+>Execution by mpiexec: Only for a test case. % mpiexec -n 6 a.out &
 
 
 ### Post-processing Simulation Analysis ###
