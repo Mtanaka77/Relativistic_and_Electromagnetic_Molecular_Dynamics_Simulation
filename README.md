@@ -7,7 +7,7 @@ Four physical CGS units are used in this code: a_unit= 1.00d-08 cm, t_unit= 1.00
 
 One needs files in the simulation: 1) @cnt3-3p8Ca.f03: Molecular dynamics simulation code, 2) param_em3p8_Ca.h: Common parameters of this simulation, 3) Cntemp_config.STARTC: figure parameters, 4) p_config_ss.xyz_D150 and P135 of pellet electrons, H, C and Au ions. The program is written in Fortran 2003 and MPI of ver.3 for parallelization.
 
-### Courant Condition and Real Mass Simulation ###
+### Courant Condition and Real-Mass Simulation ###
 
 It is noted, however, that the Gauss's equation must be corrected for t>0 time steps as finite errors accumulate in the divergence term. This is true if a discrete coordinate space is used in any method.
 Also, all explicit simulation code must satisfy the Courant condition, that is, Dx(length)/Dt(time step) > c, the speed of light. Otherwise, a simulation is overflown shortly. 
@@ -32,7 +32,7 @@ Compilation by mpif90
 
 >% mpif90 -byteswapio -mcmodel=medium -fast @a_cnt3-3p8Ca.f03 -I/opt/pgi/fftw3/include -L/opt/pgi/fftw3/lib -lfftw3
 
-### (2) Linux (gfortran); configure, make, and make install.
+### (2) Linux (gfortran): configure, make, and make install.
 
 >mpich-4.0.2: ./configure --prefix=/opt/mpich-4.0.2 2>&1 | tee conf.txt
 
