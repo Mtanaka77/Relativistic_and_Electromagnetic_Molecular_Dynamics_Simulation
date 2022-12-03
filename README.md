@@ -7,6 +7,9 @@ Four physical CGS units are used in this code: a_unit= 1.00d-08 cm, t_unit= 1.00
 
 One needs files in the simulation: 1) @cnt3-3p8Ca.f03: Molecular dynamics simulation code, 2) param_em3p8_Ca.h: Common parameters of this simulation, 3) Cntemp_config.STARTC: figure parameters, 4) p_config_ss.xyz_D150 and P135 of pellet electrons, H, C and Au ions. The program is written in Fortran 2003 and MPI of ver.3 for parallelization.
 
+The operation of each subroutine or some lines of the code such as, for example,  @a_cnt3-3p8Ca.f03 and @3ddisppC.f03, are written as comments of the simulation and post-script programs.
+
+
 ### Courant Condition and Real-Mass Simulation ###
 
 It is noted, however, that the Gauss's equation must be corrected for t>0 time steps as finite errors accumulate in the divergence term. This is true if a discrete coordinate space is used in any method.
