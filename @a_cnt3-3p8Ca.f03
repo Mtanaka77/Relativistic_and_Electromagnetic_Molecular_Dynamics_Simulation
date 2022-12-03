@@ -106,6 +106,9 @@
         praefixe = '/data/sht/tanakam/'//sname  ! WRITE_CONF
       end if
 !
+!  Is Debye screening used: V= exp(-r/rdebye)/r ?
+!     forceV = pref_CL * ch(i)*ch(j)*exp(-r/rdebye)*(1.d0+r/rdebye)   &
+!                                                            /(rcl2 *r)
       ifDebye= 0   ! =1 for Debye-screening on
 !
 !  size for one major node: ionode
@@ -243,7 +246,7 @@
       real(C_DOUBLE) fchar,fcharA,heavy,heavyA
       real(C_DOUBLE) r_sp,d_sp,n_sp,lambda_d,massi,  &
                      ch_ion,wt_ion,rd_cp,rd_hp,      &
-                     ch_el,wt_el,rd_el,rdebye
+                     ch_el,wt_el,rd_el
       common/iroha/  nZ,nZA                          ! in /READ_CONF/ at l.316
       common/charg/  fchar,fcharA                    !
       common/hev_el/ heavy,heavyA                   ! defied at l.397
@@ -258,7 +261,7 @@
 !
 !
       integer(C_INT) i,it,is,istop1,istop2,iwa,iwb,iwc,iwd,   &
-                     ifrefl,nframe,ns1,np1,ns2,        &
+                     ifrefl,nframe,ns1,np1,ns2,               &
                      nh1,nh2,istop7,istop8
       common/parm1/  it,is
       common/abterm/ istop1,istop2,istop7,istop8
@@ -1011,13 +1014,13 @@
 !
       integer(C_INT),dimension(100) :: nz0,nz1,nz2,nz3,i0,i1
       common/parall/ nz0,nz1,nz2,nz3,i0,i1
-      integer(C_INT) nw,nu,rank,iterft
+      integer(C_INT) nw,nu,rank  !,iterft
       integer(C_INT) npp(7),nqq(7),nppa
 !
       real(C_DOUBLE),dimension(mx,my,3) :: senv,recv
       real(C_DOUBLE)  fff,gax,gay,gaz,gam,gamma
 !
-      integer(C_INT)  size,ipar,igrp,ifrefl,ifDebye,         &
+      integer(C_INT)  size,ipar,igrp,ifDebye,ifrefl, &
                       ns,np,nq,nCLp,reg_top,reg_bot, &
                       istop10,istop11
 !
@@ -1055,7 +1058,8 @@
                     sbx,sbz,slx,time
       equivalence  (ekin(1),ekin20(1))
 !
-      integer*8      ix,iy,iz,ll,mm,nn,l,m,n
+!     integer*8      ix,iy,iz,ll,mm,nn,l,m,n
+      integer(C_INT) ix,iy,iz,ll,mm,nn,l,m,n
       integer(C_INT) i,j,k,kk,jj,ibox,neigh,it,is,iwa,iwb,iwc,iwd,    &
                     iwrt1,iwrt2,iwrt3,iwrta,iwrtb,iwrtc,   &
                     nskip,nsk,ncoe,wrt2,istop1,istop2,     &
