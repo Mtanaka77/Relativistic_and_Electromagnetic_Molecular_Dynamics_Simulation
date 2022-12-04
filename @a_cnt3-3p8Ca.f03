@@ -1,77 +1,80 @@
 !*--------------------------------------------------------------------*
 !                                                                     !
 !  # 3-D Molecular Dynamics in Relativistic Electromagnetic Fields #  !
-!    Reference: Computer Physics Comm., 241, 56-63, 2019.             !
-!                                                Dec.24, 2016         !
-!  # Fortran 2003 version (real(C_DOUBLE))       Nov. 3, 2020         !
+!                                                     Dec.24, 2016    !
+!    Reference: Computer Physics Commun., vol.241, pp.56-63 (2019)    !
 !                                                                     !
-!  Files                                                              !
+!  # Fortran 2003 (real(C_DOUBLE)) and MPI Packages   Nov. 3, 2020    !
+!                                                                     !
+!  Used files                                                         !
 !  1. @cnt3-3p8Ca.f03:  Molecular dynamics simulation code            !
 !  2. param_em3p8_Ca.h: Common parameters of this simulation          !
-!  3. Cntemp_config.STARTC: Configure parameters                      !
-!  4. p_config_ss.xyz_D150, P135: Pellet files of H,C,Au and e        !             
+!  3. Cntemp_config.STARTC: Define the simulation time, box sizes,    !
+!        names of atoms and pellet sized, injected laser parameters   !
+!  4. p_config_ss.xyz_D150, P135: Initially loaded particles of       !
+!        H,C,Au atoms and electrons                                   !             
 !                                                                     !
-!  * An explicit code is strictly bound by the Courant condition,     !
-!   dx(length) / dt(time step) > c, the speed of light..              !
-!  * Gauss's law must be corrected as errors in divergence term       !
-!   accumulate in time. This is true if a finite difference scheme    !
-!   of any kind is utilized.                                          !
+!  * An explicit simulation code is strictly bound by the Courant     !
+!     condition, Dx(length) /Dt(time) > c, the speed of light.        !
+!  * Gauss's law must be corrected because errors of divergence term  !
+!     accumulate in time. This is true if a finite difference scheme  !
+!     of any kind is utilized.                                        !
 !                                                                     !
 !     The author and maintainer of these simulation codes are         !
 !   Motohiko Tanaka, Ph.D./Professor, Graduate School of Engineering, !
 !   Chubu University, Kasugai 487-8501, Japan.   2022/09/01           !
 !                                                                     !
-!   https://github.com/Mtanaka77/molecular_dynamics                   !
+!   https://github.com/Mtanaka77/Relativistic_Molecular_Dynamics_     !
+!   Simulation                                                        !
 !                                                                     !
 !*--------------------------------------------------------------------*
 !
-!    MPI+OpenMP: uses /forces/, mp/me=1836, real masses
-!    The CGS units: 
+!   MPI+OpenMP: subroutine /forces/; real atomic masses mp/me=1836
+!   The CGS units: 
 !      a_unit= 1.0000d-08 cm, Angstrom
 !      t_unit= 1.0000d-15 sec, ato second
 !      m_unit= 0.9110d-27 g, electron mass
 !      e_unit= 4.8032d-10 esu, unit charge
 !
-!    /READ_CONF/ is used in nZ, nZA, intens, lambda
-!    3D filled H(+) by ranff(0.) filling ... in /moldyn/ 
+!   In subroutine /READ_CONF/, nZ, nZA, intens, lambda are used.
+!    3D filled H(+) by ranff(0.) ... in /moldyn/ 
 !    No gap between r>rout and r<rout  ... in /forces/ 
 !
-!  Subroutine description
-!  A) Program cnt3emp - /RUN_MD/ 
+!   Subroutine descriptions
+!   A) Program cnt3emp - /RUN_MD/ 
 !                       tables of parallelization: nz0-nz3, i00,i01
 !                       /READ_CONF/
 !                       formation of pellets (for kstart=0)
-!                       or read read(12), restarting file (kstart=1)
-!                       definition of several constants 
-!                       /init/: constants and others
-!                     - /moldyn/: the main routine 
-!                     - /RUN_MD/ for a restart time: write(12)
-!                       /lplots/
+!                        or read read(12) at restart (for kstart=1)
+!                       definition of several constants in /init/: 
+!                        constants and others
+!                      - /RUN_MD/ for start, and restart write(12)
+!                      - /moldyn/: the main subroutine 
+!                       final time /lplots/
 !
-!  B) Inside subroutine /moldyn/ 
+!   B) Inside of subroutine /moldyn/ 
 !       initialization for it=1 case (kstart=0)
 !       Labels
-!       particle index ncel(...)
-!       initialization for writes FT.13, FT.23
+!       particle index: ncel(...)
+!       initialization for writes: FT.13, FT.23
 !       start label 1000
-!         FFTW initialization (one time at a start time)
-!         magnetic field
+!         FFTW initialization (one time at a start/restart time)
+!         equation of magnetic field
 !         current density
-!         electric field (transverse)
+!         equation of electric field (transverse)
 !         divergence field correction (in every 5 steps)
 !         longitudinal electric field (in every 5 steps)
-!         to subroutine /forces/
-!         advance position and momentum
+!         to call subroutine /forces/
+!         advances of position and momentum
 !         diagnosis (in every iwrt1 or iwrt2 steps)
 !       end of label 1000
 !
-!  C) Many subroutines including /edges/, /sendrecv1,2/, /filt3/...
+!   C) Many subroutines including /edges/, /sendrecv1,2/, /filt3/...
 !
-!    L.1026  write() it,dcpu   <- comment out
-!    cntemp...1: cpu time  1.  <- 243.0
-!    Exec time= 1 min          <- run7.sh: =240m
+!    cntemp_config.STARTC: elapsed time in minutes  
+!    Execution time= 1-595 minutes   <- run7.sh: <= 600 min
 !*-------------------------------------------------------------------*
-! Fortran 2003 version
+! Fortran 2003 /Fortran 2008 Output (test)
 !
       program  cnt3emp
       use, intrinsic :: iso_c_binding 
@@ -106,32 +109,33 @@
         praefixe = '/data/sht/tanakam/'//sname  ! WRITE_CONF
       end if
 !
-!  Is Debye screening used: V= exp(-r/rdebye)/r ?
-!     forceV = pref_CL * ch(i)*ch(j)*exp(-r/rdebye)*(1.d0+r/rdebye)   &
-!                                                            /(rcl2 *r)
+!  Is Debye-screening used: V= exp(-r/rdebye)/r ?
+!    force: forceV= pref_CL* ch(i)*ch(j)*exp(-r/rdebye)*(1.d0+r/rdebye) &
+!                   /(rcl2 *r) in /forces/
       ifDebye= 0   ! =1 for Debye-screening on
 !
-!  size for one major node: ionode
-      if(ipar.eq.size-1) then  ! size-1 by NEC !!
+!  ipar=1 for the one major node: ionode
+      if(ipar.eq.1) then  ! size-1 by NEC !!
         ionode= .true.
       else
         ionode= .false.
       end if
-!c
+!
       suffix2= numbr2  ! new files (in param.h) 
       suffix1= numbr1  ! an old restart file
       suffix0= numbr0  ! Cntemp_config.STARTx
-!c
+!
 !
       if(ionode) then
         OPEN (unit=11,file=praefixc//'.06'//suffix2, &
               status='unknown',form='formatted')
 !
-        write(11,100) size
-  100   format('This run uses ',i3,' ranks',/)
-!c      
-        write(11,103) ipar,igrp
-  103   format('My process is #',i3,' of group #',i3)
+        write(11,'("This run uses ",i3," ranks",/)') size
+! 100   format('This run uses ',i3,' ranks',/)
+!      
+        write(11,'("My process is #",i3," of group #",i3)') &
+                                                     ipar,igrp
+! 103   format('My process is #',i3,' of group #',i3)
       end if
 !
 !*******************************************
