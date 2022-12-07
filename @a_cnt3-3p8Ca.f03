@@ -73,7 +73,7 @@
 !    cntemp_config.STARTC: elapsed time in minutes  
 !    Execution time= 1-595 minutes   <- run7.sh: <= 600 min
 !*-------------------------------------------------------------------*
-! Fortran 2003 /Fortran 2008 Write direct format
+! Fortran 2003 /Fortran 2008 Write output (test)
 !       write(11,'("This run uses ",i3," ranks",/)') size
 !
       program  cnt3emp
@@ -151,7 +151,7 @@
 !
       if(ionode) then
         write(11,'(/,"*ipar, wtime(sec)=",i3,1pd15.7)') ipar,wtime
-        write(11,'(" The job has been finished. size= ")') size 
+        write(11,'(" The job has been finished. size= ",i5)') size 
 !
         close(11)
       end if
@@ -756,8 +756,8 @@
       end if
 !
       if(ionode) then
-        write(11,'(" time step: dt=",1pd13.5,/,            &
-               " particle list is updated: itabs=",0pi4)') &
+        write(11,'(" time step: dt=",1pd13.5,/,          &
+               " particle list is updated: itabs=",i4)') &
                   dt,itabs
 !
         write(11,'(" #carbon atoms =",i7," (C+Au)",/,   &
