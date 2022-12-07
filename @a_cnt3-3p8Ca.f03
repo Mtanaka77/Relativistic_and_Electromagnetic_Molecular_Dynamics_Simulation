@@ -73,7 +73,7 @@
 !    cntemp_config.STARTC: elapsed time in minutes  
 !    Execution time= 1-595 minutes   <- run7.sh: <= 600 min
 !*-------------------------------------------------------------------*
-! Fortran 2003 /Fortran 2008 Write output (test)
+! Fortran 2003 /Fortran 2008 Write direct format
 !       write(11,'("This run uses ",i3," ranks",/)') size
 !
       program  cnt3emp
