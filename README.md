@@ -21,9 +21,9 @@ The description of each subroutine and important lines of, for example,
 is written as comments of the simulation code and post-script programs. 
 Initial 70 lines of the file @cnt3-3p8Ca.f03 are devoted to give the title, references, 
 summary of subroutines and remarks of the simulation code. 
-The major subroutine /moldyn/ does the magnetic field equation, the tranverse electric field equation, 
+The major subroutine /moldyn/ calculates the magnetic field equation, the tranverse electric field equation, 
 the correction of the longitudinal electric field, the longitudinal electric field equation, 
-the forces calculation, and advancement of positions and mometa.
+the forces calculation, and advancement of positions and momenta.
 
 
 ### Courant Condition and Real-Mass Simulation ###
