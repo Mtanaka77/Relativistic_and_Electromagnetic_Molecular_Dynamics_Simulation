@@ -16,11 +16,15 @@ One needs files in the simulation: 1) @cnt3-3p8Ca.f03: Molecular dynamics simula
 The program is written in Fortran 2003/Fortran 2008 (write format in the same line)  
 and MPI of ver.3 for parallelization.
 
-The explanation of each subroutine and important lines of, for example, 
+The description of each subroutine and important lines of, for example, 
 @a_cnt3-3p8Ca.f03 and @3ddisppC.f03 to be shown later, 
-is described as comments of the simulation code and post-script programs. 
+is written as comments of the simulation code and post-script programs. 
 Initial 70 lines of the file @cnt3-3p8Ca.f03 are devoted to give the title, references, 
-sammary of subroutines and remarks of the simulation code.
+summary of subroutines and remarks of the simulation code. 
+The major subroutine /moldyn/ does the magnetic field equation, the tranverse electric field equation, 
+the correction of the longitudinal electric field, the longitudinal electric field equation, 
+the forces calculation, and advancement of positions and mometa.
+
 
 ### Courant Condition and Real-Mass Simulation ###
 
