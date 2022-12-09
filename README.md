@@ -24,7 +24,7 @@ summary of subroutines and remarks of the simulation code.
 The major subroutine /moldyn/ calculates the magnetic field equation, 
 current density and the tranverse electric field equation, 
 the correction of the longitudinal electric field, the longitudinal electric field equation, 
-the forces calculation, and advancement of positions and momenta.
+the forces calculation, and advancement of positions and momenta toward the next time step.
 
 
 ### Courant Condition and Real-Mass Simulation ###
