@@ -31,7 +31,7 @@ and the tranverse electric field is advanced,
 It is noted, however, that the Gauss's law must be corrected for t>0 time steps as finite errors in the 
 divergence term accumulate. That is the reason why the longitudinal electric field as above 
 is used in the discrete coordinate space in any method. But, the relativistic formulae 
-/vec{v}= \vec{p}/(sqrt(m^2 +(px^2 +py^2 +pz^2)/c^2)) is valid in the nanoscale cases.
+/vec{v}= \vec{p}/(sqrt(m^2 +(px^2 +py^2 +pz^2)/c^2)) is valid in the nanoscale cases (Ref. 1).
 Also, all the explicit simulation code must satisfy the Courant condition, that is, 
 Dx(length)/Dt(time step) > c, the speed of light. 
 Otherwise, a simulation is overflown quite shortly.
