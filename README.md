@@ -24,8 +24,7 @@ summary of subroutines and remarks of the simulation code.
 In the major subroutine /moldyn/, (i) the magnetic field is advanced, (ii) current density is calculated 
 and the tranverse electric field is advanced, 
 (iii) the correction of the longitudinal electric field is made, (iv) the longitudinal electric field is added, 
-(v) the forces are calculated, and (vi) positions and momenta are assined to particles toward the next time step.
-
+(v) the forces are calculated, and (vi) positions and momenta of particles are advanced toward the next time step.
 
 ### Courant Condition and Real-Mass Simulation ###
 
