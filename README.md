@@ -28,9 +28,9 @@ and the tranverse electric field is advanced,
 
 ### Courant Condition and Real-Mass Simulation ###
 
-It is noted, however, that the Gauss's equation must be corrected for t>0 time steps as 
-finite errors in the divergence term accumulate. 
-This is true when a discrete coordinate space is used in any method. 
+It is noted, however, that the Gauss's law must be corrected for t>0 time steps as finite errors in the 
+divergence term accumulate. That is the reason why the longitudinal electric field as above 
+is used in the discrete coordinate space in any method. 
 Also, all the explicit simulation code must satisfy the Courant condition, that is, 
 Dx(length)/Dt(time step) > c, the speed of light. 
 Otherwise, a simulation is overflown quite shortly.
