@@ -21,12 +21,10 @@ The description of each subroutine and important lines of, for example,
 is written as comments of the simulation code and post-script programs. 
 Initial 70 lines of the file @cnt3-3p8Ca.f03 are devoted to give the title, references, 
 summary of subroutines and remarks of the simulation code. 
-In the major subroutine /moldyn/, (i) the magnetic field is advanced,  
-(ii) current density and the tranverse electric field is advanced, 
-(iii) the correction of the longitudinal electric field is made, 
-(iv) the longitudinal electric field is added, 
-(v) the forces are calculation, 
-and (vi) positions and momenta are assined to particles toward the next time step.
+In the major subroutine /moldyn/, (i) the magnetic field is advanced, (ii) current density is calculated 
+and the tranverse electric field is advanced, 
+(iii) the correction of the longitudinal electric field is made, (iv) the longitudinal electric field is added, 
+(v) the forces are calculated, and (vi) positions and momenta are assined to particles toward the next time step.
 
 
 ### Courant Condition and Real-Mass Simulation ###
