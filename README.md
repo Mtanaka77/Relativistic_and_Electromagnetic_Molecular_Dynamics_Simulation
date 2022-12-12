@@ -31,7 +31,7 @@ and the transverse electric field is advanced,
 It is noted, however, that the Gauss's law must be corrected for t>0 time steps as finite errors in the 
 divergence term accumulate. That is the reason why the longitudinal electric field as above 
 is used in the discrete coordinate space in any method. But, the relativistic formulae of velocity and momeutum
-/vec{v}= \vec{p}/(sqrt(m^2 +(px^2 +py^2 +pz^2)/c^2)) is valid in the nanoscale cases (Ref. 1).
+/vec{v}= \vec{p}/(sqrt(m^2 +(px^2 +py^2 +pz^2)/c^2)) is valid in the nanoscale cases (Ref. 1 and Ref. 2).
 Also, all the explicit simulation code must satisfy the Courant condition, that is, 
 Dx(length)/Dt(time step) > c, the speed of light. 
 Otherwise, a simulation is overflown quite shortly.
@@ -101,5 +101,7 @@ For the elapsed time of parallel simulation, it executed in 3.2 sec/step for 52 
 
 2. M. Tanaka, A simulation of low-frequency electromagnetic phenomena in kinetic plasmas of three dimensions, J.Comput. Phys., 107, 124-145 (1993).
 
-3. M. Murakami and M. Tanaka, Generation of high-quality mega-electron volt proton beams with intense-laser-driven nanotube accelerator, Applied Phys. Letters, 102, 163101 (2013).
+3. M. Tanaka, Macro-EM particle simulation method and a study of collisionless magnetic reconnection, Comput.Phys.Commun., 87, 117-138 (1995).
+
+4. M. Murakami and M. Tanaka, Generation of high-quality mega-electron volt proton beams with intense-laser-driven nanotube accelerator, Applied Phys. Letters, 102, 163101 (2013).
 
