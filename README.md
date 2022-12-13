@@ -16,9 +16,8 @@ One needs files in the simulation: 1) @cnt3-3p8Ca.f03: Molecular dynamics simula
 The program is written in Fortran 2003/Fortran 2008 (write format in the same line)  
 and MPI of ver.3 for parallelization.
 
-The description of each subroutine and important lines of, for example, 
-@a_cnt3-3p8Ca.f03 and @3ddisppC.f03 to be shown later, 
-is written as comments of the simulation code and post-script programs. 
+The description of each subroutine and important lines of @a_cnt3-3p8Ca.f03 and @3ddisppC.f03 
+(to be shown later), is written as comments of the simulation code and post-processing programs. 
 Initial 70 lines of the file @cnt3-3p8Ca.f03 are devoted to give the title, references, 
 summary of subroutines and remarks of the simulation code. 
 In the major subroutine /moldyn/, (i) the magnetic field is advanced, (ii) current density is calculated 
