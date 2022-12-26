@@ -41,11 +41,11 @@ the negative direction toward the origin and then go out to the positive directi
 The pellets at the origin are irradiated by these waves and are ejected to ion perpenducular 
 and electron parallel directions toward an open space. 
 The final energies for laser intensity 10^22 W/cm^2 are around 30-40 MeV in 20-40 fs, 
-which is shown by animation movies at my homepage, http://dphysique.isc.chubu.ac.jp/.
+which is shown by animation movies at my homepage, http://photon.isc.chubu.ac.jp/.
 
 ### Execution Scripts ###
 
-(1) Linux (PGI): MPI and FFTW; configure, make, make install.
+(1) Linux (PGI): MPI and FFTW; configure, make, make install for installation..
 
   %  mpich-4.0.2: ./configure --prefix=/opt/pgi/mpich-4.0.2 2>&1 | tee conf.txt
 
@@ -57,11 +57,11 @@ which is shown by animation movies at my homepage, http://dphysique.isc.chubu.ac
 
 Compilation by mpif90: 
 
-'mpif90 @a_cnt3-3p8Ca.f03' needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150.
+The script 'mpif90 @a_cnt3-3p8Ca.f03' needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150.
 
   % mpif90 -byteswapio -mcmodel=medium -fast @a_cnt3-3p8Ca.f03 -I/opt/pgi/fftw3/include -L/opt/pgi/fftw3/lib -lfftw3
 
-(2) Linux (gfortran):  MPI and FFTW; configure, make, and make install.
+(2) Linux (gfortran):  MPI and FFTW; configure, make, and make install for installation.
 
   %  mpich-4.0.2: ./configure --prefix=/opt/mpich-4.0.2 2>&1 | tee conf.txt
 
