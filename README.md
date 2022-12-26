@@ -12,9 +12,8 @@ The mass of hydrogen, for example, is 1.6726d-24 g.
 One needs files in the simulation: 1) @cnt3-3p8Ca.f03: Molecular dynamics simulation code, 
 2) param_em3p8_Ca.h: Common parameters of this simulation, 
 3) Cntemp_config.STARTC: configuring parameters, 
-4) p_config_ss.xyz_D150 and P135 of pellet electrons: H, C and Au ions. 
-The program is written in Fortran 2003/Fortran 2008 (write format in the same line)  
-and MPI of ver.3 for parallelization.
+4) p_config_ss.xyz_D150 and P135 of pellet electrons: H, C and Au ions and electrons. 
+The program is written in Fortran 2003/Fortran 2008 (write format in the same line) and MPI of Ver.3 for parallelization.
 
 The description of each subroutine and important lines of @a_cnt3-3p8Ca.f03 and @3ddisppC.f03 
 (to be shown later), is written as comments of the simulation code and post-processing programs. 
