@@ -80,7 +80,7 @@ To analyze simulation results, this program provides the post-processing tool.
 They are named @3dfdisp.f03 and @3ddisp.f03, for examples. 
 The velocity distributions in parallel and perpendicular directions, @3dfdispC.f03, are plotted 
 in sequential times of ions and electrons. The @3ddisppC.f03 program is time sequential plots 
-of H, C, Au ions and electrons in side and top views with energy histories as well at the end. 
+of H, C, Au ions and electrons from side and top views with energy histories as well at the end of the run. 
 These graphic outputs by PDF files are shown on the PC screen, either cntemp.77Cfb.pdf or 
 cntemp.77Csa.pdf. They are discussed in the latter half of the CPC paper in 2019 (Ref. 1 below).
 
