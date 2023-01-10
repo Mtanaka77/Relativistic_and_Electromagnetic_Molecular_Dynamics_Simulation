@@ -4,7 +4,7 @@
 
 A molecular dynamics simulation code is implemented for relativistic and electromagnetic fields 
 in three dimensions. It is applied to nanoscale particle phenomena such as nanotube accelerators. 
-Maxwell equations are solved, and momentum equations of relativistic particles are then advanced in time. 
+In the code, Maxwell equations are solved, and momentum equations of relativistic particles are then advanced in time. 
 Four physical CGS units are used in this code: a_unit= 1.00d-08 cm, t_unit= 1.00d-15 sec, 
 electron mass m_unit= 0.9110d-27 g and its charge e_unit= 4.8032d-10 esu. 
 The mass of hydrogen, for example, is 1.6726d-24 g.
