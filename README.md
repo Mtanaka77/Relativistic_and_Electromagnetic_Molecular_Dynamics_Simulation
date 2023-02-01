@@ -26,8 +26,7 @@ and the transverse electric field is advanced,
 
 ### Courant Condition and Real-Mass Simulation ###
 
-It is noted, however, that the Gauss's law must be corrected for t>0 time steps as finite errors in the 
-divergence term accumulate. That is the reason why the longitudinal electric field as above 
+It is noted, however, that the Gauss's law must be corrected for the t>0 time steps because finite errors in the divergence term accumulate. That is the reason why the longitudinal electric field as above 
 is used in the discrete coordinate space in any method. But, the relativistic formulae of velocity and momeutum
 /vec{v}= \vec{p}/(sqrt(m^2 +(px^2 +py^2 +pz^2)/c^2)) is valid in the nanoscale cases (Ref. 1 and Ref. 2).
 Also, all the explicit simulation code must satisfy the Courant condition, that is, 
