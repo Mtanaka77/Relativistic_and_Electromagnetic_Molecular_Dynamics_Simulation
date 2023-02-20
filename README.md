@@ -24,7 +24,7 @@ and the transverse electric field is advanced,
 (iii) the correction of the longitudinal electric field is made, (iv) the longitudinal electric field is added, 
 (v) the forces are calculated, and (vi) positions and momenta of particles are advanced toward the next time step.
 
-### Courant Condition and Real-Mass Simulation ###
+### Courant Condition and Realistic Mass Simulation ###
 
 It is noted, however, that the Gauss's law must be corrected for the t>0 time steps because finite errors in the divergence term accumulate. That is the reason why the longitudinal electric field as above 
 is used in the discrete coordinate space in any method. But, the relativistic formulae of velocity and momeutum
@@ -44,7 +44,7 @@ which is shown by animation movies at my homepage, http://photon.isc.chubu.ac.jp
 
 ### Execution Scripts ###
 
-(1) Linux (PGI): MPI and FFTW; configure, make, make install for installation..
+(1) Linux (PGI Fortran): MPI and FFTW; configure, make, make install for installation..
 
   %  mpich-4.0.2: ./configure --prefix=/opt/pgi/mpich-4.0.2 2>&1 | tee conf.txt
 
@@ -56,7 +56,7 @@ The script 'mpif90 @a_cnt3-3p8Ca.f03' needs param_em3p8_Ca.h, Cntemp_config.STAR
 
   % mpif90 -byteswapio -mcmodel=medium -fast @a_cnt3-3p8Ca.f03 -I/opt/pgi/fftw3/include -L/opt/pgi/fftw3/lib -lfftw3
 
-(2) Linux (gfortran):  MPI and FFTW; configure, make, and make install for installation.
+(2) Linux (gcc gfortran): MPI and FFTW; configure, make, and make install for installation.
 
   %  mpich-4.0.2: ./configure --prefix=/opt/mpich-4.0.2 2>&1 | tee conf.txt
 
