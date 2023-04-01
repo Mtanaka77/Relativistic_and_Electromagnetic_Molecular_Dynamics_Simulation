@@ -1,6 +1,9 @@
 ## Relativistic and Electromagnetic Molecular Dynamics Simulation for Nanoscale Phenomena ##
 
-As "Open Internet Access by Molecular Dynamics Simulations", a couple of various codes are shown in https://github.com/Mtanaka77/, which are "Relativistic and Electromagnetic Molecular Dynamics Simulation for Nanoscale Phenomena", "Large-scale Electromagnetic Particle-in-Cell Simulation", and "SIESTA on Vector-Parallel Clusters". Please visit other pages other than "Relativistic and Electromagnetic Molecular Dynamics Simulation" to be shown below.
+As "Open Internet Access by Molecular Dynamics Simulations", a couple of various codes are shown in https://github.com/Mtanaka77/, which are "Relativistic and Electromagnetic Molecular Dynamics Simulation for Nanoscale Phenomena", "Large-scale Electromagnetic Particle-in-Cell Simulation", and "SIESTA on Vector-Parallel Clusters". 
+This page was on the relativistic molecular dynamics simulations for a carbon-gold nanotube accelerator, 
+Computer Physics Communications (2019).
+Please visit other pages other than "Relativistic and Electromagnetic Molecular Dynamics Simulation" to be shown below.
 
 
 ### Molecular Dynamics Simulation: CGS Units and Necessary Files ###
