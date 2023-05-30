@@ -31,10 +31,12 @@ and the transverse electric field is advanced,
 ### Gauss's Law, Courant Condition and Realistic Mass Simulation ###
 
 It is noted, however, that the Ampere's law becomes inaccurate in
-the Cartesian coordinate space, (1/c)*\partial E/\partial t= rot B -(4\pi/c) J.
-Thus, the Gauss's law must be used for correction in the short time steps
+the Cartesian coordinate space, (1/c)\partial{\textbf E}/\partial t=
+rot{\textbf B} -(4\pi/c){\textbf J}, residing from the longitudinal
+electric field.
+Thus, the Gauss's law, div{\textbf E}=4\pi q, must be used for correction
 because finite errors accumulate in the divergence term.
-That is the reason why the longitudinal electric field as above is utilized
+That is the reason why the longitudinal electric field EADME.md-Relativ
 in the discrete coordinate space in any method.
 But, the relativistic formulae of velocity and momeutum
 /vec{v}= \vec{p}/(sqrt(m^2 +(px^2 +py^2 +pz^2)/c^2)) is valid
