@@ -36,8 +36,7 @@ rot{\textbf B} -(4\pi/c){\textbf J}, residing from the longitudinal
 electric field.
 Thus, the Gauss's law, div{\textbf E}=4\pi q, must be used for correction
 because finite errors accumulate in the divergence term.
-That is the reason why the longitudinal electric field must be solved
-in the discrete coordinate space in any method.
+That is why the longitudinal electric field must be solved in the discrete coordinate space.
 But, the relativistic formulae of velocity and momeutum
 /vec{v}= \vec{p}/(sqrt(m^2 +(px^2 +py^2 +pz^2)/c^2)) is valid
 in the nanoscale cases (Ref. 1 and Ref. 2).
