@@ -31,7 +31,7 @@ and the transverse electric field is advanced,
 ### Gauss's Law, Courant Condition and Realistic Mass Simulation ###
 
 It is noted, however, that the Ampere's law becomes inaccurate in
-the Cartesian coordinate space, c*d E/dt= rot B -(4*pi/c) J.
+the Cartesian coordinate space, (1/c)*d E/dt= rot B -(4*pi/c) J.
 Thus, the Gauss's law must be used for correction in the short time steps
 because finite errors accumulate in the divergence term.
 That is the reason why the longitudinal electric field as above is utilized
