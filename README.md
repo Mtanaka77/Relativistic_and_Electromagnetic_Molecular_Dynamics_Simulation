@@ -28,13 +28,19 @@ and the transverse electric field is advanced,
 (iii) the correction of the longitudinal electric field is made, (iv) the longitudinal electric field is added, 
 (v) the forces are calculated, and (vi) positions and momenta of particles are advanced toward the next time step.
 
-### Courant Condition and Realistic Mass Simulation ###
+### Gauss's Law, Courant Condition and Realistic Mass Simulation ###
 
-It is noted, however, that the Gauss's law must be corrected for the t>0 time steps because finite errors in the divergence term accumulate. That is the reason why the longitudinal electric field as above 
-is used in the discrete coordinate space in any method. But, the relativistic formulae of velocity and momeutum
-/vec{v}= \vec{p}/(sqrt(m^2 +(px^2 +py^2 +pz^2)/c^2)) is valid in the nanoscale cases (Ref. 1 and Ref. 2).
-Also, all the explicit simulation code must satisfy the Courant condition, that is, 
-Dx(length)/Dt(time step) > c, the speed of light. 
+It is noted, however, that the Ampere's law becomes inaccurate in
+the Cartesian coordinate space, c*d E/dt= rot B -(4*pi/c) J.
+Thus, the Gauss's law must be used for correction in the short time steps
+because finite errors accumulate in the divergence term.
+That is the reason why the longitudinal electric field as above is utilized
+in the discrete coordinate space in any method.
+But, the relativistic formulae of velocity and momeutum
+/vec{v}= \vec{p}/(sqrt(m^2 +(px^2 +py^2 +pz^2)/c^2)) is valid
+in the nanoscale cases (Ref. 1 and Ref. 2).
+Also, all the explicit simulation code must satisfy the Courant condition,
+that is, Dx(length)/Dt(time step) > c, the speed of light.
 Otherwise, a simulation is overflown quite shortly.
 
 A simulation of the nanotube accelerator is set up by putting pellets of H, C and Au atoms 
