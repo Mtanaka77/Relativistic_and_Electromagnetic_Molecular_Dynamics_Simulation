@@ -3,7 +3,7 @@
 As "Open Internet Access by Molecular Dynamics Simulations", a couple of various codes are shown in https://github.com/Mtanaka77/, which are "Relativistic and Electromagnetic Molecular Dynamics Simulation for Nanoscale Phenomena", "Large-scale Electromagnetic Particle-in-Cell Simulation", "SIESTA on Vector-Parallel Clusters", and 
 "Molecular Dynamics of Water and Ice by TIP5P Code".
 
-This page is discussed on the relativistic and nanoscale molecular dynamics simulations, Computer Physics Communications (2019, Ref. 1). Explanation of the Fortran main code has been updated. You may visit companion pages on top of "Relativistic and Electromagnetic Molecular Dynamics Simulation".
+This page is discussed on the relativistic and nanoscale molecular dynamics simulations, Computer Physics Communications (2019, Ref. 1). 
 
 
 ### Molecular Dynamics Simulation: CGS Units and Necessary Files ###
