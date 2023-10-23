@@ -1,8 +1,7 @@
 !*--------------------------------------------------------------------*
 !                                                                     !
 !  ## Molecular Dynamics in Relativistic Electromagnetic Fields ##    !
-!                                                     Dec.24, 2016    !
-!                                                                     !
+!                                             Since Dec.24, 2016      !
 !  Used files :                                                       !
 !  1. @cnt3-3p8Ca.f03:  Molecular dynamics simulation code            !
 !  2. param_em3p8_Ca.h: Common parameters of this simulation          !
@@ -18,8 +17,14 @@
 !     scheme of any kind is utilized.                                 !
 !                                                                     !
 !   Reference:                                                        !
-!      Computer Physics Commun., vol.241, pp.56-63 (2019).            !
-!      Fortran 2003 and MPI Packages   Nov. 3 (2020)                  !
+!   M.Tanaka and M. Murakami, Relativistic and electromagnetic        !
+!     molecular dynamics simulations for a carbon-gold nanotube       1
+!     accelerator, Computer Physics Communications, Elsevier Publ.,   !
+!     vol.241, pp.56-63 (2019).                                       !
+!   M.Tanaka, A simulation of low-frequency electromagnetic phenomena !
+!     in kinetic plasmas of three dimensions, J.Comput. Phys.,        !
+!     107, 124-145 (1993). 
+!   Fortran 2003 and MPI Packages   Nov. 3 (2020)                  !
 !                                                                     !
 !   Author/maintainer: Motohiko Tanaka, Ph.D.,Professor,              !
 !      Graduate School of Chubu University, Kasugai 487-8501, Japan.  !
