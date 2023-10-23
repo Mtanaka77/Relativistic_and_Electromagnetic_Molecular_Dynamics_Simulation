@@ -1,5 +1,4 @@
 !*--------------------------------------------------------------------*
-!                                                                     !
 !  ## Molecular Dynamics in Relativistic Electromagnetic Fields ##    !
 !                                             Since Dec.24, 2016      !
 !  Used files :                                                       !
@@ -10,28 +9,27 @@
 !  4. p_config_ss.xyz_D150, P135: Initially loaded particles of       !
 !             H,C,Au atoms and electrons                              !             
 !                                                                     !
-!  > An explicit simulation code is strictly bound by the Courant     !
+!  >> An explicit simulation code is strictly bound by the Courant    !
 !     condition, Dx(length)/Dt(time) > c, the speed of light.         !
-!  > The Gauss's law must be corrected because errors of divergence   !
+!  >> The Gauss's law must be corrected because errors of divergence  !
 !     term accumulate in time. This is true if a finite difference    !
 !     scheme of any kind is utilized.                                 !
 !                                                                     !
 !   Reference:                                                        !
 !   M.Tanaka and M. Murakami, Relativistic and electromagnetic        !
-!     molecular dynamics simulations for a carbon-gold nanotube       1
+!     molecular dynamics simulations for a carbon-gold nanotube       !
 !     accelerator, Computer Physics Communications, Elsevier Publ.,   !
 !     vol.241, pp.56-63 (2019).                                       !
 !   M.Tanaka, A simulation of low-frequency electromagnetic phenomena !
 !     in kinetic plasmas of three dimensions, J.Comput. Phys.,        !
-!     107, 124-145 (1993). 
-!   Fortran 2003 and MPI Packages   Nov. 3 (2020)                  !
+!     107, 124-145 (1993).                                            !
+!   Fortran 2003 and MPI Packages   Nov. 3 (2020)                     !
 !                                                                     !
-!   Author/maintainer: Motohiko Tanaka, Ph.D.,Professor,              !
+!   Author/maintainer: Motohiko Tanaka, Ph.D., Professor,             !
 !      Graduate School of Chubu University, Kasugai 487-8501, Japan.  !
 !                                                                     !
 !   GPL-3.0 License, at https://github.com/Mtanaka77/                 !
-!     /Relativistic_Molecular_Dynamics_Simulation/                    !
-!                                                                     !
+!   /Relativistic_and_Electromagnetic_Molecular_Dynamics_Simulation/  !
 !*--------------------------------------------------------------------*
 !                                                                     !
 !   MPI+OpenMP: subroutine /forces/; real atomic masses mp/me=1836    !
