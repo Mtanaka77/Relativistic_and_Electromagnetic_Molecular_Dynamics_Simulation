@@ -25,8 +25,8 @@
 !     107, 124-145 (1993).                                            !
 !   Fortran 2003 and MPI Packages   Nov. 3 (2020)                     !
 !                                                                     !
-!   Author/maintainer: Motohiko Tanaka, Ph.D., Professor,             !
-!      Graduate School of Chubu University, Kasugai 487-8501, Japan.  !
+!   Author/maintainer: Motohiko Tanaka, Ph.D.                         !
+!      (Graduate School, Chubu University, Japan: spring, 2024.)      !
 !                                                                     !
 !   GPL-3.0 License, at https://github.com/Mtanaka77/                 !
 !   /Relativistic_and_Electromagnetic_Molecular_Dynamics_Simulation/  !
@@ -73,7 +73,6 @@
 !       end of label 1000                                             !
 !                                                                     !
 !   C) Many subroutines including /edges/, /sendrecv1,2/, /filt3/...  !
-!                                                                     !   
 !    cntemp_config.STARTC: elapsed time in minutes                    !
 !    Execution time= 595 minutes + restart   <- run7.sh               !
 !                                                                     !
