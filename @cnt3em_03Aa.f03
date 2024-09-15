@@ -5,6 +5,9 @@
 !  ## Molecular Dynamics in Relativistic Electromagnetic Fields ##    !
 !                                                                     !
 !   MPI+OpenMP: subroutine /forces/; real atomic masses mp/me=1836    !
+!     Open system with central region in XYZ coordinated space;       !
+!     the Z direction is parallelized, where the size mz= n_proc*mza  !
+!     and n_proc is the PE's nodes like n_proc=64, for example.       ! 
 !   READ_conf is used in nZ, nZA, intens, lambda                      !
 !   3D filled H(+) by ranff(0.) filling ... moldyn 1150               !
 !   No gap between r>rout and r<rout  ... forces 920,940,1690,1750    !
@@ -82,12 +85,13 @@
 !    Fortran 2003 /Fortran 2008 Write output (finished)               !   
 !       write(11,'("This run uses ",i3," ranks",/)') size             !
 !                                                                     !
-!  The initial version by Fujitsu FX100                               !
+!  The initial version was by Fujitsu FX100 Supercomputer, 2015-2019. !
 !    mpifrtpx -Kfast,openmp -o aq4.out @cnt3emq.f03 -lfftw3           !
 !    (Ez,Bx) in envelop: (sin,cos)*exp(-(t/tq)**2)                    !
 !*--------------------------------------------------------------------*
 !
       program  cnt3emw
+      use, intrinsic :: iso_c_binding 
       implicit  none
 !
       include   'param_em3p7_Aa.h'
@@ -112,7 +116,7 @@
       call mpi_comm_rank (MPI_COMM_WORLD,rank,ierror)
       call mpi_comm_size (MPI_COMM_WORLD,size,ierror)
 !
-      ipar = 1 +rank  ! rank's name
+      ipar = 1 +rank    ! rank's name
       igrp = kgrp
 !
       if(ipar.eq.1) then
@@ -152,11 +156,9 @@
         OPEN (unit=11,file=praefixc//'.06'//suffix1, &
               status='unknown',form='formatted')
 !
-        write(11,100) size
-  100   format('This run uses ',i3,' ranks',/)
-!
-        write(11,103) ipar,igrp
-  103   format('My process is #',i3,' of group #',i3)
+        write(11,'("This run uses",i3," ranks")') size
+        write(11,'("My process is #",i3," of group #",i3)') &
+                 ipar,igrp
 !
         close(11)
       end if
@@ -178,14 +180,13 @@
         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
               status='unknown',position='append',form='formatted')
 !
-        write(11,693) ipar,ctime,wtime
-  693   format(/,'*ipar, ctime, wtime(sec)=',i3,1p2e15.7)
+        write(11,'("*ipar, ctime, wtime(sec)=",i3,1p2d15.7)') &
+                 ipar,ctime,wtime
 !
         close(11)
       end if
 !*
       call mpi_finalize  (ierror)
-    1 continue
 !*
       stop
       end program cnt3emw
@@ -194,6 +195,7 @@
 !------------------------------------------------------------------------
       subroutine date_and_time_7 (date_now,time_now)
 !------------------------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
       implicit none
 !
       integer, dimension(8) :: ipresent_time
@@ -215,6 +217,7 @@
 !------------------------------------------------------
 !*  Measure both cpu and elapsed times 
 !
+      use, intrinsic :: iso_c_binding 
       implicit none
 !
       include    'param_em3p7_Aa.h'
@@ -272,6 +275,7 @@
 !----------------------------------------------------------------------
       subroutine RUN_MD (size,ipar,igrp,if_start,ifDebye,ifedist)
 !----------------------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
       implicit  none
 !
       include    'param_em3p7_Aa.h'
@@ -560,8 +564,7 @@
           OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
                 status='unknown',position='append',form='formatted')
 !
-          write(11,630) 
-  630     format(' Restart data are loaded from FT10.....',/)
+          write(11,'(" Restart data are loaded from FT10.....",/)') 
           close(11)
         end if
 !
@@ -607,23 +610,13 @@
           OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
                 status='unknown',position='append',form='formatted')
 !
-          write(11,640) t,it,is
-  640     format(' Starting: t=',1pe11.3,'   it,is=',i7,i5)
+          write(11,'(" Starting: t=",1pe11.3,"   it,is=",i7,i5)') t,it,is
 !
           nCLp= ns +np +nq  ! just for write out here
-          write(11,643) ns,np,nq,nCLp
-  643     format(' ns,np,nq; nCLp=',i8,i6,i8,2x,i8,/)
+          write(11,'(" ns,np,nq; nCLp=",i8,i6,i8,2x,i8,/)') ns,np,nq,nCLp
 !
-          write(11,645) iwa,iwb,iwc,iwd
-  645     format(' iwa, iwb, iwc, iwd=',4i7,/)
+          write(11,'(" iwa, iwb, iwc, iwd=",4i7,/)') iwa,iwb,iwc,iwd
 !          
-!         OPEN (unit=50,file='ft50.data',               &
-!               status='unknown',form='formatted')
-!         write(50,640) t,it,is
-!         write(50,643) ns,np,nq,nCLp
-!         write(50,645) iwa,iwb,iwc,iwd
-!         close(50)
-!
           close(11)
         end if
 !
@@ -718,8 +711,8 @@
           write(11,*) ' '
         else
           write(11,*) ' '
-          write(11,603) xmax3,ymax3,zmax3
-  603     format('# Lx/2, Ly/2, Lz/2 (cm) = ',3f12.5,/)
+          write(11,'("# Lx/2, Ly/2, Lz/2 (cm) = ",3f12.5,/)') &
+                   xmax3,ymax3,zmax3
         end if
 !
         close(11)
@@ -931,6 +924,7 @@
 !----------------------------------------------------------------------
       subroutine FLOPEN (nframe,igrp)
 !----------------------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
       implicit none
 !
       include   'param_em3p7_Aa.h'
@@ -979,8 +973,8 @@
       use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include 'fftw3.f03'
-!     include 'aslfftw3.f03'
+!     include 'fftw3.f03'
+      include 'aslfftw3.f03'
 !
       include 'param_em3p7_Aa.h'
       include 'mpif.h'
@@ -1203,9 +1197,9 @@
                 status='unknown',position='append',form='formatted')
 !
           write(11,*) 'write x0,y0,z0...'
-          write(11,132) (i,x0(i),y0(i),z0(i),i=1,5)
-          write(11,132) (i,x0(i),y0(i),z0(i),i=ns+1,ns+5)
-          write(11,132) (i,x0(i),y0(i),z0(i),i=ns+np+1,ns+np+5)
+          write(11,'("i=",i6,2x,1p3d11.4)') (i,x0(i),y0(i),z0(i),i=1,5)
+          write(11,'("i=",i6,2x,1p3d11.4)') (i,x0(i),y0(i),z0(i),i=ns+1,ns+5)
+          write(11,'("i=",i6,2x,1p3d11.4)') (i,x0(i),y0(i),z0(i),i=ns+np+1,ns+np+5)
   132     format('i=',i6,2x,1p3e11.4)
 !
           close(11)
@@ -1814,7 +1808,10 @@
         if(iwrt3.eq.0 .and. ionode) then
         if(.not.ifeqlib) then
 !
-        write(wrt,*) 'write(30)... t=',t
+        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+              status='unknown',position='append',form='formatted')
+        write(11,*) 'write(30)... t=',t
+        close(11)
 !
         OPEN (unit=30,file=praefixc//'.30'//suffix1,              &
               status='unknown',position='append',form='unformatted')
@@ -2016,8 +2013,8 @@
         write(11,*) ' ety,btx; EE,HH (given sin*ff/cos*ff)...'
 !
         do n=1,mz,20
-        write(11,999) n,etx(l,m,n),bty(l,m,n),EE(l,m,n),HH(l,m,n)
-  999   format(i4,1p2e13.3,2x,2e13.3)
+        write(11,'(i4,1p2d13.3,2x,2e13.3)') &
+                 n,etx(l,m,n),bty(l,m,n),EE(l,m,n),HH(l,m,n)
         end do
 !
         close(11)
@@ -2030,9 +2027,9 @@
           OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
                 status='unknown',position='append',form='formatted')
 !
-          write(11,993) cp7-cp1,cp2-cp1,cp3-cp2,cp4-cp3,cp5-cp4, &
-                        cp6-cp5,cp7-cp6
-  993     format('*Ctime ctime=',f7.3,' 1,2,3,4,5,6=',6f7.3)
+          write(11,'("*Ctime ctime=",f7.3," 1,2,3,4,5,6=",6f7.3)') &
+                   cp7-cp1,cp2-cp1,cp3-cp2,cp4-cp3,cp5-cp4, &
+                   cp6-cp5,cp7-cp6
           close(11)
         end if
 !       
@@ -2420,11 +2417,11 @@
             end if
           end if
 !
-          write(11,710) time(is),ekin(is),ekn1(is),ekn2(is),ecr(is),  &
+          write(11,'("t=",1pd9.2,14d11.2,d11.3)') &
+                    time(is),ekin(is),ekn1(is),ekn2(is),ecr(is),  &
                     elj(is),sex(is),sez(is),sbx(is),sbz(is),etot(is),  &
                     Rgyc(is),Rgyi(is),Rgye(is),slx(is),                &
                     dcpu
-  710     format('t=',1pe9.2,14e11.2,e11.3) 
         end if
 !
         close(11)
@@ -2512,6 +2509,7 @@
                          Lx3,Ly3,Lz3,rcut_Clf,rcutlj,prefc_lj,pref_lj, &
                          size,ipar,igrp,n_twice,ns,np,nCLp)
 !---------------------------------------+++++++-------------------------
+      use, intrinsic :: iso_c_binding 
       implicit  none
 !*
       include    'param_em3p7_Aa.h'
@@ -3007,7 +3005,9 @@
 !----------------------------------------------------------
       subroutine lp_out (z,nCLp,igrp,istop)
 !----------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
       implicit none
+!
       include  'param_em3p7_Aa.h'
 !
       real*8     z(npq0)
@@ -3076,7 +3076,9 @@
 !*  Indices of the neighboring (27) sub-boxes.
 !   Non-periodic: no folding
 !
+      use, intrinsic :: iso_c_binding 
       implicit none
+!
       include 'param_em3p7_Aa.h'
 !
       integer*4   isize2,isize4,icmax,              &
@@ -3154,6 +3156,7 @@
 !------------------------------------------------------------
       subroutine filt3 (srx,sry,srz,EE,HH,ifeh)
 !------------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
       implicit none
 !
       include   'param_em3p7_Aa.h'
@@ -3310,6 +3313,7 @@
       subroutine filt1 (srx)
 !------------------------------------------------------------
 !  Only for srx (ES case)
+      use, intrinsic :: iso_c_binding 
       implicit none
 !
       include   'param_em3p7_Aa.h'
@@ -3389,6 +3393,7 @@
                                    ipar1,ipar2)
 !------------------------------------------------------------------------
 ! Reflection by the cylinder
+      use, intrinsic :: iso_c_binding 
       implicit none
 !
       include    'param_em3p7_Aa.h'
@@ -3420,6 +3425,7 @@
                                      R_cn1,R_cn2,ipar1,ipar2)
 !------------------------------------------------------------------------
 ! Reflection by a hollow cylinder: Z_cn1 < z < Z_cn2
+      use, intrinsic :: iso_c_binding 
       implicit none
 !
       include    'param_em3p7_Aa.h'
@@ -3450,7 +3456,9 @@
 !--------------------------------------------------------------------
       subroutine READ_CONF (np,ifrefl)  ! data
 !-------------------------- +++++++++ -------------------------------
+      use, intrinsic :: iso_c_binding 
       implicit none
+!
       include    'param_em3p7_Aa.h'
 !
       integer*4  np,ifrefl
@@ -3567,7 +3575,9 @@
 !----------------------------------------------------------------
       subroutine WRITE_CONF (ns,np,nCLp)
 !----------------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
       implicit none
+!
       include  'param_em3p7_Aa.h'
 !
       real*8     fchar,fcharA
@@ -3637,7 +3647,9 @@
 !-----------------------------------------------------------
       subroutine nonfdP (xg,yg,zg,x4,y4,z4,npio)
 !-----------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
       implicit none
+!
       include  'param_em3p7_Aa.h'
 !
       integer*4  npio,i
@@ -3659,7 +3671,9 @@
                        ipar,istop,if_start,ns,np,nq,nCLp)
 !----------------------****--------------- ++ ++ ++ +++ ------
 !  Carbon and Au accelerator
+      use, intrinsic :: iso_c_binding 
       implicit none
+!
       include  'param_em3p7_Aa.h'
 !
       integer*4   ipar,istop,wrt2,ns,np,nq,nZ,nZA,nCLp
@@ -3916,6 +3930,7 @@
       if(ionode) then
         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
               status='unknown',position='append',form='formatted')
+!
         write(11,541) s1/nq
   541   format(' Kinetic energy of an electron /mc^2=',1pe13.5)
 !
@@ -3930,6 +3945,7 @@
       subroutine ggauss
 !---------------------------------------------------------------
 !  (-3.,3.) case
+      use, intrinsic :: iso_c_binding 
       implicit none
 !
       real*4  fv,vv0,dv,vv,s,sdv,fun
@@ -3968,6 +3984,7 @@
       function dgaus2 (vmax)
 !---------------------------------------------------------------
 !  vmax dimension
+      use, intrinsic :: iso_c_binding 
       implicit none
 !
       real*4  dgaus2,vmax
@@ -4008,7 +4025,9 @@
 !-------------------------------------------------------------
       subroutine vdistr (xg,yg,zg,vx,vy,vz,ns,np,nCLp)
 !-------------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
       implicit none
+!
       include  'param_em3p7_Aa.h'
 !
       real*8     xg(npq0),yg(npq0),zg(npq0),   &
@@ -4155,7 +4174,9 @@
 !-----------------------------------------------------------
       subroutine edistr (vx,vy,vz,am,ns,np,nCLp)
 !-----------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
       implicit none
+!
       include  'param_em3p7_Aa.h'
 !
       integer*4  ns,np,nq,nCLp,i,k,ix,ILN
@@ -4305,7 +4326,9 @@
 !------------------------------------------------------
       subroutine averg1 (q,qav,is)
 !------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
       implicit none
+!
       real*4 q(5000),qav
       integer*4  is,i
 !
@@ -4324,7 +4347,9 @@
 !------------------------------------------------------
       subroutine rehist
 !------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
       implicit none
+!
       include  'param_em3p7_Aa.h'
 !
       real*4        ekin,ppot,ekn1,ekn2,etot,Rgyi,Rgye,          &
@@ -4393,6 +4418,7 @@
 !------------------------------------------------------
       subroutine lplots
 !------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
       implicit none
 !
       real*4        ekin,ppot,ekn1,ekn2,etot,Rgyi,Rgye,          &
@@ -4535,6 +4561,7 @@
 !------------------------------------------------------
       subroutine lplmax (f,fmax,fmin,is)
 !------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
       implicit none
 !
       real*4 f(7000),fmax,fmin
@@ -4556,6 +4583,8 @@
       subroutine ppl3da (xg,yg,zg,ch,ag,Rgy1,Rgy2,ns,np,nq,  &
                          nCLp,igrp,ifskip_e,ifskip_p)
 !------------------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
+!
       include    'param_em3p7_Aa.h'
 !
       integer*4  ns,np,nq,nCLp,igrp,nZ,nZA
@@ -4777,6 +4806,7 @@
                          nCLp,igrp)
 !------------------------------------------------------------------
 !  View from top (x,y)
+      use, intrinsic :: iso_c_binding 
 !
       include    'param_em3p7_Aa.h'
 !
@@ -4949,6 +4979,7 @@
 !---------------------------------------
 !  ic= 3 tri-color
 !  ic= 0 gray scale, r= 0. for black
+      use, intrinsic :: iso_c_binding 
 !
        write(77,*) 'stroke'
 !
@@ -4970,6 +5001,7 @@
        subroutine circle (x,y,d,ic)
 !-------------------------------------------------
 !*  Open circle centered at (x,y) /or outer edge.
+      use, intrinsic :: iso_c_binding 
 !
       write(77,*) " 3.0 setlinewidth"
 !
@@ -5137,6 +5169,7 @@
 !   il=1................ linear plot of (x,y)
 !   il=2................ log10 plot of (x,log y)
 !***********************************************************************
+      use, intrinsic :: iso_c_binding 
 !
       dimension  x(7000),y(7000),u(7000),v(7000)
       dimension  xcm(6),ycm(6),pl(6),pr(6),ql(6),qr(6)
@@ -5368,6 +5401,8 @@
 !-----------------------------------------------------------------------
       subroutine scalex (xcm,ycm,x00,y00,dx,dy,isc)
 !-----------------------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
+!
       common/gscale/ x0(10),y0(10),xl(10),yl(10),dxi(10),dyi(10)
 !
       x0(isc)= x00
@@ -5385,6 +5420,8 @@
 !-----------------------------------------------------------------------
       subroutine plotl (x,y,isc,ipl)
 !-----------------------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
+!
       common/gscale/ x0(10),y0(10),xl(10),yl(10),dxi(10),dyi(10)
 !
       xcm= xl(isc) +dxi(isc)*(x -x0(isc))
@@ -5421,6 +5458,7 @@
 !        n100 = 3 : power of ten format
 !        n100 = othewise : not write out
 !-----------------------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
 !
       real*4 val
       character chr13*13,chr12*12,chr3*3
@@ -5582,6 +5620,7 @@
 !        6   :  2 point dash  --2.0-- - - --2.0--
 !   otherwise:  line          ---------------------
 !-----------------------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
 !
       h1  =  0.05
       h2  =  2.0 * h1
@@ -5714,6 +5753,8 @@
 !-----------------------------------------------------------------------
       subroutine daisho(x  ,nx,xmin1,xmax1)
 !-----------------------------------------------------------------------
+      use, intrinsic :: iso_c_binding 
+!
       dimension x(1)
 !
       xmax1= x(1)
@@ -5747,6 +5788,8 @@
 !---------------------------------------------------------------
        subroutine gopen (nframe)
 !----------------------------------------------------------
+       use, intrinsic :: iso_c_binding 
+!
        common/convsn/ fmag,x0,y0,h0,n0
        common/pages/  ipage,nfrm
 !
@@ -5855,6 +5898,8 @@
 !-----------------------------
        subroutine gclose
 !-----------------------------
+       use, intrinsic :: iso_c_binding 
+!
        call plote
        return
        end
@@ -5863,6 +5908,8 @@
 !-----------------------------
        subroutine plote
 !-----------------------------
+       use, intrinsic :: iso_c_binding 
+!
        write(77,10) 
    10  format('@eop')
        return
@@ -5873,8 +5920,9 @@
        subroutine chart
 !-----------------------------------------
 !*     Four frames in a page (if nfrm=4).
-       common/pages/ ipage,nfrm
+       use, intrinsic :: iso_c_binding 
 !
+       common/pages/ ipage,nfrm
 !
        ipage = ipage +1
        loc= mod(ipage-1,nfrm)
@@ -5940,6 +5988,8 @@
 !------------------------------------
        subroutine factor(fct)
 !------------------------------------
+       use, intrinsic :: iso_c_binding 
+!
        write(77,10) fct,fct
    10  format(f6.2,1x,f6.2,' sc')
        return
@@ -5949,6 +5999,8 @@
 !------------------------------------
        subroutine newpen (ip)
 !------------------------------------
+       use, intrinsic :: iso_c_binding 
+!
        i1=(ip-1)/2
        i2=ip-2*i1
        write(77,*) 'sn'
@@ -5965,6 +6017,8 @@
 !-----------------------------
        subroutine linee
 !-----------------------------
+       use, intrinsic :: iso_c_binding 
+!
        write(77,*) 'st'
        return
        end
@@ -5973,6 +6027,7 @@
 !------------------------------------
        subroutine plot (x0,y0,ip)
 !------------------------------------
+       use, intrinsic :: iso_c_binding 
 !
        x= x0
        y= y0
@@ -5996,7 +6051,7 @@
 !-------------------------------------------------
        subroutine symbol (x0,y0,h0,isymb,ang,n0)
 !-------------------------------------------------
-!      use, intrinsic :: iso_c_binding 
+       use, intrinsic :: iso_c_binding 
        implicit none
 !
        character    ica*80,ich(80)*1
@@ -6031,7 +6086,7 @@
 !-----------------------------------------------
        subroutine number (x0,y0,h0,anu,ang,n0)
 !-----------------------------------------------
-!      use, intrinsic :: iso_c_binding 
+       use, intrinsic :: iso_c_binding 
        implicit none
 !
        real*4  x0,y0,h0,anu,ang,x,y,h
@@ -6102,7 +6157,7 @@
 !-----------------------------------------------
        subroutine number2 (x0,y0,h0,anu,ang,n0)
 !-----------------------------------------------
-!      use, intrinsic :: iso_c_binding  ! <-
+       use, intrinsic :: iso_c_binding  ! <-
        implicit none
 !
        real*4  x0,y0,h0,anu,ang,x,y,h
@@ -6139,6 +6194,8 @@
 !---------------------------------------------------
        subroutine sunscl (x,y,h,n)
 !---------------------------------------------------
+       use, intrinsic :: iso_c_binding  ! <-
+!
        common/convsn/ fmag,x0,y0,h0,n0
 !
        if(x.eq.999.) then
