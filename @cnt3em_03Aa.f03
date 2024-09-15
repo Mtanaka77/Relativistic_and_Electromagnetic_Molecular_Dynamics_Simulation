@@ -1,6 +1,6 @@
 !**********************************************************************
 !*--------------------------------------------------------------------*
-!  @cnt3ems_01Aa.f03                    Dec.24, 2016, Sep.13, 2024    !   
+!  @cnt3ems_03Aa.f03                    Dec.24, 2016, Sep.13, 2024    !   
 !                                                                     !
 !  ## Molecular Dynamics in Relativistic Electromagnetic Fields ##    !
 !                                                                     !
@@ -85,7 +85,7 @@
 !    Fortran 2003 /Fortran 2008 Write output (finished)               !   
 !       write(11,'("This run uses ",i3," ranks",/)') size             !
 !                                                                     !
-!  The initial version was by Fujitsu FX100 Supercomputer, 2015-2019. !
+!  Initial version by Fujitsu FX100 Supercomputer, 2015-2019.         !
 !    mpifrtpx -Kfast,openmp -o aq4.out @cnt3emq.f03 -lfftw3           !
 !    (Ez,Bx) in envelop: (sin,cos)*exp(-(t/tq)**2)                    !
 !*--------------------------------------------------------------------*
