@@ -1,0 +1,27 @@
+# Praefix-String......................: Cemp0701
+# Cell boundary 0/1/2 (open/closed/2D):            0
+# Maximum cpu time (min). ca 10 min.. :    300.0
+# Physikalische Endzeit.. 10^-15 sec .:    50.1000d-15
+# Diskretisierungs-Schritt......0.0005:    0.00050d-15
+# Write out interval for IWRT1..0.025.:    0.02500d-15 
+# Write out interval for IWRT2..0.50..:    0.20000d-15 
+# Write out interval for IWRT3..field.:    0.20000d-15 
+# Particle table update interval......:            5
+# Number of protons...................:        10120 
+# Charge state of carbon... 6.00......:         6.00
+# Charge state of gold.....20.00......:        60.00
+# lump of charge nZ...................:            1
+# lump of charge nZA..................:            4
+# proton/electron mass ratio..........:    1836.0d+00
+# Intensity in W/cm2..................:    6.0d+20
+# Wavelength in 800.d-7 cm............:    0.800d-4
+# Size of target (cm).................:    30.d-8
+# Density of H target (/cm^3).........:    8.9d+21
+# Ortsraum-Cutoff (Ang)..short range .:   10.000d+00
+# LJ-Cutoff (Ang).......1.122462048 ..:    3.500d+00
+# LJ energy of C (eV).................:    2.500d+00
+# LJ energy of others (eV)............:   0.0010d+00
+# Electron temperature (eV)...........:    1.00d-03
+# Plot Rgmax (gyration radius)........:     200.0
+
+# LJ energy of Na (kcal/mol)..........:    0.0148000000000000
