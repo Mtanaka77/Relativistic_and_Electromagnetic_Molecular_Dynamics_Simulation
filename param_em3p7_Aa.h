@@ -1,6 +1,6 @@
 !  param_em3p7_Aa.h
 !
-!  restart: numbr1 
+!  restart: numbr2,numbr1 
 !  EM parallel: num_proc
 !
 !    Give Lengthx in Angstrom, then is converted to cm !!
@@ -21,12 +21,13 @@
 ! #PBS -l elapstim_req=00:15:00
 ! #PBS --venode=16      #  32
 ! #PBS --venum-lhost=8
+! #PBS -v OMG_NUM_THREADS=8
 
       parameter  (iflinx=.false.,num_proc=16)      ! 512/16= 32
-!       parameter  (iflinx=.false.,num_proc=64)    ! 512/64= 8
+!       parameter  (iflinx=.false.,num_proc=32)    ! 512/32
 !
       parameter  (sname='Cntemp',cname='cntemp')   ! cntemp
-      parameter  (numbr2='Aa',numbr1='Aa',numbr0='A')  ! Aa, Aa
+        parameter  (numbr2='Aa',numbr1='Aa',numbr0='A')  ! Aa, Aa
 !
       parameter  (kstart=0,kgrp=1)
 !       parameter  (kstart=1,kgrp=1)
@@ -37,14 +38,10 @@
       parameter  (isizeX=50,isizeY=50,isizeZ=128)  ! isizeX 10 Ang !
       parameter  (Lenx3=500.d0,Leny3=500.d0,Lenz3=1280.d0)
       parameter  (mx=201,my=201,mz=512)            ! Grid: 2.5 Ang, mz=512
-      parameter  (mza=32)      ! test case -> 16   ! mz=512, 32 ranks 
+      parameter  (mza=32)                          ! mz=512, 16 ranks 
+!       parameter  (mza=16)                        ! mz=512, 32 ranks 
       parameter  (mxyza=mx*my*mza)                 ! divided in Z
 !
-!     parameter  (isizeX=50,isizeY=50,isizeZ=128)  ! isizeX 10 Ang !
-!     parameter  (Lenx3=500.d0,Leny3=500.d0,Lenz3=1280.d0)
-!     parameter  (mx=201,my=201,mz=512)            ! Grid: 2.5 Ang, mz=512
-!     parameter  (mza=8)                           ! mz=512, 64 ranks
-!     parameter  (mxyza=mx*my*mza)
 ! ----------------------------------------------------------
       parameter  (lxy3= 3*mx*my)
       parameter  (sconv=1.0d-8)
@@ -52,21 +49,18 @@
       parameter  (npq0=ns0+np0+nq0)
       parameter  (n00=npq0/num_proc+1,n10=ns0/num_proc+1)
 !     parameter  (nbxs=7000,nbxc=5000,nbx2=5000)
-      parameter  (nbxs=6000,nbxc=3500,nbx2=3500)   ! medium 
-!     parameter  (nbxs=3500,nbxc=2000,nbx2=2000)   ! small? 
+      parameter  (nbxs=6000,nbxc=3500,nbx2=3500)   ! medium ?
+!     parameter  (nbxs=3500,nbxc=2000,nbx2=2000)   ! small in 96 cpu
       parameter  (nc3=isizeX*isizeY*isizeZ)
 !
 ! zero at ymin3< 0 <ymax3
 !  E*B direction is -y
-!  parameter  (mx=201,my=201,mz=608)            ! Grid: 2.5 Ang, mz=600
-      parameter  (xmax3= (100/200.d0)*sconv*Lenx3, & ! EM field 200*400 meshes
+      parameter  (xmax3= (100/200.d0)*sconv*Lenx3, & ! EM field 200*512 meshes
                   xmin3=-(100/200.d0)*sconv*Lenx3, & ! 
                   ymax3= (100/200.d0)*sconv*Leny3, & !  E*H field
                   ymin3=-(100/200.d0)*sconv*Leny3, & ! 
                   zmax3= (256/512.d0)*sconv*Lenz3, & !  axial direction 
                   zmin3=-(256/512.d0)*sconv*Lenz3)   ! 
-!                   zmax3= (384/768.d0)*sconv*Lenz3, & !  axial direction 
-!                   zmin3=-(384/768.d0)*sconv*Lenz3)   ! 
 !
 !  /data/sht/tanakam/cntemp + .06a
 !  /home/tanakam/cntem3/Cntemp + _config.START + A
