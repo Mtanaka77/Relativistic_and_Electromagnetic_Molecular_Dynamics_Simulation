@@ -15,8 +15,8 @@ Four physical CGS units are used in this code: a_unit= 1.00d-08 cm, t_unit= 1.00
 electron mass m_unit= 0.9110d-27 g and its charge e_unit= 4.8032d-10 esu. 
 The mass of hydrogen, for example, is 1.6726d-24 g.
 
-One needs files in the simulation: 1) @cnt3-3p8Ca.f03: Molecular dynamics simulation code, 
-2) param_em3p8_Ca.h: Common parameters of this simulation, 
+One needs files in the simulation: 1) @cnt3-3p7Ca.f03: Molecular dynamics simulation code, 
+2) param_em3p7_Ca.h: Common parameters of this simulation, 
 3) Cntemp_config.STARTC: configuring parameters, 
 4) p_config_ss.xyz_D150 and P135 of pellet electrons: H, C and Au ions and electrons. 
 The program is written in Fortran 2003/Fortran 2008 (write format in the same line) and MPI of Ver.3 for parallelization.
