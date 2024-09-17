@@ -21,9 +21,9 @@ One needs files in the simulation: 1) @cnt3-3p7Ca.f03: Molecular dynamics simula
 4) p_config_ss.xyz_D150 and P135 of pellet electrons: H, C and Au ions and electrons. 
 The program is written in Fortran 2003/Fortran 2008 (write format in the same line) and MPI of Ver.3 for parallelization.
 
-Previously upto 2019, the first version was created with @cnt3em_03Aa.f03 for the paper in Ref.1
-CPC 2019. For better version with elavorated energies and smoothing, the code of 
-@a_cnt3-3p7Ca.f03 has been made.   
+Previously upto 2019, the proper version was created with @cnt3em_03Aa.f03 for the paper in Ref.1
+CPC 2019. For better version with elavorated energies, smoothing and parallelization, the 
+simulation code has been made as @a_cnt3-3p7Ca.f03.   
 
 The description of each subroutine and important lines of @a_cnt3-3p8Ca.f03 and @3ddisppC.f03 
 (to be shown later), is written as comments of the simulation code and post-processing programs. 
