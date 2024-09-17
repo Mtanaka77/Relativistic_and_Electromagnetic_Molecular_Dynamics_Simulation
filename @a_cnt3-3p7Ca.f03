@@ -1674,8 +1674,17 @@
       do l= 2,mx-1
       nw= n -nz1(ipar) +1
 !
+!     yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
+!     btx(l,m,n)= btx(l,m,n) -cdt*((etz(l,m+1,n) -etz(l,m-1,n))/hy2   &
+!                                 -(ety(l,m,n+1) -ety(l,m,n-1))/hz2)  &
+!                 -dt*omega*E0*sin(omega*tg -ak*yy)
+!                       driver at omega*(tg)
+!
+      yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
       btx(l,m,nw)= btx(l,m,nw) -cdt*((etz(l,m+1,nw) -etz(l,m-1,nw))/hy2  &
-                                    -(ety(l,m,nw+1) -ety(l,m,nw-1))/hz2)
+                                    -(ety(l,m,nw+1) -ety(l,m,nw-1))/hz2) &
+                   -dt*omega*E0*sin(omega*tg -ak*yy)
+!
       bty(l,m,nw)= bty(l,m,nw) -cdt*((etx(l,m,nw+1) -etx(l,m,nw-1))/hz2  &
                                     -(etz(l+1,m,nw) -etz(l-1,m,nw))/hx2)
       btz(l,m,nw)= btz(l,m,nw) -cdt*((ety(l+1,m,nw) -ety(l-1,m,nw))/hx2  &
@@ -1900,15 +1909,26 @@
       etx(l,m,nw)= etx(l,m,nw)                               &
                   +cdt*((btz(l,m+1,nw) -btz(l,m-1,nw))/hy2   &
                        -(bty(l,m,nw+1) -bty(l,m,nw-1))/hz2)  &
-                  -p4dt*cjx(l,m,n)/dV  !!! cjx( ,n) is a full size
+                  -p4dt*cjx(l,m,nw)/dV 
+!                                    cjx( ,n) is a full size
       ety(l,m,nw)= ety(l,m,nw)                               &
                   +cdt*((btx(l,m,nw+1) -btx(l,m,nw-1))/hz2   &
                        -(btz(l+1,m,nw) -btz(l-1,m,nw))/hx2)  &
-                  -p4dt*cjy(l,m,n)/dV
+                  -p4dt*cjy(l,m,nw)/dV
+!
+!     etz(l,m,n)= etz(l,m,n)                               &
+!                 +cdt*((bty(l+1,m,n) -bty(l-1,m,n))/hx2   &
+!                      -(btx(l,m+1,n) -btx(l,m-1,n))/hy2)  &
+!                 -p4dt*cjz(l,m,n)/dV                      &
+!                 +dt*omega*E0*cos(omega*(tg+dth) -ak*yy)
+!     end do                      !  at tg+dth
+!
+      yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
       etz(l,m,nw)= etz(l,m,nw)                               &
                   +cdt*((bty(l+1,m,nw) -bty(l-1,m,nw))/hx2   &
                        -(btx(l,m+1,nw) -btx(l,m-1,nw))/hy2)  &
-                  -p4dt*cjz(l,m,n)/dV
+                  -p4dt*cjz(l,m,nw)/dV                       &
+                  +dt*omega*E0*cos(omega*(tg+dth) -ak*yy)
       end do 
       end do
    50 end do
