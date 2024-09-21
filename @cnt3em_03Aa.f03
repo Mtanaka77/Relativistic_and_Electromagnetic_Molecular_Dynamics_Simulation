@@ -1,13 +1,10 @@
 !**********************************************************************
 !*--------------------------------------------------------------------*
-!  @cnt3ems_03Aa.f03                    Dec.24, 2016, Sep.13, 2024    !   
+!  @cnt3ems_01Aa.f03                    Dec.24, 2016, Sep.13, 2024    !   
 !                                                                     !
 !  ## Molecular Dynamics in Relativistic Electromagnetic Fields ##    !
 !                                                                     !
 !   MPI+OpenMP: subroutine /forces/; real atomic masses mp/me=1836    !
-!     Open system with central region in XYZ coordinated space;       !
-!     the Z direction is parallelized, where the size mz= n_proc*mza  !
-!     and n_proc is the PE's nodes like n_proc=64, for example.       ! 
 !   READ_conf is used in nZ, nZA, intens, lambda                      !
 !   3D filled H(+) by ranff(0.) filling ... moldyn 1150               !
 !   No gap between r>rout and r<rout  ... forces 920,940,1690,1750    !
@@ -85,7 +82,8 @@
 !    Fortran 2003 /Fortran 2008 Write output (finished)               !   
 !       write(11,'("This run uses ",i3," ranks",/)') size             !
 !                                                                     !
-!  Initial version by Fujitsu FX100 Supercomputer, 2015-2019.         !
+!*--------------------------------------------------------------------*
+!  First version was made by Fujitsu FX100 Supercomputer at 2015-2019.!
 !    mpifrtpx -Kfast,openmp -o aq4.out @cnt3emq.f03 -lfftw3           !
 !    (Ez,Bx) in envelop: (sin,cos)*exp(-(t/tq)**2)                    !
 !*--------------------------------------------------------------------*
@@ -135,7 +133,7 @@
         praefixc = '/lv01/mtanaka/cntem3/'//cname  ! write(13)
         praefixe = '/lv01/mtanaka/cntem3/'//sname  ! WRITE_CONF
       else
-        praefixs = '/home/tanakam/cntem3/'//sname      ! Simulator FX100
+        praefixs = '/home/tanakam/cntem3A/'//sname      ! Simulator FX100
         praefixi = '/data/sht/tanakam/'//cname     ! read(12) - common by NFS
         praefixc = '/data/sht/tanakam/'//cname     ! write(13)
         praefixe = '/data/sht/tanakam/'//sname     ! WRITE_CONF
@@ -222,11 +220,11 @@
 !
       include    'param_em3p7_Aa.h'
       include    'mpif.h'
-!cc
+!
       real*8     cputime,walltime,buffer1(2),buffer2(2), &
                  cputime0,walltime0,ct(2),tm(2)
       integer*4  size,MPIerror
-!cc
+!
       logical  first
       data     first/.true./
       save     first,cputime0,walltime0
@@ -564,7 +562,7 @@
           OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
                 status='unknown',position='append',form='formatted')
 !
-          write(11,'(" Restart data are loaded from FT10.....",/)') 
+          write(11,'(" Restart data are loaded from FT12.....",/)') 
           close(11)
         end if
 !
@@ -950,7 +948,7 @@
               status='unknown',position='append',form='formatted')
 !
         write(11,*) 'igrp=',igrp,' uses ',             &
-                    praefixs//'_config.START'//suffix1
+                    praefixs//'_config.START'//suffix0
         close(11)
 !
         OPEN (unit=77,file=praefixc//'.77'//suffix1//'.ps',      &
@@ -1045,7 +1043,7 @@
                     vm,s0,s1,s2,rcore,rr,r1,ani,ane,         &
                     vmax2,dgaus2
       real*8        cpu0,cpu1,dcpu,walltm0,walltm1
-!cc
+!
       real*8          ctime1,ctime2,walltime1,walltime2
       common/ps_time/ ctime1,ctime2,walltime1,walltime2 
 !
@@ -1571,11 +1569,11 @@
         if(ionode) then
         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
               status='unknown',position='append',form='formatted')
-        write(11,*) 'Present EE,HH by E0*sin(omega*tg-ak*zz)*ff... t=',tg
+        write(11,*) 'Present EE by E0*sin and HH by E0*cos... t=',tg
 !
         l= mx/2+1
-        m= my/2+1
-        do n= 1,mz,20
+        n= mz/2+1
+        do m= 1,my,20
         xx= xmin3 +Lx3*(l-1)/mx +hx/2.d0
         yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
         zz= zmin3 +Lz3*(n-1)/mz +hz/2.d0
@@ -1937,13 +1935,15 @@
          m.lt.1 .or. m.ge.my .or.  &
          n.lt.1 .or. n.ge.mz) then
 !                                          4/01/2017
+!     EE(l,m,n)= E0*sin(omega*(tg+dth) -ak*yy)
+!     HH(l,m,n)= E0*cos(omega*tg -ak*yy)  ! at time tg
         ff= exp(-( (zg(i)-p_xyz)**2/zg02 +(xg(i)**2+yg(i)**2)/xy02 ))
 !
-        etxi= E0*sin(omega*(tg+dth) -ak*zg(i)) *ff   ! statV/cm
+        etxi= 0
         etyi= 0
-        etzi= 0
-        btxi= 0                     !          +++  
-        btyi= E0*cos(omega*(tg+dth) -ak*zg(i)) *ff   !  -y direction
+        etzi= E0*sin(omega*(tg+dth) -ak*zg(i)) *ff   ! statV/cm
+        btxi= E0*cos(omega*(tg+dth) -ak*zg(i)) *ff   !  -y direction  
+        btyi= 0
         btzi= 0
       else
         xx= mx*(xg(i)-xmin3)/Lx3 +1.0001d0  ! ookisa:1 -> my
@@ -2455,7 +2455,7 @@
 !
         call vdistr (xg,yg,zg,vx,vy,vz,ns,np,nCLp) 
         call edistr (vx,vy,vz,am,ns,np,nCLp)
-!cc
+!
         close (77)
 !
         OPEN (unit=23,file=praefixc//'.23'//suffix1,               &
@@ -2483,7 +2483,7 @@
 !       call lplots
 !       close(77)
 !
-!cc     if(wrt.eq.11) close(wrt)
+!       if(wrt.eq.11) close(wrt)
 !     end if
 !     end if
 ! --------------------------------------- on major nodes --------------
@@ -2528,7 +2528,7 @@
 !
       real*4         time,xp_leng
       common/headr2/ time,xp_leng
-!cc
+!
       integer*4      i,j,k,l,kk,kc,ll,ncel,lcel,nipl,lipl,liplc,kmax, &
                      ibind,istop,ibox,neigh,ierror,iwrt1,iwrt2,iwrt3, &
                      iwrt4,ix,iy,iz,ix1,iy1,iz1,istp,npar
@@ -4589,10 +4589,10 @@
 !
       integer*4  ns,np,nq,nCLp,igrp,nZ,nZA
       common/iroha/ nZ,nZA
-!cc
+!
       real*8     xg(npq0),yg(npq0),zg(npq0),ch(npq0),ag(npq0)
       real*4     Rgy1,Rgy2,rgmax,rmax1,ypp,zpp,amass
-!cc 
+! 
       logical    ifskip_e,ifskip_p
 !
       real*8        pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax,  &
@@ -4812,10 +4812,10 @@
 !
       integer*4  ns,np,nq,nCLp,igrp,nZ,nZA
       common/iroha/ nZ,nZA
-!cc
+!
       real*8     xg(npq0),yg(npq0),zg(npq0),ch(npq0),ag(npq0)
       real*4     Rgy1,Rgy2,rgmax,rmax1,ypp,zpp
-!cc
+!
 !
       real*8        pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax,  &
                     Temp,epsCLJ,epsLJ
