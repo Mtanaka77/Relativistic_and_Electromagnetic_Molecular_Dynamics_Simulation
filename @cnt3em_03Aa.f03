@@ -1579,7 +1579,7 @@
         zz= zmin3 +Lz3*(n-1)/mz +hz/2.d0
         ff= exp(-( (zz-p_xyz)**2/zg02 +(xx**2+yy**2)/xy02 ))
 !
-        write(11,37) n,zz,E0*sin(omega*tg-ak*zz)*ff,  &
+        write(11,37) m,yy,E0*sin(omega*tg-ak*zz)*ff,  &
                       E0*cos(omega*(tg-dth)-ak*zz)*ff
    37   format(' n=',i3,' zz=',1pe11.3,2x,2e13.5)
         end do
@@ -1619,7 +1619,7 @@
       end if
 !
 !
-!  B(n+1/2): B(n-1/2), E(n)
+!* B(n+1/2): B(n-1/2), E(n)
 !
        call clocks (cp1,wall1,size)
 !
@@ -1654,8 +1654,8 @@
 !
         call clocks (cp2,wall2,size)
 !
-!  Faster by one pass
-!  vx(n) <- vx(n+1/2) ??
+!* Faster by one pass
+!  vx(n) <- vx(n+1/2) 
 !
       do n= 1,mz
       do m= 1,my
@@ -1739,7 +1739,8 @@
       end do
 !
 !
-!  Poisson equation: read_10: it=1 or restart
+!* Poisson equation: read_10: it=1 or restart
+!
       if(mod(it,5).eq.1 .or. read_10) then  
         if(n_twice.eq.1) read_10= .false.   ! n_twice= 1
 !
@@ -1843,7 +1844,7 @@
       end do
       end do
 !
-!  ET(n+1): E(n), B(n+1/2)
+!* ET(n+1): E(n), B(n+1/2)
 !   p4dt= 4*pi*5.d-19
 !
       do n= 2,mz-1
@@ -1910,7 +1911,7 @@
 !
         call clocks (cp5,wall5,size)
 !
-!  EL(n+1/2)
+!* EL(n+1/2)
 !   All region (infinite)        Syncro by ipar=1,2,...,size ranks
 !
 !                                    +++ ++++++ ++++++ +++++ 
@@ -1923,7 +1924,7 @@
 !
         call clocks (cp6,wall6,size)
 !
-!  This includes vx(n) ??
+!* This includes vx(n)... 
 !    mid-point is E(n+1/2), B(n+1/2)
 !
       do i= 1,nCLp
@@ -2033,6 +2034,7 @@
           close(11)
         end if
 !       
+!       
 !---------------------
 !* Reflection walls
 !---------------------
@@ -2048,9 +2050,9 @@
 !
 !  Top and bottom of the cans
         rr1= R_sp  ! 30.d-08 =30 Ang
-!a           **** <- READ_CONF
+!            **** <- READ_CONF
 !        
-!       if(.false.) then
+!       if(.false.) then  <-- to be or not to be
 !       ----------------
 !       do i= ns+1,ns+np
 !       rr0= ranff(0.)*rr1  ! cm
@@ -2149,7 +2151,7 @@
 !*  Diagnosis section.
 !------------------------------
 !
-      if(mod(it,100).eq.1 .and. ionode) then
+      if(iwrt1.eq.0 .and. ionode) then
       if(.not.ifeqlib) then
           OPEN (unit=13,file=praefixc//'.13'//suffix1,             &
                 status='unknown',position='append',form='unformatted')
