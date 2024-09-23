@@ -54,7 +54,8 @@ the negative direction toward the origin and then go out to the positive directi
 The pellets at the origin are irradiated by these waves and are ejected to ion perpenducular 
 and electron parallel directions toward an open space. 
 The final energies for laser intensity 10^22 W/cm^2 are around 30-40 MeV in 20-40 fs, 
-which is shown by animation movies at my homepage, http://photon.isc.chubu.ac.jp/.
+which is shown by animation movies at my homepage, https://physique.isc.chubu.ac.jp/,
+http://www1.m4.mediacat.ne.jp/dphysique/.
 
 ### Execution Scripts ###
 
