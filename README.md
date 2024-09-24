@@ -23,9 +23,9 @@ which is the non-parallel or parallelized simulation code,
 4) p_config_ss.xyz_D150 and P135 of pellet electrons: H, C and Au ions and electrons. 
 The program is written in Fortran 2003/Fortran 2008 (write format in the same line) and MPI of Ver.3 for parallelization.
 
-The description of each subroutine and important lines of @cnt3em_03Aa.f03 and @3ddisppC.f03 
-(to be shown later), is written as comments of the simulation code and post-processing programs. 
-Initial 70 lines of the file @cnt3em_03Aa.f03 are devoted to give the title, references, 
+The description of each subroutine and important lines of @cnt3em_05Aa.f03 and/or @a_cnt3-3p7Ca.f03 and 
+the post-processed program @3ddisppC.f03, etc. (to be shown later), are written with many comments of the simulation code. 
+Initial 100 lines of the file @cnt3em_05Aa.f03 or @a_cnt3-3p7Ca.f03 are devoted to give the title, references, 
 summary of subroutines and remarks of the simulation code. 
 In the major subroutine /moldyn/, (i) the magnetic field is advanced, (ii) current density is calculated 
 and the transverse electric field is advanced, 
