@@ -5,7 +5,7 @@ As "Open Internet Access by Molecular Dynamics Simulations", a couple of various
 
 This page is discussed on the relativistic and nanoscale molecular dynamics simulations, Computer Physics Communications (2019, Ref. 1). Updated files of a single code @cnt3em_05Aa.f03 and a parallelized one @a_cnt3-3p7Ca.f03 are used. 
 They are compiled by parameters and configuration files which are dated at Sep. 2024.
-Each simulation code is suitable for the single or parallelized version which depends on different machines. 
+Each simulation code is suitable for a single or parallelized one which really depends on different architecture. 
 
 
 ### Molecular Dynamics Simulation: CGS Units and Necessary Files ###
