@@ -5,12 +5,12 @@
 !                                                                     !
 !   MPI+OpenMP: subroutine /forces/; real atomic masses mp/me=1836    !
 !     Open system with central region in XYZ coordinated space;       !
-!     the Z direction is parallelized, where mza= mz/n_proc with      !
-!     n_proc the PE's nodes; efficiency highly depends on computers.  !.
+!     the Z direction is parallelized. Efficiency depends on          !
+!     the architecture, and Fujitsu is thr best for parallelization.  !
 !                                                                     !
-!   Reference:                                                        !
-!      Computer Physics Commun., vol.241, pp.56-63 (2019).            !
-!      Fortran 2003 and MPI Packages   Nov. 3 (2020)                  !
+!   READ_conf is used in nZ, nZA, intens, lambda                      !
+!   3D filled H(+) by ranff(0.) filling ... moldyn 1150               !
+!   No gap between r>rout and r<rout  ... forces 920,940,1690,1750    !
 !                                                                     !
 !   Author/maintainer: Motohiko Tanaka, Ph.D.,Professor,              !
 !      Graduate School of Chubu University, Kasugai 487-8501, Japan.  !
@@ -18,18 +18,24 @@
 !   GPL-3.0 License, at https://github.com/Mtanaka77/                 !
 !     /Relativistic_Molecular_Dynamics_Simulation/                    !
 !                                                                     !
+!   Reference:                                                        !
+!      Computer Physics Commun., vol.241, pp.56-63 (2019).            !
+!      Fortran 2003 and MPI Packages   Nov. 3 (2020)                  !
+!                                                                     !
 !*--------------------------------------------------------------------*
-!  The initial version by Fujitsu FX100 Supercomputer in 2015-2019.   !
+!  The initial version was by Fujitsu FX100 Supercomputer, 2015-2019. !
+!                                                                     !
 !    mpifrtpx -Kfast,openmp -o aq4.out @cnt3emq.f03 -lfftw3           !
+!    (Ez,Bx) in envelop: (sin,cos)*exp(-(t/tq)**2)                    !
 !*--------------------------------------------------------------------*
 !                                                                     !
 !  Used files :                                                       !
-!  1. @a_cnt3-3p7Ca.f03: Molecular dynamics simulation code           !
+!  1. @cnt3ems_07Ca.f03:  Molecular dynamics simulation code            !
 !  2. param_em3p7_Ca.h: Common parameters of this simulation          !
 !  3. Cntemp_config.STARTC: Define simulation time, box sizes,        !
 !             atom names and pellet size, injected laser parameters   !
 !  4. p_config_ss.xyz_D150, P135: Initially loaded particles of       !
-!             H,C,Au atoms and associated electrons                   !             
+!             H,C,Au atoms and electrons                              !             
 !                                                                     !
 !  > An explicit simulation code is strictly bound by the Courant     !
 !     condition, Dx(length)/Dt(time) > c, the speed of light.         !
@@ -37,9 +43,6 @@
 !     term accumulate in time. This is true if a finite difference    !
 !     scheme of any kind is utilized.                                 !
 !                                                                     !
-!   READ_conf is used in nZ, nZA, intens, lambda                      !
-!   3D filled H(+) pellet by ranff(0.) ... /moldyn/, L.470-580        !
-!   No gap between r>rout and r<rout  ... /forces/, L.3160-3370       !
 !*--------------------------------------------------------------------*
 !                                                                     !
 !   The CGS system:                                                   !
@@ -69,7 +72,6 @@
 !       Labels                                                        !
 !       particle index: ncel(...)                                     !
 !       initialization for writes: FT.13, FT.23                       !
-!                                                                     !
 !       start label 1000                                              !
 !         FFTW initialization (one time at a start/restart time)      !
 !         equation of magnetic field                                  !
@@ -123,7 +125,7 @@
         praefixi = '/data/sht/tanakam/'//cname  ! read(12) - 18 + 6
         praefixc = '/data/sht/tanakam/'//cname  ! write(13)
         praefixe = '/data/sht/tanakam/'//sname  ! WRITE_CONF
-      end if             ! 28+6=34  sname='Cntemp' in param_em3p7_Ca.h
+      end if             ! 27+6= 33  sname='Cntemp' in param_em3p7_Ca.h
 !
 !  Is Debye-screening used: V= exp(-r/rdebye)/r ?
 !    force: forceV= pref_CL* ch(i)*ch(j)*exp(-r/rdebye)*(1.d0+r/rdebye) &
@@ -580,7 +582,6 @@
         xyz(i+ns2,2)= xyz(i,2) +0.1d-8*ranff(0.d0)
         xyz(i+ns2,3)= xyz(i,3)
         end do
-!
           if(ionode) then
             open (unit=11,file=praefixc//'.06'//suffix2,   &
                   status='unknown',position='append',form='formatted')
@@ -1640,7 +1641,7 @@
         call clocks (wall1,size,2)
 !
       prho= 4*pi/dV
-      fnml= 8.d0/(mx*my*mz) !((mx+1)*(my+1)*(mz+1))
+      fnml= 8.d0/(mx+1)*(my+1)*(mz+1))
       gam = 1.25d0 ! 1.5d0
 !     ***   ******
 !
@@ -1652,7 +1653,7 @@
 !       ++++++++++++++++++++++++++++
 !
 !  backward/forward fftw's
-!    NEC's 
+!    NEC's 2003 style - plan reversed
         plan= fftw_plan_r2r_3d  &
              (mz,my,mx, qq,qq_c, FFTW_RODFT00,FFTW_RODFT00,FFTW_RODFT00, &
               FFTW_ESTIMATE)
