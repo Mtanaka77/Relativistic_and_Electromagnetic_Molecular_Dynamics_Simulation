@@ -1595,8 +1595,8 @@
 !***
       rank= ipar -1
 !    ++++++++++++++++++++  
-      reg_top= num_proc  ! top of registered node
-      reg_bot= 1         ! bottom of registered node is 1
+      reg_top= num_proc    ! top of registered node
+      reg_bot= 1           ! bottom of registered node is 1
 !    ++++++++++++++++++++
 !***
       yg0= 3.5d0*0.800d-4
@@ -1606,33 +1606,39 @@
 !
       p_xyz= 0.800d-4*(-3.d0 +tg/2.6666667d-15)
 !                             ++
+!                             ++
 !  Only side borders of etx,ety,etz fields at it= 1
+!
+!     yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
+!     etz(l,m,n)= etz(l,m,n)                               &
+!                 +cdt*((bty(l+1,m,n) -bty(l-1,m,n))/hx2   &
+!                      -(btx(l,m+1,n) -btx(l,m-1,n))/hy2)  &
+!                 -p4dt*cjz(l,m,n)/dV                      &
+!                 +dt*omega*E0*cos(omega*(tg+dth) -ak*yy)
+!     btx(l,m,n)= btx(l,m,n) -cdt*((etz(l,m+1,n) -etz(l,m-1,n))/hy2   &
+!                                 -(ety(l,m,n+1) -ety(l,m,n-1))/hz2)  &
+!                 -dt*omega*E0*sin(omega*tg -ak*yy)
+!                       driver at omega*(tg)
+!
       if(it.eq.1) then
         call edges (etx,ety,etz,ipar,rank,reg_top,reg_bot)
-      end if
 !
-!  As confirmation by looking
-      if(it.eq.1 .and. ionode) then
-        open (unit=11,file=praefixc//'.06'//suffix2,  &
-              status='unknown',position='append',form='formatted')
-!
-        write(11,*) 'Present driving fields... t=',tg
-        write(11,*) 'btx and etz along y direction...'
-!
-        do m= 1,my,20
+        do n= 1,mz
+        do m= 1,my
+        do l= 1,mx
         xx= xmin3 +Lx3*(l-1)/mx +hx/2.d0
         yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
         zz= zmin3 +Lz3*(n-1)/mz +hz/2.d0
 !
         ff= exp(-( (yy-p_xyz)**2/yg02 +(xx**2+zz**2)/xz02))
 !
-        write(11,'(" m=",i3," yy=",1pd11.3,2x,2d13.5)') &
-                      m,yy,E0*sin(omega*tg-ak*yy)*ff,  &
-                      E0*cos(omega*(tg-dth)-ak*yy)*ff
+        etz(l,m,n)= E0*sin(omega*(tg+dth) -ak*yy) *ff
+        btx(l,m,n)= E0*cos(omega*tg -ak*yy) *ff
+        end do 
         end do
-!
-        close(11)
+        end do
       end if
+!
 !
 !*****************************************
 !* FFTW3 routines are initialized        *
@@ -1641,8 +1647,8 @@
         call clocks (wall1,size,2)
 !
       prho= 4*pi/dV
-      fnml= 8.d0/(mx+1)*(my+1)*(mz+1))
-      gam = 1.25d0 ! 1.5d0
+      fnml= 8.d0/((mx+1)*(my+1)*(mz+1))
+      gam = 1.25d0  ! 1.5d0
 !     ***   ******
 !
       if(first_es) then 
@@ -1653,7 +1659,7 @@
 !       ++++++++++++++++++++++++++++
 !
 !  backward/forward fftw's
-!    NEC's 2003 style - plan reversed
+!    NEC's 2003 style - plan order is reversed
         plan= fftw_plan_r2r_3d  &
              (mz,my,mx, qq,qq_c, FFTW_RODFT00,FFTW_RODFT00,FFTW_RODFT00, &
               FFTW_ESTIMATE)
@@ -1673,12 +1679,6 @@
       do m= 2,my-1
       do l= 2,mx-1
       nw= n -nz1(ipar) +1
-!
-!     yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
-!     btx(l,m,n)= btx(l,m,n) -cdt*((etz(l,m+1,n) -etz(l,m-1,n))/hy2   &
-!                                 -(ety(l,m,n+1) -ety(l,m,n-1))/hz2)  &
-!                 -dt*omega*E0*sin(omega*tg -ak*yy)
-!                       driver at omega*(tg)
 !
       yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
       btx(l,m,nw)= btx(l,m,nw) -cdt*((etz(l,m+1,nw) -etz(l,m-1,nw))/hy2  &
@@ -1916,12 +1916,6 @@
                        -(btz(l+1,m,nw) -btz(l-1,m,nw))/hx2)  &
                   -p4dt*cjy(l,m,nw)/dV
 !
-!     etz(l,m,n)= etz(l,m,n)                               &
-!                 +cdt*((bty(l+1,m,n) -bty(l-1,m,n))/hx2   &
-!                      -(btx(l,m+1,n) -btx(l,m-1,n))/hy2)  &
-!                 -p4dt*cjz(l,m,n)/dV                      &
-!                 +dt*omega*E0*cos(omega*(tg+dth) -ak*yy)
-!
       yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
       etz(l,m,nw)= etz(l,m,nw)                               &
                   +cdt*((bty(l+1,m,nw) -bty(l-1,m,nw))/hx2   &
@@ -1943,7 +1937,8 @@
         call clocks (wall4,size,2)
 !
 !
-!  The total electrostatic field is added, to have Coulomb forces.
+!* Poisson equation: the total electrostatic field is added, 
+!  to have Coulomb forces.
 !  Normalization: 
 !    complex, or R <-> C -> n
 !    form factors are: odd case -> 2*(n+1), even case -> 2*(n-1)
@@ -2065,14 +2060,13 @@
         go to 2000
       end if
 !     ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      
 !
       E_C_r = E_C_r2
       E_LJ  = E_LJ2
 !
         call clocks (wall6,size,2)
 !
-!  Acceleration by E(n+1/2), B(n+1/2) - xyz(,i) becomes local here !!
+!* Acceleration by E(n+1/2), B(n+1/2) - xyz(,i) becomes local here !!
 !  This includes vx(n) 
 !
       p_xyz= 0.800d-4*(-3.d0 +(tg+dth)/2.6666667d-15)
@@ -2095,7 +2089,7 @@
           etxi= 0
           etyi= 0
           etzi= E0*sin(omega*(tg+dth) -ak*xyz(i,2))*ff  ! statV/cm
-          btxi= E0*cos(omega*(tg+dth) -ak*xyz(i,2))*ff  !  only (etz, btx) extention
+          btxi= E0*cos(omega*tg -ak*xyz(i,2))*ff 
           btyi= 0
           btzi= 0
 !
@@ -2757,9 +2751,9 @@
 !
         eetx(ll,mm,nn)= etx7(l,m,n)
         eety(ll,mm,nn)= ety7(l,m,n)
-        eetz(ll,mm,nn)= etz7(l,m,n) +E0*sin(omega*(tg+dth)-ak*yy)*ff
+        eetz(ll,mm,nn)= etz7(l,m,n) 
 !
-        bbtx(ll,mm,nn)= btx7(l,m,n) +E0*cos(omega*tg-ak*yy)*ff
+        bbtx(ll,mm,nn)= btx7(l,m,n)
         bbty(ll,mm,nn)= bty7(l,m,n)
         bbtz(ll,mm,nn)= btz7(l,m,n)
         end do
@@ -5246,8 +5240,7 @@
 !------------------------------------------------------------
 !* Protons
 !
-!     if(.not.ifskip_p) then
-      nskip= (np+1.e-5)/1000
+      nskip= (np+1.e-5)/1000  !<-- even np= 0 is OK
 !---                    ****
 !
       do 300 i= ns+1,ns+np,nskip
@@ -5270,7 +5263,6 @@
       call circle (xx-0.12,yy-0.12,dd,2)
   300 continue
 !---
-!     end if
 !
 !* Carbon ions
 !
@@ -5323,9 +5315,8 @@
 !
 !* Electrons in pellet
 !
-!     if(.not.ifskip_e) then
-      nskip= (np+1.e-5)/1000   ! -e
-!---                    ****
+      nskip= (np +1.e-5)/1000   ! -e
+!---                     ****
 !
       do 500 i= ns+np+1,ns+np+np,nskip
       xp= xg(i)*cph -yg(i)*sph
@@ -5346,7 +5337,6 @@
       call newcolor (3,1.,0.,0.)  ! red
       call circle (xx-0.12,yy-0.12,dd,1)
   500 continue
-!     end if
 !
 !* Electrons around CNT - heavy
 !
@@ -5469,7 +5459,7 @@
 !
 !     do 100 i= 1,nCLp
       do i= 1,ns+np    ! for all atoms
-      xx = - xg(i)     ! arrange the x-direction with ppl3da plot
+      xx = - xg(i)     ! arrange the x,y-direction with ppl3da plot
       yy = yg(i)
 !
 !     if(abs(x(i)).gt.xmax) go to 100
@@ -5511,7 +5501,7 @@
 !
 !* Protons
 !
-      nskip= max(1,np/1000)
+      nskip= (np +1.e-5)/1000  !<-- when np= zero is OK
 !
       do i= ns+1,ns+np,nskip
       xx= ps*(-xg(i)) +HL
@@ -5527,7 +5517,7 @@
 !
 !* Carbon ions
 !
-      nskip= (ns/2)/1000  ! plot only a few
+      nskip= (ns/2)/1000 
 !
       do i= 1,ns/2,nskip
       xx= ps*(-xg(i)) +HL
@@ -5543,7 +5533,7 @@
 !
 !* Au ions
 !
-      nskip= (ns/2)/1000  ! plot only a few
+      nskip= (ns/2)/1000 
 !
       do i= ns/2+1,ns,nskip
       xx= ps*(-xg(i)) +HL
@@ -5559,7 +5549,7 @@
 !
 !* Electrons in pellet
 !
-      nskip= max(1,np/1000)
+      nskip= (np +1.e-5)/1000  !<-- when np= zero is OK
 !
       do 500 i= ns+np+1,ns+np+np,nskip
       xx= ps*(-xg(i)) +HL
