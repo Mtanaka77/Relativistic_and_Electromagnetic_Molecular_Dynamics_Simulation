@@ -102,14 +102,11 @@
 !     character  suffix2*2,suffix1*2,suffix0*1
       logical    if_start,ionode
       common/ionod/ ionode
-! ---------------------------------------------
+!
+!-------------------------------------------------------------
+!  52 nodes, 104 ranks by Fujitsu FX100
 !
       call mpi_init (ierror)
-!
-!*******************************************
-!*  A global communication group.          *
-!*******************************************
-! 52 node, 104 rank by Fujitsu FX100
 !
       call mpi_comm_rank (MPI_COMM_WORLD,rank,ierror)
       call mpi_comm_size (MPI_COMM_WORLD,size,ierror)
@@ -387,7 +384,8 @@
 !**************************************************************
 !
       pi = 4.d0*datan(1.d0)
-!* cgs
+!
+!  CGS system
       a_unit= 1.0000d+00   ! cm
       m_unit= 0.9110d-27   ! g, electron mass
       e_unit= 4.8032d-10   ! esu, unit charge
@@ -873,6 +871,7 @@
       call moldyn (size,ipar,igrp,ifDebye,ifrefl,ifedist,    &
                    if_start,ns,np,nq,nCLp)
 !*---------------- ++ ++ ++ ++ +++ ----------------------------
+!
 !**************************************************************
 !* Restart data.
 !
@@ -1087,15 +1086,15 @@
       common/srflst0/ cr_table,itab,nipl0(n00),lipl0(nbxs,n00)
 !
       real*8     intens,lambda,E0,ak,ct,omega,Eta,Bta, &
-                 ff,p_xyz,zg0,zg02,xy0,xy02
+                 ff,p_xyz,yg0,xz0,yg02,xz02
       common/electr/ intens,lambda
       common/swaves/ E0,ak,ct,omega
 !
 !+++++
-!!    integer*4  mx,my,mz       ! in parameter statement
+!!    integer*4  mx,my,mz       ! in parameters param_3p7Ca.h
       integer*4  l,m,n,ll,mm,nn,mxh,myh,mzh
       parameter  (mxh=mx,myh=my,mzh=mz)
-!!    parameter  (mxh=mx/2+1,myh=my/2+1,mzh=mz/2+1)
+!     parameter  (mxh=mx/2+1,myh=my/2+1,mzh=mz/2+1)
 !
       integer*4  ifeh,item3ab,item3,npar3,ierror,wrt7,wrt
       real*8     Lx3,Ly3,Lz3,hx2,hy2,hz2,hx,hy,hz,p4dt,dV,cdt
@@ -1124,8 +1123,7 @@
                 wall4,wall5,wall6,wall7
 !+++++
       logical    first11,first06,eq_phase,ifeqlib,    &
-                 ifskip_e,ifskip_p,first_kk,first_es, &
-                 read_10
+                 first_kk,first_es,read_10
 !
       logical    ionode
       common/ionod/ ionode
@@ -1422,6 +1420,7 @@
       n_twice= n_twice +1    !           n_twice= 1
 !    *********************
 !
+!  if(it.eq.1) tg= 0.d0 
       teql= 0.0005d-15 
       ifeqlib= (if_start).and.(t.lt.teql)
 !               ++++++++
@@ -1498,7 +1497,7 @@
 !
 !  t is in 10^-15 sec (omega in 10^15 unit)
       omega = c1*(2*pi/lambda)    ! 2.36d+15 /sec
-      ak    = 2*pi/lambda  ! 7.85d+4/cm <- 0.8 micron
+      ak    = 2*pi/lambda         ! 7.85d+4/cm <- 0.8 micron
 !
       if(it.eq.1) then
       if(ionode) then
@@ -1538,35 +1537,37 @@
         end do
       end if
 !
-      xy0= 0.1d-4        ! =0.1 micron.is a cutoff distance
-      zg0= 3.5d0*0.800d-4
-      xy02= xy0**2
-      zg02= zg0**2
+      xz0= 0.1d-4           ! =0.1 micron.is a cutoff distance
+      yg0= 3.5d0*0.800d-4
+      xz02= xz0**2
+      yg02= yg0**2
 !
       p_xyz= 0.800d-4*(-3.d0 +tg/2.6666667d-15)
 !                             ++
-!  for initial condition
-      if(.not.ifeqlib .and. it.eq.1) then
+!* For initial condition
+!   btx(l,m,n)= ...-dt*omega*E0*sin(omega*tg -ak*yy) *ff  
+!   HH(l,m,n)=  E0*cos(omega*tg -ak*yy)  
+!   etz(l,m,n)= ...+dt*omega*E0*cos(omega*(tg+dth) -ak*yy)
+!   EE(l,m,n)=  E0*sin(omega*(tg+dth) -ak*yy)
 !
+      if(it.eq.1) then
         do n= 1,mz
         do m= 1,my
         do l= 1,mx
         xx= xmin3 +Lx3*(l-1)/mx +hx/2.d0
         yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
         zz= zmin3 +Lz3*(n-1)/mz +hz/2.d0
-        ff= exp(-( (zz-p_xyz)**2/zg02 +(xx**2+yy**2)/xy02))
+        ff= exp(-( (yy-p_xyz)**2/yg02 +(xx**2+zz**2)/xz02))
 !
-        etx(l,m,n)= E0*sin(omega*tg -ak*zz) *ff
-        bty(l,m,n)= E0*cos(omega*(tg-dth) -ak*zz) *ff
-        end do    !               ++++++
+        etz(l,m,n)= E0*sin(omega*(tg+dth) -ak*yy) *ff
+        btx(l,m,n)= E0*cos(omega*tg -ak*yy) *ff
+        end do 
         end do
         end do
       end if
 !
-!  As confirmed
-      if(first_kk) then
-      if(.not.ifeqlib .and. ionode) then
-        first_kk= .false.
+!  As confirmed above
+      if(it.eq.1) then
 !
         if(ionode) then
         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
@@ -1580,16 +1581,15 @@
         xx= xmin3 +Lx3*(l-1)/mx +hx/2.d0
         yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
         zz= zmin3 +Lz3*(n-1)/mz +hz/2.d0
-        ff= exp(-( (zz-p_xyz)**2/zg02 +(xx**2+yy**2)/xy02 ))
+        ff= exp(-( (yy-p_xyz)**2/yg02 +(xx**2+zz**2)/xz02 ))
 !
-        write(11,37) m,yy,E0*sin(omega*tg-ak*zz)*ff,  &
-                      E0*cos(omega*(tg-dth)-ak*zz)*ff
+        write(11,37) m,yy,E0*sin(omega*(tg+dth) -ak*yy)*ff,  &
+                      E0*cos(omega*tg -ak*yy)*ff
    37   format(' m=',i3,' yy=',1pd11.3,2x,2d13.5)
         end do
 !
         close(11)
         end if
-      end if
       end if
 !
 !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1624,6 +1624,11 @@
 !
        call clocks (cp1,wall1,size)
 !
+!   btx(l,m,n)= ...-dt*omega*E0*sin(omega*tg -ak*yy) *ff  
+!   HH(l,m,n)=  E0*cos(omega*tg -ak*yy)  
+!   etz(l,m,n)= ...+dt*omega*E0*cos(omega*(tg+dth) -ak*yy)
+!   EE(l,m,n)=  E0*sin(omega*(tg+dth) -ak*yy)
+!
       do n= 2,mz-1
       do m= 2,my-1
       do l= 2,mx-1
@@ -1645,7 +1650,7 @@
       do m= 1,my
       do l= 1,mx
       yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
-      HH(l,m,n)= E0*cos(omega*tg -ak*yy)  ! at time tg
+      HH(l,m,n)= E0*cos(omega*tg -ak*yy)  
       end do
       end do
       end do
@@ -1655,7 +1660,7 @@
 !
         call clocks (cp2,wall2,size)
 !
-!  Faster by one pass
+!* Faster by one pass
 !  vx(n) <- vx(n+1/2) ??
 !
       do n= 1,mz
@@ -1740,7 +1745,8 @@
       end do
 !
 !
-!  Poisson equation: read_10: it=1 or restart
+!* Poisson equation: read_10: it=1 or restart
+!
       if(mod(it,5).eq.1 .or. read_10) then  
         if(n_twice.eq.1) read_10= .false.   ! n_twice= 1
 !
@@ -1832,7 +1838,7 @@
 !
         call clocks (cp3,wall3,size)
 !
-! Save for etx
+! Save for etx-etz
 !
       do n= 1,mz
       do m= 1,my
@@ -1911,7 +1917,7 @@
 !
         call clocks (cp4,wall4,size)
 !
-!  EL(n+1/2)
+!* EL(n+1/2)
 !   All region (infinite)        Syncro by ipar=1,2,...,size ranks
 !
 !                                    +++ ++++++ ++++++ +++++ 
@@ -1924,7 +1930,8 @@
 !
         call clocks (cp5,wall5,size)
 !
-!  This includes vx(n) ??
+!
+!* This includes vx(n) ??
 !    mid-point is E(n+1/2), B(n+1/2)
 !
       do i= 1,nCLp
@@ -1936,14 +1943,12 @@
          m.lt.1 .or. m.ge.my .or.  &
          n.lt.1 .or. n.ge.mz) then
 !                                          4/01/2017
-!     EE(l,m,n)= E0*sin(omega*(tg+dth) -ak*yy)
-!     HH(l,m,n)= E0*cos(omega*tg -ak*yy)  ! at time tg
-        ff= exp(-( (zg(i)-p_xyz)**2/zg02 +(xg(i)**2+yg(i)**2)/xy02 ))
+        ff= exp(-( (yg(i)-p_xyz)**2/yg02 +(xg(i)**2+zg(i)**2)/xz02 ))
 !
         etxi= 0
         etyi= 0
-        etzi= E0*sin(omega*(tg+dth) -ak*zg(i)) *ff   ! statV/cm
-        btxi= E0*cos(omega*(tg+dth) -ak*zg(i)) *ff   !  -y direction  
+        etzi= E0*sin(omega*(tg+dth) -ak*yg(i)) *ff   ! statV/cm
+        btxi= E0*cos(omega*tg -ak*yg(i)) *ff 
         btyi= 0
         btzi= 0
 !
@@ -2003,7 +2008,6 @@
       end do
 !
 !
-!       if(mod(it,5).eq.1 .and. ionode) then
       if(iwrt2.eq.0 .and. ionode) then
         l= mx/2+1
         n= mz/2+1
@@ -2144,9 +2148,9 @@
 !       call reflect_2Dbox (xg,yg,zg,px,py,pz,xmax,size,ipar,nCLp)
 !     end if
 !
-!------------------------------
-!*  Diagnosis section.
-!------------------------------
+!**************************************
+!*  Diagnosis section.                *
+!**************************************
 !
       if(iwrt1.eq.0 .and. ionode) then
       if(.not.ifeqlib) then
@@ -2159,7 +2163,6 @@
       end if
       end if
 !
-!* dt= 0.5 (every one of 0.5x10^-15) 
 !
       if(iwrt3.eq.0 .and. ionode) then   ! 1.d-15 sec 
       if(.not.ifeqlib) then
@@ -2173,45 +2176,26 @@
          OPEN (unit=29,file=praefixc//'.29'//suffix1,             &
                status='unknown',position='append',form='unformatted')
 !
-!  real*4
+!  real*4: Fields minus EE, HH
          write(29) t
 !
-!        do n= 1,mz !,2
-!        do m= 1,my !,2
-!        do l= 1,mx !,2
-!        ll= l !2*l -1
-!        mm= m !2*m -1
-!        nn= n !2*n -1
+         do n= 1,mz,2
+         do m= 1,my,2
+         do l= 1,mx,2
+         ll= (l+1)/2
+         mm= (m+1)/2
+         nn= (n+1)/2
 !
-!        eetx(ll,mm,nn)= etx(l,m,n)
-!        eety(ll,mm,nn)= ety(l,m,n)
-!        eetz(ll,mm,nn)= etz(l,m,n)
-!        bbtx(ll,mm,nn)= btx(l,m,n)
-!        bbty(ll,mm,nn)= bty(l,m,n)
-!        bbtz(ll,mm,nn)= btz(l,m,n)
-!        end do
-!        end do
-!        end do
-!
-!        write(29) eetx,eety,eetz,bbtx,bbty,bbtz  ! real*4, half size
-!
-!  Field minus EE, HH
-         do n= 1,mz !,2
-         do m= 1,my !,2
-         do l= 1,mx !,2
-         ll= l !2*l -1
-         mm= m !2*m -1
-         nn= n !2*n -1
          xx= xmin3 +Lx3*(l-1)/mx +hx/2.d0  ! xx kariru
          yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
          zz= zmin3 +Lz3*(n-1)/mz +hz/2.d0
-         ff= exp(-( (zz-p_xyz)**2/zg02 +(xx**2+yy**2)/xy02 ))
+         ff= exp(-( (yy-p_xyz)**2/yg02 +(xx**2+zz**2)/xz02 ))
 !
-         eetx(ll,mm,nn)= etx(l,m,n) +E0*sin(omega*(tg+dth)-ak*zz) *ff
+         eetx(ll,mm,nn)= etx(l,m,n)
          eety(ll,mm,nn)= ety(l,m,n)
-         eetz(ll,mm,nn)= etz(l,m,n)
-         bbtx(ll,mm,nn)= btx(l,m,n)                   !     +++
-         bbty(ll,mm,nn)= bty(l,m,n) +E0*cos(omega*tg-ak*zz) *ff
+         eetz(ll,mm,nn)= etz(l,m,n) 
+         bbtx(ll,mm,nn)= btx(l,m,n)
+         bbty(ll,mm,nn)= bty(l,m,n)
          bbtz(ll,mm,nn)= btz(l,m,n)
          end do
          end do
@@ -2230,6 +2214,7 @@
       if(ionode) then
         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
               status='unknown',position='append',form='formatted')
+!
 !       until this diagnosis of write(11,)
 ! --------------------------------------- on major nodes --------------
 !
@@ -2450,11 +2435,9 @@
               status='unknown',position='append',form='formatted')
 !
         write(11,*) '*plots are made... at tg=',tg
-        ifskip_e= .true. !.false.
-        ifskip_p= .true. !.false.
 ! 
         call ppl3da (xg,yg,zg,ch,ag,Rgyi(is),Rgye(is),ns,np,nq,  &
-                     nCLp,igrp,ifskip_e,ifskip_p)
+                     nCLp,igrp)
         call ppl3dz (xg,yg,zg,ch,ag,Rgyi(is),Rgye(is),ns,np,nq,  &
                      nCLp,igrp)
 !
@@ -2499,6 +2482,7 @@
         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
               status='unknown',position='append',form='formatted')
 !
+        write(11,*)
         write(11,*) ' final: t, tmax (sec)=',tg,tmax
         write(11,*) ' final: cpu1/60., cptot (min)=',dcpu/60.d0,cptot
 !                                               ++++
@@ -2579,7 +2563,7 @@
       rsccl = 1.0d-8               ! 1 ang= 10^{-8} cm
 !
 !*-------------------------------------------
-!* update particle table infrequentLy3
+!* Update particle table infrequentLy3
 !*-------------------------------------------
 !
       itab= itab +1
@@ -2809,7 +2793,7 @@
           istop= istp
           return
         end if
-! ++++++ initial/every itabs / restart ++++++++++++
+! ++++++ Initial/every itabs / restart ++++++++++++
       end if
 !
 !*****************************************
@@ -2854,7 +2838,7 @@
       forceV = ch(i)*ch(j)/(rcl**2 *r)
       E_C_r2 = E_C_r2 + ch(i)*ch(j)/rcl
 !
-!* short-range forces
+!* Short-range forces
 !
       if(i.le.ns .and. j.le.ns) then   ! strictly, C or Au pair
         rcut= 3.5d-8
@@ -4573,7 +4557,7 @@
 !
 !------------------------------------------------------------------
       subroutine ppl3da (xg,yg,zg,ch,ag,Rgy1,Rgy2,ns,np,nq,  &
-                         nCLp,igrp,ifskip_e,ifskip_p)
+                         nCLp,igrp)
 !------------------------------------------------------------------
       use, intrinsic :: iso_c_binding 
       implicit none
@@ -4587,7 +4571,6 @@
                      Temp,epsCLJ,epsLJ
       real(C_float)  Rgy1,Rgy2,rmax1,xpp,ypp,zpp,amass,  &
                      phi,tht,dtwr,dtwr2,dtwr3,rgmax
-      logical        ifskip_e,ifskip_p
 !
       common/parm2/ pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax
       common/parm4/ phi,tht,dtwr,dtwr2,dtwr3,rgmax
@@ -4719,11 +4702,8 @@
 !----------------------------------------------------
 !* Protons
 !
-      if(.not.ifskip_p) then
-!---
-      nskip= max(1,np/1000)
-!---                  ****
-!
+      nskip= (np +1.e-5)/1000
+!--- 
       do 300 i= ns+1,ns+np,nskip
       xp= xg(i)*cph -yg(i)*sph
       yp= xg(i)*sph +yg(i)*cph
@@ -4744,7 +4724,7 @@
       call circle (xx-0.12,yy-0.12,dd,2)
   300 continue
 !---
-      end if
+!     end if
 !
 !* Carbon ions
 !
@@ -4797,10 +4777,8 @@
 !
 !* Electrons in pellet
 !
-      if(.not.ifskip_e) then
-!---
-      nskip= max(1,np/1000)   ! -e
-!---                  ****
+      nskip= (np +1.e-5)/1000   ! -e
+!---     
 !
       do 500 i= ns+np+1,ns+np+np,nskip
       xp= xg(i)*cph -yg(i)*sph
@@ -4821,6 +4799,8 @@
       call newcolor (3,1.0,0.0,0.0)  ! red
       call circle (xx-0.12,yy-0.12,dd,1)
   500 continue
+!
+!     end if
 !
 !* Electrons around CNT - heavy
 !
@@ -4848,7 +4828,6 @@
       call circle (xx-0.12,yy-0.12,dd,1)
   600 continue
 !---
-      end if
 !
       call newcolor (0,1.,0.,0.)  ! reset
 !---------------------
@@ -4944,7 +4923,7 @@
 !
 !     do 100 i= 1,nCLp
       do i= 1,ns+np    ! for all atoms
-      xx = - xg(i)     ! arrange the x-direction with ppl3da plot
+      xx = - xg(i)     ! arrange the x,y-direction with ppl3da plot
       yy = yg(i)
 !
 !     if(abs(x(i)).gt.xmax) go to 100
@@ -4986,7 +4965,7 @@
 !-------------------------------------------------------------
 !* Protons
 !
-      nskip= max(1,np/1000)
+      nskip= (np +1.e-5)/1000
 !
       do i= ns+1,ns+np,nskip
       xx= ps*(-xg(i)) +HL
@@ -5034,7 +5013,7 @@
 !
 !* Electrons in pellet
 !
-      nskip= max(1,np/1000)
+      nskip= (np +1.e-5)/1000
 !
       do 500 i= ns+np+1,ns+np+np,nskip
       xx= ps*(-xg(i)) +HL
