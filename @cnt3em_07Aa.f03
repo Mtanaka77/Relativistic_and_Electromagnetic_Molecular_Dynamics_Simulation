@@ -912,9 +912,9 @@
         OPEN (unit=77,file=praefixc//'.77'//suffix1//'.ps',      &
               status='unknown',position='append',form='formatted')
 !   ---------------------------          ++++++
-        if(ifedist.ne.1) then
+!       if(ifedist.ne.1) then
           call lplots
-        end if
+!       end if
 !   ---------------------------
         call plote
         close(77)
@@ -2056,7 +2056,7 @@
 !       ----------------
 !
         if(it.eq.1.and.ionode) then
-          open (unit=11,file=praefixc//'.06'//suffix2,  &
+          open (unit=11,file=praefixc//'.06'//suffix1,  &
                 status='unknown',position='append',form='formatted')
 !
           write(11,*) '    '
@@ -3673,7 +3673,7 @@
       end do
 !
         if(ionode) then
-        open (unit=11,file=praefixc//'.06'//suffix2,  &
+        open (unit=11,file=praefixc//'.06'//suffix1,  &
               status='unknown',position='append',form='formatted')
 !
         write(11,*) ' '
@@ -3723,7 +3723,7 @@
       cci= cci1+cci2+cci3+cci4+cci5+cci6
 !
       if(ionode) then
-        open (unit=11,file=praefixc//'.06'//suffix2,  &
+        open (unit=11,file=praefixc//'.06'//suffix1,  &
               status='unknown',position='append',form='formatted')
 !
         write(11,*) 'Sum of ch(1,2,3,4,5,6)... '
@@ -3740,7 +3740,7 @@
 !
       if(abs(cci).gt.1.d-10) then
         if(ionode) then
-          open (unit=11,file=praefixc//'.06'//suffix2,  &
+          open (unit=11,file=praefixc//'.06'//suffix1,  &
                 status='unknown',position='append',form='formatted')
 !
           write(11,*) ' cci not equal or smaller than 1.d-10...',cci
