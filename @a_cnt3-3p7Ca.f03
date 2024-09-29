@@ -266,12 +266,14 @@
       common/initpos/ x0,y0,z0
 !
       integer(C_INT) nZ,nZA,itab,itabs
+      common/iroha/  nZ,nZA                          ! in /READ_CONF/ at l.316
+      common/parm6/ itabs
+!
       logical    cr_table
       real(C_DOUBLE) fchar,fcharA,heavy,heavyA
       real(C_DOUBLE) r_sp,d_sp,n_sp,lambda_d,massi,  &
                      ch_ion,wt_ion,rd_cp,rd_hp,      &
                      ch_el,wt_el,rd_el
-      common/iroha/  nZ,nZA                          ! in /READ_CONF/ at l.316
       common/charg/  fchar,fcharA                    !
       common/hev_el/ heavy,heavyA                   ! defied at l.397
       common/ionsiz/ r_sp,d_sp,n_sp,massi,lambda_d,  &  ! l.310
@@ -281,7 +283,6 @@
       integer(C_INT),dimension(n00) :: nipl0
       integer(C_INT),dimension(nbxs,n00) :: lipl0
       common/srflst0/ cr_table,itab,nipl0,lipl0
-      common/plupdat/ itabs
 !
 !
       integer(C_INT) i,it,is,istop1,istop7,iwa,iwb,iwc,iwd,   &
@@ -297,10 +298,8 @@
       common/parm2/  pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax
       common/physc/  a_unit,m_unit,e_unit,t_unit,c1,c2,Wrest
 !
-      real(C_float)  phi,tht,dtwr,dtwr2,dtwr3,rgmax,cptot,dtwr20,dtwr30
+      real(C_float)  phi,tht,dtwr,dtwr2,dtwr3,rgmax,dtwr20,dtwr30
       common/parm4/  phi,tht,dtwr,dtwr2,dtwr3,rgmax
-      common/parm9/  cptot       ! +++++ from READ_CONF, L.3710
-!
 !
       real(C_DOUBLE) rcut_Clf,rcutLJ,Temp,Temp_erg,epsCLJ,epsLJ, &
                      W_1p,Nele0
@@ -349,8 +348,11 @@
 !
       logical    ionode
       common/sub_proc/ ionode  
+!
+      real(C_DOUBLE) cptot
+      common/parm7/ cptot
       
-      namelist/inp1/ phi,tht,cptot
+      namelist/inp1/ phi,tht
       namelist/inp2/ dt,tmax,dtwr,dtwr2,dtwr3
 !
 !**************************************************************
@@ -455,6 +457,7 @@
 !* Initial configuration in /READ_CONF/ 
       call READ_CONF (np,ifrefl,praefix8)
 !     +++++++++++++++++++++++++++++++++++
+!
       if(ionode) then
         open (unit=11,file=praefixc//'.06'//suffix2,   &
               status='unknown',position='append',form='formatted')
@@ -582,6 +585,7 @@
         xyz(i+ns2,2)= xyz(i,2) +0.1d-8*ranff(0.d0)
         xyz(i+ns2,3)= xyz(i,3)
         end do
+!
           if(ionode) then
             open (unit=11,file=praefixc//'.06'//suffix2,   &
                   status='unknown',position='append',form='formatted')
@@ -1168,13 +1172,13 @@
       common/physc/ a_unit,m_unit,e_unit,t_unit,c1,c2,Wrest
       common/ENERGY/ E_C_s,E_C_PME,E_C_r,E_LJ,E_elas
 !
-      real(C_float) phi,tht,dtwr,dtwr2,dtwr3,cptot,          &
+      real(C_float) phi,tht,dtwr,dtwr2,dtwr3,                &
                     fchar4,fcharA4,Temp4,rgmax,              & 
                     xmax4,ymax4,zmax4,xmin4,ymin4,zmin4,     &
                     dx,dy,dz,s0,s1,s2,rcore,rr,r1,ani,ane
-      real(C_DOUBLE) dcpu
+      real(C_DOUBLE) dcpu,cptot
       common/parm4/ phi,tht,dtwr,dtwr2,dtwr3,rgmax
-      common/parm9/ cptot
+      common/parm7/ cptot
 !
       real(C_DOUBLE) Temp,epsCLJ,epsLJ,m_gamma,Pot0,W_1p,Nele0,   &
                      R_sp,D_sp,N_sp,Lambda_D,massi,               &
@@ -1606,7 +1610,7 @@
 !
       p_xyz= 0.800d-4*(-3.d0 +tg/2.6666667d-15)
 !                             ++
-!                             ++
+!   
 !  Only side borders of etx,ety,etz fields at it= 1
 !
 !     yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
@@ -2294,24 +2298,12 @@
         end if
       end if
 !
-!     if(ionode) then
-      if(.false.) then
-        open (unit=11,file=praefixc//'.06'//suffix2,  &
-              status='unknown',position='append',form='formatted')
- 
-        write(11,*) "it,t=",it,tg
-        close(11)
-      end if
-!
-!     if(it.lt.10) go to 1000
-!     if(.true.) go to 2000
-!
 !**********************************************
 !* The main loop of /moldyn/ is over now      *
 !**********************************************
-!------------------------------
+!----------------------------------------------
 !*  Diagnostic section.
-!------------------------------
+!----------------------------------------------
 !  FT13: collection of position  
       if(iwrt1.eq.0 .and. ionode) then
         open (unit=13,file=praefixc//'.13'//suffix2,             &
@@ -3089,11 +3081,11 @@
 !
       logical         cr_table
       integer(C_INT)  itab,itabs
+      common/parm6/ itabs
 !
       integer(C_INT),dimension(n00) :: nipl0
       integer(C_INT),dimension(nbxs,n00) :: lipl0
       common/srflst0/ cr_table,itab,nipl0,lipl0
-      common/plupdat/ itabs
 !
 !* afre table
       integer(C_INT)  nafl,iafl,jafl
@@ -3124,6 +3116,7 @@
 !*-------------------------------------------
 !* update particle table infrequentLy3
 !*-------------------------------------------
+!     itabs= 5  <-- READ_conf
 !
       itab= itab +1
       if(mod(itab,itabs).eq.1 .or. cr_table) then
@@ -3989,8 +3982,8 @@
       common/cutoffrd/ rcut_Clf,rcutLJ
       common/ELSTA/  Temp,epsCLJ,epsLJ
 !
-      integer(C_INT)  itabs
-      common/plupdat/ itabs
+      integer(C_INT) itabs
+      common/parm6/ itabs
 !----------------------------------------------------------------
       real(C_DOUBLE) a_unit,m_unit,e_unit,t_unit,c1,c2,Wrest
       common/physc/  a_unit,m_unit,e_unit,t_unit,c1,c2,Wrest
@@ -4001,9 +3994,11 @@
       real(C_DOUBLE) pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax
       common/parm2/  pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax
 !
-      real(C_float) phi,tht,dtwr,dtwr2,dtwr3,rgmax,cptot
+      real(C_float) phi,tht,dtwr,dtwr2,dtwr3,rgmax
       common/parm4/ phi,tht,dtwr,dtwr2,dtwr3,rgmax
-      common/parm9/ cptot
+!
+      real(C_DOUBLE) cptot
+      common/parm7/ cptot
 !
       real(C_DOUBLE) R_sp,D_sp,N_sp,Lambda_D,massi,            &
                      ch_ion,wt_ion,rd_CP,rd_HP,ch_el,wt_el,rd_el
@@ -4102,7 +4097,7 @@
       include  'param_em3p7_Ca.h'
 !
       integer(C_INT) ifrefl,itabs
-      common/plupdat/ itabs
+      common/parm6/ itabs
 !
       real(C_DOUBLE) fchar,fcharA
       integer(C_INT) nZ,nZA
@@ -4121,13 +4116,15 @@
       common/ELSTA/  Temp,epsCLJ,epsLJ
 !----------------------------------------------------------------
       real(C_DOUBLE) pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax
-      real(C_float)  phi,tht,dtwr,dtwr2,dtwr3,cptot,rgmax
+      real(C_float)  phi,tht,dtwr,dtwr2,dtwr3,rgmax
 !
       real(C_DOUBLE) Lx3,Ly3,Lz3,hx2,hy2,hz2,hx,hy,hz,p4dt,dV,cdt
       common/hx2l/  Lx3,Ly3,Lz3,hx2,hy2,hz2,hx,hy,hz,p4dt,dV,cdt
       common/parm2/ pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax
       common/parm4/ phi,tht,dtwr,dtwr2,dtwr3,rgmax
-      common/parm9/ cptot
+!
+      real(C_DOUBLE) cptot
+      common/parm7/ cptot
 !
       real(C_DOUBLE) R_sp,D_sp,N_sp,Lambda_D,massi,            &
                      ch_ion,wt_ion,rd_CP,rd_HP,ch_el,wt_el,rd_el

@@ -102,11 +102,14 @@
 !     character  suffix2*2,suffix1*2,suffix0*1
       logical    if_start,ionode
       common/ionod/ ionode
-!
-!-------------------------------------------------------------
-!  52 nodes, 104 ranks by Fujitsu FX100
+! ---------------------------------------------
 !
       call mpi_init (ierror)
+!
+!*******************************************
+!*  A global communication group.          *
+!*******************************************
+! 52 node, 104 rank by Fujitsu FX100
 !
       call mpi_comm_rank (MPI_COMM_WORLD,rank,ierror)
       call mpi_comm_size (MPI_COMM_WORLD,size,ierror)
@@ -384,8 +387,7 @@
 !**************************************************************
 !
       pi = 4.d0*datan(1.d0)
-!
-!  CGS system
+!* cgs
       a_unit= 1.0000d+00   ! cm
       m_unit= 0.9110d-27   ! g, electron mass
       e_unit= 4.8032d-10   ! esu, unit charge
@@ -871,7 +873,6 @@
       call moldyn (size,ipar,igrp,ifDebye,ifrefl,ifedist,    &
                    if_start,ns,np,nq,nCLp)
 !*---------------- ++ ++ ++ ++ +++ ----------------------------
-!
 !**************************************************************
 !* Restart data.
 !
@@ -1091,10 +1092,10 @@
       common/swaves/ E0,ak,ct,omega
 !
 !+++++
-!!    integer*4  mx,my,mz       ! in parameters param_3p7Ca.h
+!!    integer*4  mx,my,mz       ! in parameter statement
       integer*4  l,m,n,ll,mm,nn,mxh,myh,mzh
       parameter  (mxh=mx,myh=my,mzh=mz)
-!     parameter  (mxh=mx/2+1,myh=my/2+1,mzh=mz/2+1)
+!!    parameter  (mxh=mx/2+1,myh=my/2+1,mzh=mz/2+1)
 !
       integer*4  ifeh,item3ab,item3,npar3,ierror,wrt7,wrt
       real*8     Lx3,Ly3,Lz3,hx2,hy2,hz2,hx,hy,hz,p4dt,dV,cdt
@@ -1544,7 +1545,7 @@
 !
       p_xyz= 0.800d-4*(-3.d0 +tg/2.6666667d-15)
 !                             ++
-!* For initial condition
+!  For initial condition
 !   btx(l,m,n)= ...-dt*omega*E0*sin(omega*tg -ak*yy) *ff  
 !   HH(l,m,n)=  E0*cos(omega*tg -ak*yy)  
 !   etz(l,m,n)= ...+dt*omega*E0*cos(omega*(tg+dth) -ak*yy)
@@ -1624,11 +1625,6 @@
 !
        call clocks (cp1,wall1,size)
 !
-!   btx(l,m,n)= ...-dt*omega*E0*sin(omega*tg -ak*yy) *ff  
-!   HH(l,m,n)=  E0*cos(omega*tg -ak*yy)  
-!   etz(l,m,n)= ...+dt*omega*E0*cos(omega*(tg+dth) -ak*yy)
-!   EE(l,m,n)=  E0*sin(omega*(tg+dth) -ak*yy)
-!
       do n= 2,mz-1
       do m= 2,my-1
       do l= 2,mx-1
@@ -1660,7 +1656,7 @@
 !
         call clocks (cp2,wall2,size)
 !
-!* Faster by one pass
+!  Faster by one pass
 !  vx(n) <- vx(n+1/2) ??
 !
       do n= 1,mz
@@ -1745,8 +1741,7 @@
       end do
 !
 !
-!* Poisson equation: read_10: it=1 or restart
-!
+!  Poisson equation: read_10: it=1 or restart
       if(mod(it,5).eq.1 .or. read_10) then  
         if(n_twice.eq.1) read_10= .false.   ! n_twice= 1
 !
@@ -1809,7 +1804,6 @@
       end do
       end do
 !
-!
         if(iwrt3.eq.0 .and. ionode) then
         if(.not.ifeqlib) then
 !
@@ -1838,7 +1832,7 @@
 !
         call clocks (cp3,wall3,size)
 !
-! Save for etx-etz
+! Save for etx
 !
       do n= 1,mz
       do m= 1,my
@@ -1917,7 +1911,7 @@
 !
         call clocks (cp4,wall4,size)
 !
-!* EL(n+1/2)
+!  EL(n+1/2)
 !   All region (infinite)        Syncro by ipar=1,2,...,size ranks
 !
 !                                    +++ ++++++ ++++++ +++++ 
@@ -1930,8 +1924,7 @@
 !
         call clocks (cp5,wall5,size)
 !
-!
-!* This includes vx(n) ??
+!  This includes vx(n) ??
 !    mid-point is E(n+1/2), B(n+1/2)
 !
       do i= 1,nCLp
@@ -2008,6 +2001,7 @@
       end do
 !
 !
+!       if(mod(it,5).eq.1 .and. ionode) then
       if(iwrt2.eq.0 .and. ionode) then
         l= mx/2+1
         n= mz/2+1
@@ -2037,120 +2031,47 @@
           close(11)
         end if
 !       
-!---------------------
-!* Reflection walls
-!---------------------
-!* Relax electron distributions within the target
-!  Exclude ions !
+!------------------------------------------
+!* Squeeze inside the pendulum for it=1
+!------------------------------------------
 !
-!   There are not protons...
-        if(.false.) then
-!     if(ifeqlib) then
-!     ++++++++++++++++
-!
-        ifeqlib= .false.
-!       cccccccccccccccc
+      if(it.eq.1) then
 !
 !  Top and bottom of the cans
-        rr1= R_sp  ! 30.d-08 =30 Ang
-!a           **** <- READ_CONF
-!        
+        rr1= 30.d-08 ! =30 Ang
+!            **** <- READ_CONF
 !       ----------------
-!       do i= ns+1,ns+np
-!       rr0= ranff(0.)*rr1  ! cm
-!       ph0= 2*pi*ranff(0.)
+        do i= ns+1,ns+np
+        rr0= ranff(0.d0)*rr1  ! cm
+        ph0= 2*pi*ranff(0.d0)
 !
-!       xg(i)= rr0*sin(ph0)
-!       yg(i)= rr0*cos(ph0)
-!       zg(i)= zg(i)
+        xg(i)= rr0*sin(ph0)
+        yg(i)= rr0*cos(ph0)
+        zg(i)= zg(i)
 !
-!       xg(i+np)= xg(i) +0.1d-8*ranff(0) ! elec= H(+): ns+1 -> ns+np+1
-!       yg(i+np)= yg(i) +0.1d-8*ranff(0)
-!       zg(i+np)= zg(i)
-!       end do
+        xg(i+np)= xg(i) +0.1d-8*ranff(0.d0) ! elec= H(+): ns+1 -> ns+np+1
+        yg(i+np)= yg(i) +0.1d-8*ranff(0.d0)
+        zg(i+np)= zg(i)
+        end do
 !       ----------------
-!       end if
 !
-        if(ionode) then
-          OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
-                 status='unknown',position='append',form='formatted')
+        if(it.eq.1.and.ionode) then
+          open (unit=11,file=praefixc//'.06'//suffix2,  &
+                status='unknown',position='append',form='formatted')
 !
           write(11,*) '    '
           write(11,*) '# Make Coulomb-optimized distributions...'
-          write(11,*) ' There are no proton and e (cm)...'
-!         write(11,330) (i,xg(i),yg(i),zg(i),xg(i+np),yg(i+np), &
-!                         zg(i+np),i=ns+1,ns+5)
-! 330     format(' i=',i7,1p3e13.4,2x,3e13.4)
+          write(11,*) ' proton and electron (cm)...'
+          write(11,'(" i=",i7,1p3d13.4,2x,3d13.4)') &
+                         (i,xg(i),yg(i),zg(i),xg(i+np),yg(i+np), &
+                          zg(i+np),i=ns+1,ns+10)
           close(11)
-        end if
-!
-!
-        if_start= .false.  ! make F after equilibration
-!       ---------------
-!
-        if(eq_phase) then
-!       ++++++++++++
-          eq_phase= .false.  ! equil phase ends here
-!
-          if(ionode) then
-            OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
-                  status='unknown',position='append',form='formatted')
-            write(11,*) 'Initial time at restart...'
-            write(11,*) ' 1600: ifeqlib= .false.'
-            write(11,*) ' 1640: if_start, eq_phase=',if_start,eq_phase
-            close(11)
-          end if
-!
-          cr_table= .true.   ! create p-table: restart
-          n_twice= 0         ! must be set =0
-!
-          itab= 0   
-          item3= 0
-          tg= 0.
-           t= tg
-!
-          is= 0
-          it= 0
-          iwa= -1
-          iwb= -1
-          iwc= -1
-          iwd= -1
-!
-          if(ionode) then
-            OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
-                  status='unknown',position='append',form='formatted')
-            write(11,*) '    '
-            write(11,*) '# Use optimized distribution (given T)...'
-            close(11)
-          end if
-!                    ++
-          do i= 1,ns+np  ! CNT + H(+)
-          px(i)= 0.d0
-          py(i)= 0.d0
-          pz(i)= 0.d0
-          end do
-!
-          vmax2= 0.7d0*pthe  ! sqrt(Temp_erg), cm/sec
-!                    ++
-          do i= ns+np+1,nCLp
-          px(i)= 0 !am(i)*dgaus2(vmax2) 
-          py(i)= 0 !am(i)*dgaus2(vmax2)
-          pz(i)= 0 !am(i)*dgaus2(vmax2)
-          end do
-!
-          go to 1000
         end if
       end if
 !
-!     if(ifrefl.eq.1) then
-!       call reflect_box (xg,yg,zg,px,py,pz,ag,nCLp)
-!     else if(ifrefl.eq.2) then
-!       call reflect_2Dbox (xg,yg,zg,px,py,pz,xmax,size,ipar,nCLp)
-!     end if
-!
-!**************************************
-!*  Diagnosis section.                *
-!**************************************
+!------------------------------------------
+!*  Diagnosis section.
+!------------------------------------------
 !
       if(iwrt1.eq.0 .and. ionode) then
       if(.not.ifeqlib) then
@@ -2163,6 +2084,7 @@
       end if
       end if
 !
+!* dt= 0.5 (every one of 0.5x10^-15) 
 !
       if(iwrt3.eq.0 .and. ionode) then   ! 1.d-15 sec 
       if(.not.ifeqlib) then
@@ -2214,7 +2136,6 @@
       if(ionode) then
         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
               status='unknown',position='append',form='formatted')
-!
 !       until this diagnosis of write(11,)
 ! --------------------------------------- on major nodes --------------
 !
@@ -2482,7 +2403,6 @@
         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
               status='unknown',position='append',form='formatted')
 !
-        write(11,*)
         write(11,*) ' final: t, tmax (sec)=',tg,tmax
         write(11,*) ' final: cpu1/60., cptot (min)=',dcpu/60.d0,cptot
 !                                               ++++
@@ -2563,7 +2483,7 @@
       rsccl = 1.0d-8               ! 1 ang= 10^{-8} cm
 !
 !*-------------------------------------------
-!* Update particle table infrequentLy3
+!* update particle table infrequentLy3
 !*-------------------------------------------
 !
       itab= itab +1
@@ -2793,7 +2713,7 @@
           istop= istp
           return
         end if
-! ++++++ Initial/every itabs / restart ++++++++++++
+! ++++++ initial/every itabs / restart ++++++++++++
       end if
 !
 !*****************************************
@@ -2838,7 +2758,7 @@
       forceV = ch(i)*ch(j)/(rcl**2 *r)
       E_C_r2 = E_C_r2 + ch(i)*ch(j)/rcl
 !
-!* Short-range forces
+!* short-range forces
 !
       if(i.le.ns .and. j.le.ns) then   ! strictly, C or Au pair
         rcut= 3.5d-8
