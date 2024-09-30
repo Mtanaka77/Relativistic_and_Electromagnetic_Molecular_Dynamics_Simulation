@@ -1,9 +1,13 @@
+!**********************************************************************
 !*--------------------------------------------------------------------*
-!  @cnt3ems_07Aa.f03                    Dec.24, 2016, Sep.13, 2024    !   
+!  @cnt3ems_01Aa.f03                    Dec.24, 2016, Sep.13, 2024    !   
 !                                                                     !
 !  ## Molecular Dynamics in Relativistic Electromagnetic Fields ##    !
 !                                                                     !
 !   MPI+OpenMP: subroutine /forces/; real atomic masses mp/me=1836    !
+!     Open system with central region in XYZ coordinated space;       !
+!     the Z direction is parallelized, where the size mz= n_proc*mza  !
+!     and n_proc is the PE's nodes like n_proc=64, for example.       ! 
 !   READ_conf is used in nZ, nZA, intens, lambda                      !
 !   3D filled H(+) by ranff(0.) filling ... moldyn 1150               !
 !   No gap between r>rout and r<rout  ... forces 920,940,1690,1750    !
@@ -29,14 +33,9 @@
 !   Author/maintainer: Motohiko Tanaka, Ph.D.,Professor,              !
 !      Graduate School of Chubu University, Kasugai 487-8501, Japan.  !
 !                                                                     !
-!*--------------------------------------------------------------------*
-!                                                                     !
 !   GPL-3.0 License, at https://github.com/Mtanaka77/                 !
 !     /Relativistic_Molecular_Dynamics_Simulation/                    !
 !                                                                     !
-!  Initial version by Fujitsu FX100 Supercomputer, 2015-2019.         !
-!    mpifrtpx -Kfast,openmp -o aq4.out @cnt3emq.f03 -lfftw3           !
-!    (Ez,Bx) in envelop: (sin,cos)*exp(-(t/tq)**2)                    !
 !*--------------------------------------------------------------------*
 !                                                                     !
 !   The CGS system:                                                   !
@@ -86,6 +85,9 @@
 !    Fortran 2003 /Fortran 2008 Write output (finished)               !   
 !       write(11,'("This run uses ",i3," ranks",/)') size             !
 !                                                                     !
+!  The initial version was by Fujitsu FX100 Supercomputer, 2015-2019. !
+!    mpifrtpx -Kfast,openmp -o aq4.out @cnt3emq.f03 -lfftw3           !
+!    (Ez,Bx) in envelop: (sin,cos)*exp(-(t/tq)**2)                    !
 !*--------------------------------------------------------------------*
 !
       program  cnt3emw
@@ -486,22 +488,22 @@
 !
 !  Generate electrons
         do i= ns+1,ns+np   ! electrons for protons
-        xg(i+np)= xg(i) +0.1d-8*ranff(0.)
-        yg(i+np)= yg(i) +0.1d-8*ranff(0.)
+        xg(i+np)= xg(i) +0.1d-8*ranff(0.d0)
+        yg(i+np)= yg(i) +0.1d-8*ranff(0.d0)
         zg(i+np)= zg(i)
         end do
 !
         do i= 1,ns/2       ! electrons for C
         ns2= ns+2*np
-        xg(i+ns2)= xg(i) +0.1d-8*ranff(0.)
-        yg(i+ns2)= yg(i) +0.1d-8*ranff(0.)
+        xg(i+ns2)= xg(i) +0.1d-8*ranff(0.d0)
+        yg(i+ns2)= yg(i) +0.1d-8*ranff(0.d0)
         zg(i+ns2)= zg(i)
         end do
 !
         do i= ns/2+1,ns    ! electrons for Au, ns/2+1
         ns2= ns +2*np +nZ*(ns/2)
-        xg(i+ns2)= xg(i) +0.1d-8*ranff(0.)
-        yg(i+ns2)= yg(i) +0.1d-8*ranff(0.)
+        xg(i+ns2)= xg(i) +0.1d-8*ranff(0.d0)
+        yg(i+ns2)= yg(i) +0.1d-8*ranff(0.d0)
         zg(i+ns2)= zg(i)
         end do
 !
@@ -571,7 +573,7 @@
         end if
 !
 !------------------------------------------
-!* FT10 must be mounted on NSF volume.
+!* FT12 must be mounted on NSF volume.
 !------------------------------------------
         OPEN (unit=12,file=praefixi//'.12'//suffix2,   &
               status='old',form='unformatted')
@@ -912,9 +914,9 @@
         OPEN (unit=77,file=praefixc//'.77'//suffix1//'.ps',      &
               status='unknown',position='append',form='formatted')
 !   ---------------------------          ++++++
-!       if(ifedist.ne.1) then
+        if(ifedist.ne.1) then
           call lplots
-!       end if
+        end if
 !   ---------------------------
         call plote
         close(77)
@@ -947,7 +949,7 @@
 !   --------------------------
       if(.not.ionode) return
 !   --------------------------
-!c
+!
       if(ionode) then
         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
               status='unknown',position='append',form='formatted')
@@ -962,7 +964,7 @@
         call gopen (nframe) 
         close (77)
       end if
-!c 
+!
       return
       end subroutine FLOPEN
 !
@@ -976,8 +978,8 @@
       use, intrinsic :: iso_c_binding 
       implicit none
 !
-!     include 'fftw3.f03'
-      include 'aslfftw3.f03'
+      include 'fftw3.f03'
+!     include 'aslfftw3.f03'
 !
       include 'param_em3p7_Aa.h'
       include 'mpif.h'
@@ -1087,7 +1089,7 @@
       common/srflst0/ cr_table,itab,nipl0(n00),lipl0(nbxs,n00)
 !
       real*8     intens,lambda,E0,ak,ct,omega,Eta,Bta, &
-                 ff,p_xyz,yg0,xz0,yg02,xz02
+                 ff,p_xyz,yg0,yg02,xz0,xz02
       common/electr/ intens,lambda
       common/swaves/ E0,ak,ct,omega
 !
@@ -1421,13 +1423,12 @@
       n_twice= n_twice +1    !           n_twice= 1
 !    *********************
 !
-!  if(it.eq.1) tg= 0.d0 
       teql= 0.0005d-15 
       ifeqlib= (if_start).and.(t.lt.teql)
 !               ++++++++
 !
       if(ifeqlib) then
-        dtwr= 0.1d-15
+        dtwr= 0.005d-15
       else
         dtwr= dtwr0
       end if
@@ -1498,7 +1499,7 @@
 !
 !  t is in 10^-15 sec (omega in 10^15 unit)
       omega = c1*(2*pi/lambda)    ! 2.36d+15 /sec
-      ak    = 2*pi/lambda         ! 7.85d+4/cm <- 0.8 micron
+      ak    = 2*pi/lambda  ! 7.85d+4/cm <- 0.8 micron
 !
       if(it.eq.1) then
       if(ionode) then
@@ -1545,13 +1546,9 @@
 !
       p_xyz= 0.800d-4*(-3.d0 +tg/2.6666667d-15)
 !                             ++
-!  For initial condition
-!   btx(l,m,n)= ...-dt*omega*E0*sin(omega*tg -ak*yy) *ff  
-!   HH(l,m,n)=  E0*cos(omega*tg -ak*yy)  
-!   etz(l,m,n)= ...+dt*omega*E0*cos(omega*(tg+dth) -ak*yy)
-!   EE(l,m,n)=  E0*sin(omega*(tg+dth) -ak*yy)
+!  for initial condition
+      if(.not.ifeqlib .and. it.eq.1) then
 !
-      if(it.eq.1) then
         do n= 1,mz
         do m= 1,my
         do l= 1,mx
@@ -1560,15 +1557,17 @@
         zz= zmin3 +Lz3*(n-1)/mz +hz/2.d0
         ff= exp(-( (yy-p_xyz)**2/yg02 +(xx**2+zz**2)/xz02))
 !
-        etz(l,m,n)= E0*sin(omega*(tg+dth) -ak*yy) *ff
-        btx(l,m,n)= E0*cos(omega*tg -ak*yy) *ff
-        end do 
+        etx(l,m,n)= E0*sin(omega*(tg+dth) -ak*yy) *ff
+        bty(l,m,n)= E0*cos(omega*tg -ak*yy) *ff
+        end do    !               ++++++
         end do
         end do
       end if
 !
-!  As confirmed above
-      if(it.eq.1) then
+!  As confirmed
+      if(first_kk) then
+      if(.not.ifeqlib .and. ionode) then
+        first_kk= .false.
 !
         if(ionode) then
         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
@@ -1592,6 +1591,7 @@
         close(11)
         end if
       end if
+      end if
 !
 !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !* Electromagnetic fields: B(n+1/2)= B(n-1/2) and E(n)
@@ -1613,11 +1613,13 @@
 !       ++++++++++++++++++++++++++++
 !
 !  backward/forward fftw's
-!    NEC's style: f77 is mx,my,mz
-        call dfftw_plan_r2r_3d (plan,mx,my,mz, qq,qq_c, &
-                    FFTW_RODFT00,FFTW_RODFT00,FFTW_RODFT00,FFTW_ESTIMATE)
-        call dfftw_plan_r2r_3d (pinv,mx,my,mz,psi_c,psi, &
-                    FFTW_RODFT00,FFTW_RODFT00,FFTW_RODFT00,FFTW_ESTIMATE)
+!    NEC's style
+        plan= fftw_plan_r2r_3d  &
+             (mz,my,mx, qq,qq_c, FFTW_RODFT00,FFTW_RODFT00,FFTW_RODFT00, &
+              FFTW_ESTIMATE)
+        pinv= fftw_plan_r2r_3d  &
+             (mz,my,mx,psi_c,psi,FFTW_RODFT00,FFTW_RODFT00,FFTW_RODFT00, &
+              FFTW_ESTIMATE)
       end if
 !
 !
@@ -1646,7 +1648,7 @@
       do m= 1,my
       do l= 1,mx
       yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
-      HH(l,m,n)= E0*cos(omega*tg -ak*yy)  
+      HH(l,m,n)= E0*cos(omega*tg -ak*yy)  ! at time tg
       end do
       end do
       end do
@@ -1765,7 +1767,8 @@
         qq(l,m,n)= qq(l,m,n) +prho*ch(i)
   777   end do
 !
-        call dfftw_execute_r2r (plan,qq,qq_c)
+!       call dfftw_execute_r2r (plan,qq,qq_c)
+        call fftw_execute_r2r (plan,qq,qq_c)
 !
         do n= 1,mz 
         do m= 1,my
@@ -1779,30 +1782,32 @@
         end do
         end do
 !
-        call dfftw_execute_r2r (pinv,psi_c,psi) 
+!       call dfftw_execute_r2r (pinv,psi_c,psi) 
+        call fftw_execute_r2r (pinv,psi_c,psi) 
 !
 !  For smoothing
         call filt1 (psi) 
-      end if
 !
 !  cjx(n+1/2): vx(n+1/2)
 !   Separate: Jt= J -(J*EL)*EL/|ELl^2
 !
-      do n= 2,mz-1  ! except a corner
-      do m= 2,my-1
-      do l= 2,mx-1
-      pp1= -(psi(l+1,m,n) -psi(l-1,m,n))/hx2
-      pp2= -(psi(l,m+1,n) -psi(l,m-1,n))/hy2
-      pp3= -(psi(l,m,n+1) -psi(l,m,n-1))/hz2
-      ccj= (cjx(l,m,n)*pp1 +cjy(l,m,n)*pp2 +cjz(l,m,n)*pp3)  &
-                                  /(pp1**2 +pp2**2 +pp3**2)
+        do n= 2,mz-1  ! except a corner
+        do m= 2,my-1
+        do l= 2,mx-1
+        pp1= -(psi(l+1,m,n) -psi(l-1,m,n))/hx2
+        pp2= -(psi(l,m+1,n) -psi(l,m-1,n))/hy2
+        pp3= -(psi(l,m,n+1) -psi(l,m,n-1))/hz2
+        ccj= (cjx(l,m,n)*pp1 +cjy(l,m,n)*pp2 +cjz(l,m,n)*pp3)  &
+                                     /(pp1**2 +pp2**2 +pp3**2)
 !
-      cjx(l,m,n)= cjx(l,m,n) -ccj*pp1
-      cjy(l,m,n)= cjy(l,m,n) -ccj*pp2
-      cjz(l,m,n)= cjz(l,m,n) -ccj*pp3
-      end do
-      end do
-      end do
+        cjx(l,m,n)= cjx(l,m,n) -ccj*pp1
+        cjy(l,m,n)= cjy(l,m,n) -ccj*pp2
+        cjz(l,m,n)= cjz(l,m,n) -ccj*pp3
+        end do
+        end do
+        end do
+      end if
+!
 !
         if(iwrt3.eq.0 .and. ionode) then
         if(.not.ifeqlib) then
@@ -1844,7 +1849,7 @@
       end do
       end do
 !
-!  ET(n+1): E(n), B(n+1/2)
+!  ET(n+1): use E(n), B(n+1/2)
 !   p4dt= 4*pi*5.d-19
 !
       do n= 2,mz-1
@@ -1925,7 +1930,7 @@
         call clocks (cp5,wall5,size)
 !
 !  This includes vx(n) ??
-!    mid-point is E(n+1/2), B(n+1/2)
+!    The mid-point is E(n+1/2) and B(n+1/2)
 !
       do i= 1,nCLp
       l= mx*(xg(i)-xmin3)/Lx3 +1.5000d0
@@ -1941,7 +1946,7 @@
         etxi= 0
         etyi= 0
         etzi= E0*sin(omega*(tg+dth) -ak*yg(i)) *ff   ! statV/cm
-        btxi= E0*cos(omega*tg -ak*yg(i)) *ff 
+        btxi= E0*cos(omega*(tg+dth) -ak*yg(i)) *ff 
         btyi= 0
         btzi= 0
 !
@@ -2022,14 +2027,15 @@
 !
         call clocks (cp6,wall6,size)
 !
-        if(ionode .and. iwrt1.eq.0) then
-          OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
-                status='unknown',position='append',form='formatted')
+      if(ionode .and. iwrt1.eq.0) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+              status='unknown',position='append',form='formatted')
 !
-          write(11,'("*Ctime ctime=",f7.3," 1,2,3,4,5=",5f7.3)')   &
-                   cp6-cp1,cp2-cp1,cp3-cp2,cp4-cp3,cp5-cp4,cp6-cp5
-          close(11)
-        end if
+        write(11,'("*Ctime ctime=",f7.3," 1,2,3,4,5=",5f7.3)')   &
+                 cp6-cp1,cp2-cp1,cp3-cp2,cp4-cp3,cp5-cp4,cp6-cp5
+        close(11)
+      end if
+!       
 !       
 !------------------------------------------
 !* Squeeze inside the pendulum for it=1
@@ -2069,9 +2075,15 @@
         end if
       end if
 !
-!------------------------------------------
+!     if(ifrefl.eq.1) then
+!       call reflect_box (xg,yg,zg,px,py,pz,ag,nCLp)
+!     else if(ifrefl.eq.2) then
+!       call reflect_2Dbox (xg,yg,zg,px,py,pz,xmax,size,ipar,nCLp)
+!     end if
+!
+!------------------------------
 !*  Diagnosis section.
-!------------------------------------------
+!------------------------------
 !
       if(iwrt1.eq.0 .and. ionode) then
       if(.not.ifeqlib) then
@@ -2098,26 +2110,26 @@
          OPEN (unit=29,file=praefixc//'.29'//suffix1,             &
                status='unknown',position='append',form='unformatted')
 !
-!  real*4: Fields minus EE, HH
+!  real*4
          write(29) t
 !
-         do n= 1,mz,2
-         do m= 1,my,2
-         do l= 1,mx,2
-         ll= (l+1)/2
-         mm= (m+1)/2
-         nn= (n+1)/2
-!
-         xx= xmin3 +Lx3*(l-1)/mx +hx/2.d0  ! xx kariru
+!  Field minus EE, HH
+         do n= 1,mz !,2
+         do m= 1,my !,2
+         do l= 1,mx !,2
+         ll= l !2*l -1
+         mm= m !2*m -1
+         nn= n !2*n -1
+         xx= xmin3 +Lx3*(l-1)/mx +hx/2.d0 
          yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
          zz= zmin3 +Lz3*(n-1)/mz +hz/2.d0
          ff= exp(-( (yy-p_xyz)**2/yg02 +(xx**2+zz**2)/xz02 ))
 !
-         eetx(ll,mm,nn)= etx(l,m,n)
+         eetx(ll,mm,nn)= etx(l,m,n) 
          eety(ll,mm,nn)= ety(l,m,n)
-         eetz(ll,mm,nn)= etz(l,m,n) 
-         bbtx(ll,mm,nn)= btx(l,m,n)
-         bbty(ll,mm,nn)= bty(l,m,n)
+         eetz(ll,mm,nn)= etz(l,m,n)
+         bbtx(ll,mm,nn)= btx(l,m,n) 
+         bbty(ll,mm,nn)= bty(l,m,n) 
          bbtz(ll,mm,nn)= btz(l,m,n)
          end do
          end do
@@ -2384,15 +2396,15 @@
 !
 !     if(iwrt4.eq.0) then
 !     if(ifedist.eq.0 .and. ionode) then
-!!      OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
-!!            status='unknown',position='append',form='formatted')
+!       OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+!             status='unknown',position='append',form='formatted')
 !
 !       OPEN (unit=77,file=praefixc//'.77'//suffix1//'.ps',      &
 !             status='unknown',position='append',form='formatted')
 !       call lplots
 !       close(77)
 !
-!cc     if(wrt.eq.11) close(wrt)
+!       close(11)
 !     end if
 !     end if
 ! --------------------------------------- on major nodes --------------
@@ -3491,6 +3503,9 @@
 !
       include  'param_em3p7_Aa.h'
 !
+      logical   ionode
+      common/ionod/ ionode
+!
       real*8     fchar,fcharA
       common/charg/ fchar,fcharA
 !
@@ -3518,6 +3533,10 @@
       common/ionsiz/ R_sp,D_sp,N_sp,massi,Lambda_D,            &
                      ch_ion,wt_ion,rd_CP,rd_HP,ch_el,wt_el,rd_el 
 !----------------------------------------------------------------
+!
+      if(.not.ionode) return
+!     ++++++++++++++++++++++
+!
       OPEN (unit=07,file=praefixe//'_config.ENDE'//suffix1,  &
                                           form='formatted')
 !*********************************************************************
@@ -3773,9 +3792,9 @@
       do k= 1,nZ   ! Heavy +(heavy) electrons per C(+Z)
       i= i +1
 !
-      x(i)= x(j) +0.1d-8*ranff(0.) !sgn(1,k)*(rd_CP +rd_el)
-      y(i)= y(j) +0.1d-8*ranff(0.) !sgn(2,k)*(rd_CP +rd_el)
-      z(i)= z(j) +0.1d-8*ranff(0.) !+sgn(3,k)*(rd_CP +rd_el)
+      x(i)= x(j) +0.1d-8*ranff(0.d0) !sgn(1,k)*(rd_CP +rd_el)
+      y(i)= y(j) +0.1d-8*ranff(0.d0) !sgn(2,k)*(rd_CP +rd_el)
+      z(i)= z(j) +0.1d-8*ranff(0.d0) !+sgn(3,k)*(rd_CP +rd_el)
       end do
       end do
 !
@@ -3785,9 +3804,9 @@
 !             +++++
       i= i +1
 !
-      x(i)= x(j) +0.1d-8*ranff(0.) !sgn(1,k)*(rd_CP +rd_el)
-      y(i)= y(j) +0.1d-8*ranff(0.) !sgn(2,k)*(rd_CP +rd_el)
-      z(i)= z(j) +0.1d-8*ranff(0.) !sgn(3,k)*(rd_CP +rd_el)
+      x(i)= x(j) +0.1d-8*ranff(0.d0) !sgn(1,k)*(rd_CP +rd_el)
+      y(i)= y(j) +0.1d-8*ranff(0.d0) !sgn(2,k)*(rd_CP +rd_el)
+      z(i)= z(j) +0.1d-8*ranff(0.d0) !sgn(3,k)*(rd_CP +rd_el)
       end do
       end do
 !
@@ -3889,7 +3908,8 @@
 !
       common/gaus1/ fv(51),vv0,dv
 !
-      eps= ranff(0.)
+      eps= ranff(0.d0)
+!
       do 100 k=1,51
       k2=k
       if(fv(k).gt.eps) go to 200
@@ -4460,8 +4480,8 @@
       use, intrinsic :: iso_c_binding 
       implicit none
 !
-      real*4 f(7000),fmax,fmin
       integer*4  is,i
+      real*4 f(is),fmax,fmin
 !
       fmax= -1.e10
       fmin=  1.e10
@@ -4622,8 +4642,10 @@
 !----------------------------------------------------
 !* Protons
 !
+!     if(.not.ifskip_p) then
       nskip= (np +1.e-5)/1000
-!--- 
+!---                     ****
+!
       do 300 i= ns+1,ns+np,nskip
       xp= xg(i)*cph -yg(i)*sph
       yp= xg(i)*sph +yg(i)*cph
@@ -4697,8 +4719,9 @@
 !
 !* Electrons in pellet
 !
-      nskip= (np +1.e-5)/1000   ! -e
-!---     
+!     if(.not.ifskip_e) then
+      nskip= (np+1.e-5)/1000   ! -e
+!---                    ****
 !
       do 500 i= ns+np+1,ns+np+np,nskip
       xp= xg(i)*cph -yg(i)*sph
@@ -4720,13 +4743,11 @@
       call circle (xx-0.12,yy-0.12,dd,1)
   500 continue
 !
-!     end if
-!
 !* Electrons around CNT - heavy
 !
 !     nskip= 6*ns/1000
       nskip= (nZ+nZA)*(ns/2)/1000
-!---                       ****
+!---                         ****
 !
       do 600 i= ns+np+np+1,nCLp,nskip
       xp= xg(i)*cph -yg(i)*sph
@@ -4748,6 +4769,7 @@
       call circle (xx-0.12,yy-0.12,dd,1)
   600 continue
 !---
+!     end if
 !
       call newcolor (0,1.,0.,0.)  ! reset
 !---------------------
@@ -4843,7 +4865,7 @@
 !
 !     do 100 i= 1,nCLp
       do i= 1,ns+np    ! for all atoms
-      xx = - xg(i)     ! arrange the x,y-direction with ppl3da plot
+      xx = - xg(i)     ! arrange the x-direction with ppl3da plot
       yy = yg(i)
 !
 !     if(abs(x(i)).gt.xmax) go to 100
@@ -4885,6 +4907,7 @@
 !-------------------------------------------------------------
 !* Protons
 !
+!     nskip= max(1,np/1000)
       nskip= (np +1.e-5)/1000
 !
       do i= ns+1,ns+np,nskip
@@ -4933,6 +4956,7 @@
 !
 !* Electrons in pellet
 !
+!     nskip= max(1,np/1000)
       nskip= (np +1.e-5)/1000
 !
       do 500 i= ns+np+1,ns+np+np,nskip
@@ -5115,9 +5139,10 @@
 !------------------------------------------------
 !*  ranf= (0,1)
 !
+      integer*4  ir,iq,MASK,LAMBDA
+      real*8  ranff,x,INVM
       common/ranfff/ ir,iq
 !
-      REAL*8     ranff,INVM
       PARAMETER  (MASK=2**30+(2**30-1),INVM= 0.5D0**31)
       PARAMETER  (LAMBDA=48828125)
 !
@@ -5132,7 +5157,7 @@
 !     ranff= ir/ask
 !
       return
-      end
+      end function ranff
 !
 !
 !-----------------------------------------------------------------------
@@ -5148,11 +5173,17 @@
 !***********************************************************************
       use, intrinsic :: iso_c_binding 
 !
-      dimension  x(7000),y(7000),u(7000),v(7000)
-      dimension  xcm(6),ycm(6),pl(6),pr(6),ql(6),qr(6)
+      integer*4  ix,iy,npt1,il,n1,n2,n3
+      real*4  x(npt1),y(npt1),u(npt1),v(npt1),  &
+              xcm(6),ycm(6),pl(6),pr(6),ql(6),qr(6)
 !
       character*8    lab1,lab2,lab3
       character*8    label,date_now*10,cax*1
+!
+      integer*4  nfine,iplot,npt,isc,i1,j1
+      real*4  time,xp_leng,pl1,pr1,ql1,qr1,xmax1,ymin1,ymax1, &
+              hh,hhs,xmax,xmin
+!
       common/headr1/ label,date_now
       common/headr2/ time,xp_leng
       common/pplcom/ nfine,pl1(10),pr1(10),ql1(10),qr1(10),  &
@@ -5766,6 +5797,10 @@
        subroutine gopen (nframe)
 !----------------------------------------------------------
        use, intrinsic :: iso_c_binding 
+       implicit none
+!
+       integer*4  n0,ipage,nfrm,nframe
+       real*4  fmag,x0,y0,h0,xcm,xwc
 !
        common/convsn/ fmag,x0,y0,h0,n0
        common/pages/  ipage,nfrm
@@ -5869,26 +5904,30 @@
        end if
 !
        return
-       end
+       end subroutine gopen
 !
 !
 !-----------------------------
        subroutine gclose
 !-----------------------------
        use, intrinsic :: iso_c_binding 
+       implicit none
 !
        call plote
+!
        return
-       end
+       end subroutine gclose
 !
 !
 !-----------------------------
        subroutine plote
 !-----------------------------
        use, intrinsic :: iso_c_binding 
+       implicit none
 !
        write(77,10) 
    10  format('@eop')
+!
        return
        end
 !
@@ -5898,7 +5937,9 @@
 !-----------------------------------------
 !*     Four frames in a page (if nfrm=4).
        use, intrinsic :: iso_c_binding 
+       implicit none
 !
+       integer*4  ipage,lpage,nfrm,loc
        common/pages/ ipage,nfrm
 !
        ipage = ipage +1
@@ -5959,36 +6000,47 @@
        end if
 !
        return
-       end
+       end subroutine chart
 !
 !
 !------------------------------------
        subroutine factor(fct)
 !------------------------------------
        use, intrinsic :: iso_c_binding 
+       implicit none
+!
+       real*4  fct
 !
        write(77,10) fct,fct
    10  format(f6.2,1x,f6.2,' sc')
+!
        return
-       end
+       end subroutine factor
 !
 !
 !------------------------------------
        subroutine newpen (ip)
 !------------------------------------
        use, intrinsic :: iso_c_binding 
+       implicit none
+!
+       integer*4  ip,i1,i2
+       real*4  pi1
 !
        i1=(ip-1)/2
        i2=ip-2*i1
+!
        write(77,*) 'sn'
        pi1=0.40*float(i1-1)
        write(77,30) pi1
    30  format(f3.1,' sl')
+!
        if(i2.ne.1) then
        write(77,*) '[2 2] 0 sd'
        endif
+!
        return
-       end
+       end subroutine newpen
 !
 !
 !---------------------------------------
@@ -5997,6 +6049,10 @@
 !  ic= 3 tri-color
 !  ic= 0 gray scale, r= 0. for black
        use, intrinsic :: iso_c_binding 
+       implicit none
+!
+       integer*4  ic
+       real*4  r,g,b
 !
        write(77,*) 'stroke'
 !
@@ -6011,23 +6067,29 @@
        end if
 !
        return
-       end
+       end subroutine newcolor
 !
 !
 !-----------------------------
        subroutine linee
 !-----------------------------
        use, intrinsic :: iso_c_binding 
+       implicit none
 !
        write(77,*) 'st'
+!
        return
-       end
+       end subroutine linee
 !
 !
 !------------------------------------
        subroutine plot (x0,y0,ip)
 !------------------------------------
        use, intrinsic :: iso_c_binding 
+       implicit none
+!
+       integer*4  n,ip
+       real*4  x,y,x0,y0,h
 !
        x= x0
        y= y0
@@ -6044,8 +6106,9 @@
    30  format(f5.1,1x,f5.1,' tl')
    40  format(f5.1,1x,f5.1,' l sn',1x,f5.1,1x,f5.1,' tl')
 !       write(77,*) 'st'
+!
        return
-       end
+       end subroutine plot
 !
 !
 !-------------------------------------------------
@@ -6055,7 +6118,7 @@
        implicit none
 !
        character    ica*80,ich(80)*1
-       character(*) isymb   !!! NEC: must be hitsuyo
+       character(*) isymb   !!! NEC: must be necessary hitsuyo !
        equivalence (ica,ich(1))
 !
        real*4  x0,y0,h0,ang,x,y,h
@@ -6080,7 +6143,7 @@
        write(77,*) '(',(ich(i),i=1,n),') s'
 !
        return
-       end
+       end subroutine symbol
 !
 !
 !-----------------------------------------------
@@ -6151,7 +6214,7 @@
        write(77,*) '(',isymb,') s'
 !
        return
-       end
+       end subroutine number
 !
 !
 !-----------------------------------------------
@@ -6188,13 +6251,17 @@
        write(77,*) '(',isymb,') s'
 !
        return
-       end
+       end subroutine number2
 !
 !
 !---------------------------------------------------
        subroutine sunscl (x,y,h,n)
 !---------------------------------------------------
        use, intrinsic :: iso_c_binding  ! <-
+       implicit none
+!
+       integer*4  n,n0
+       real*4  x,y,h,fmag,x0,y0,h0
 !
        common/convsn/ fmag,x0,y0,h0,n0
 !
@@ -6217,4 +6284,4 @@
        if(n.ne.777) n0= n
 !
        return
-       end
+       end subroutine sunscl
