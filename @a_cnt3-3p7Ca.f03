@@ -1610,7 +1610,7 @@
 !
       p_xyz= 0.800d-4*(-3.d0 +tg/2.6666667d-15)
 !                             ++
-!   
+!                             ++
 !  Only side borders of etx,ety,etz fields at it= 1
 !
 !     yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
@@ -2093,7 +2093,7 @@
           etxi= 0
           etyi= 0
           etzi= E0*sin(omega*(tg+dth) -ak*xyz(i,2))*ff  ! statV/cm
-          btxi= E0*cos(omega*tg -ak*xyz(i,2))*ff 
+          btxi= E0*cos(omega*(tg+dth) -ak*xyz(i,2))*ff 
           btyi= 0
           btzi= 0
 !
@@ -2242,10 +2242,13 @@
         close(11)
       end if
 !
+!-------------------------------------------
 !* Squeeze inside the pendulum for it=1
+!-------------------------------------------
 !
       if(it.eq.1) then
-!  Top and bottom of the cans
+!
+!  Top and bottom of the cans are randomized
         rr1= 30.d-08 ! =30 Ang
 !a           **** <- READ_CONF
 !       ----------------
@@ -5237,7 +5240,7 @@
 !------------------------------------------------------------
 !* Protons
 !
-      nskip= (np+1.e-5)/1000  !<-- even np= 0 is OK
+      nskip= (np +1.e-5)/1000  !<-- even np= 0 is OK
 !---                    ****
 !
       do 300 i= ns+1,ns+np,nskip
