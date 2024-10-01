@@ -24,7 +24,7 @@ The program is written in Fortran 2003/Fortran 2008 (write format in the same li
 
 The description of each subroutine and important lines of @cnt3em_07Aa.f03 and/or @a_cnt3-3p7Ca.f03 and 
 the post-processed program @3ddisppC.f03, etc. (to be shown later), are written with many comments of the simulation code. 
-Initial 100 lines of the file @cnt3em_07Aa.f03 or @a_cnt3-3p7Ca.f03 are devoted to give the title, references, 
+Initial 100 lines of the file @cnt3em_3pCa.f03 or @a_cnt3-3p7Ca.f03 are devoted to give the title, references, 
 summary of subroutines and remarks of the simulation code. 
 In the major subroutine /moldyn/, (i) the magnetic field is advanced, (ii) current density is calculated 
 and the transverse electric field is advanced, 
@@ -70,7 +70,7 @@ Compilation by mpif90:
 
 The script 'mpif90 @a_cnt3-3p8Ca.f03' needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150.
 
-  % mpif90 -byteswapio -mcmodel=medium -fast @cnt3em3_05Aa.f03 -I/opt/pgi/fftw3/include -L/opt/pgi/fftw3/lib -lfftw3
+  % mpif90 -byteswapio -mcmodel=medium -fast @cnt3em3_3pCa.f03 -I/opt/pgi/fftw3/include -L/opt/pgi/fftw3/lib -lfftw3
 
 (2) Linux (gcc gfortran): MPI and FFTW; configure, make, and make install for installation.
 
@@ -78,7 +78,7 @@ The script 'mpif90 @a_cnt3-3p8Ca.f03' needs param_em3p8_Ca.h, Cntemp_config.STAR
 
   % fftw3-3.3.10: ./configure --disable-shared --enable-maintainer-mode --enable-threads --prefix=/opt/fftw3
 
-  % mpif90 -mcmodel=medium -fPIC @cnt3em3_05Aa.f03 -I/opt/fftw3/include -L/opt/fftw3/lib -lfftw3
+  % mpif90 -mcmodel=medium -fPIC @cnt3em3_3pCa.f03 -I/opt/fftw3/include -L/opt/fftw3/lib -lfftw3
 
 Two different fortrans, PGI and gfotran, are incompatible with processors of the same name but different styles.
 
