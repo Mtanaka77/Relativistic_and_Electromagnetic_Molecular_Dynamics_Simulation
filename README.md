@@ -68,7 +68,7 @@ and/or http://www1.m4.mediacat.ne.jp/dphysique/.
 
 Compilation by mpif90: 
 
-The script 'mpif90 @a_cnt3-3p8Ca.f03' needs param_em3p8_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150.
+The script 'mpif90 @a_cnt3-3p7Ca.f03' needs param_em3p7_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150.
 
   % mpif90 -byteswapio -mcmodel=medium -fast @cnt3em3_3pCa.f03 -I/opt/pgi/fftw3/include -L/opt/pgi/fftw3/lib -lfftw3
 
