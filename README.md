@@ -1,11 +1,10 @@
 ## Relativistic and Electromagnetic Molecular Dynamics Simulation for Nanoscale Phenomena ##
 
-As "Open Internet Access by Molecular Dynamics Simulations", a couple of various codes are shown in https://github.com/Mtanaka77/, which are "Relativistic and Electromagnetic Molecular Dynamics Simulation for Nanoscale Phenomena", "Large-scale Electromagnetic Particle-in-Cell Simulation", "SIESTA on Vector-Parallel Clusters", and 
-"Molecular Dynamics of Water and Ice by TIP5P Code".
+As "Open Internet Access by Molecular Dynamics Simulations", a couple of various codes are shown in https://github.com/Mtanaka77/, which are "Relativistic and Electromagnetic Molecular Dynamics Simulation for Nanoscale Phenomena", "Large-scale Electromagnetic Particle-in-Cell Simulation", "SIESTA on Vector-Parallel Clusters", and "Molecular Dynamics of Water and Ice by TIP5P Code".
 
-This page is discussed on the relativistic and nanoscale molecular dynamics simulations, Computer Physics Communications (2019, Ref. 1). Updated files of a single code @cnt3em_07Aa.f03 and a parallelized one @a_cnt3-3p7Ca.f03 are used. 
+This page is discussed on the relativistic and nanoscale molecular dynamics simulations, Computer Physics Communications (2019, Ref. 1). Updated files of a single code @cnt3em_3pCa.f03 and a parallelized one @a_cnt3-3p7Ca.f03 are used. 
 They are compiled by parameters and configuration files which are dated at Sep. 2024.
-Each simulation code is suitable for a single or parallelized one which really depends on different architecture. 
+Each simulation code is suitable for a single or parallelized one which really depends on different architectures. 
 
 
 ### Molecular Dynamics Simulation: CGS Units and Necessary Files ###
@@ -17,9 +16,8 @@ Four physical CGS units are used in this code: a_unit= 1.00d-08 cm, t_unit= 1.00
 electron mass m_unit= 0.9110d-27 g and its charge e_unit= 4.8032d-10 esu. 
 The mass of hydrogen, for example, is 1.6726d-24 g.
 
-One needs files in the simulation: 1) @cnt3em_07Aa.f03 or @a_cnt3-3p7Ca.f03: Molecular dynamics simulation code, 
-which is the non-parallel or parallelized simulation code,
-2) param_em3p7_Aa.h or param_em3p7_Ca.h: Common parameters of this simulation, 
+One needs files in the simulation: 1) @cnt3em_3pCa.f03 or @a_cnt3-3p7Ca.f03: Molecular dynamics simulation code, which is the non-parallel or parallelized simulation code,
+2) param_3p1_Ca.h or param_em3p7_Ca.h: Common parameters of this simulation, 
 3) Cntemp_config.STARTA or Cntemp_config.STARTC: configuring parameters, 
 4) p_config_ss.xyz_D150 and P135 of pellet electrons: H, C and Au ions and electrons. 
 The program is written in Fortran 2003/Fortran 2008 (write format in the same line) and MPI of Ver.3 for parallelization.
