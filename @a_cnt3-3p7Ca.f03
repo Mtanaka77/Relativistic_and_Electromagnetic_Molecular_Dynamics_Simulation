@@ -1610,24 +1610,15 @@
 !
       p_xyz= 0.800d-4*(-3.d0 +tg/2.6666667d-15)
 !                             ++
-!                             ++
 !  Only side borders of etx,ety,etz fields at it= 1
-!
-!     yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
-!     etz(l,m,n)= etz(l,m,n)                               &
-!                 +cdt*((bty(l+1,m,n) -bty(l-1,m,n))/hx2   &
-!                      -(btx(l,m+1,n) -btx(l,m-1,n))/hy2)  &
-!                 -p4dt*cjz(l,m,n)/dV                      &
-!                 +dt*omega*E0*cos(omega*(tg+dth) -ak*yy)
-!     btx(l,m,n)= btx(l,m,n) -cdt*((etz(l,m+1,n) -etz(l,m-1,n))/hy2   &
-!                                 -(ety(l,m,n+1) -ety(l,m,n-1))/hz2)  &
-!                 -dt*omega*E0*sin(omega*tg -ak*yy)
-!                       driver at omega*(tg)
 !
       if(it.eq.1) then
         call edges (etx,ety,etz,ipar,rank,reg_top,reg_bot)
 !
-        do n= 1,mz
+        do n= nz1(ipar),nz2(ipar)
+        if(n.eq.1 .or. n.eq.mz) go to 3000
+        nw= n -nz1(ipar) +1
+!
         do m= 1,my
         do l= 1,mx
         xx= xmin3 +Lx3*(l-1)/mx +hx/2.d0
@@ -1636,11 +1627,11 @@
 !
         ff= exp(-( (yy-p_xyz)**2/yg02 +(xx**2+zz**2)/xz02))
 !
-        etz(l,m,n)= E0*sin(omega*(tg+dth) -ak*yy) *ff
-        btx(l,m,n)= E0*cos(omega*tg -ak*yy) *ff
+        etz(l,m,nw)= E0*sin(omega*tg -ak*yy) *ff
+        btx(l,m,nw)= E0*cos(omega*(tg-dth) -ak*yy) *ff
         end do 
         end do
-        end do
+ 3000   end do
       end if
 !
 !
@@ -1679,15 +1670,19 @@
 !
       do n= nz1(ipar),nz2(ipar)
       if(n.eq.1 .or. n.eq.mz) go to 30
+      nw= n -nz1(ipar) +1
 !
       do m= 2,my-1
       do l= 2,mx-1
-      nw= n -nz1(ipar) +1
 !
+      xx= xmin3 +Lx3*(l-1)/mx +hx/2.d0
       yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
+      zz= zmin3 +Lz3*(n-1)/mz +hz/2.d0
+      ff= exp(-( (yy-p_xyz)**2/yg02 +(xx**2+zz**2)/xz02))
+
       btx(l,m,nw)= btx(l,m,nw) -cdt*((etz(l,m+1,nw) -etz(l,m-1,nw))/hy2  &
                                     -(ety(l,m,nw+1) -ety(l,m,nw-1))/hz2) &
-                   -dt*omega*E0*sin(omega*tg -ak*yy)
+                   -dt*omega*E0*sin(omega*tg -ak*yy)*ff
 !
       bty(l,m,nw)= bty(l,m,nw) -cdt*((etx(l,m,nw+1) -etx(l,m,nw-1))/hz2  &
                                     -(etz(l+1,m,nw) -etz(l-1,m,nw))/hx2)
@@ -1905,11 +1900,16 @@
 !
       do n= nz1(ipar),nz2(ipar)
       if(n.eq.1 .or. n.eq.mz) go to 50
+      nw= n -nz1(ipar) +1
 !
       do m= 2,my-1
       do l= 2,mx-1
-      nw= n -nz1(ipar) +1
 !
+      xx= xmin3 +Lx3*(l-1)/mx +hx/2.d0
+      yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
+      zz= zmin3 +Lz3*(n-1)/mz +hz/2.d0
+      ff= exp(-( (yy-p_xyz)**2/yg02 +(xx**2+zz**2)/xz02))
+
       etx(l,m,nw)= etx(l,m,nw)                               &
                   +cdt*((btz(l,m+1,nw) -btz(l,m-1,nw))/hy2   &
                        -(bty(l,m,nw+1) -bty(l,m,nw-1))/hz2)  &
@@ -1920,12 +1920,11 @@
                        -(btz(l+1,m,nw) -btz(l-1,m,nw))/hx2)  &
                   -p4dt*cjy(l,m,nw)/dV
 !
-      yy= ymin3 +Ly3*(m-1)/my +hy/2.d0
       etz(l,m,nw)= etz(l,m,nw)                               &
                   +cdt*((bty(l+1,m,nw) -bty(l-1,m,nw))/hx2   &
                        -(btx(l,m+1,nw) -btx(l,m-1,nw))/hy2)  &
                   -p4dt*cjz(l,m,nw)/dV                       &
-                  +dt*omega*E0*cos(omega*(tg+dth) -ak*yy)
+                  +dt*omega*E0*cos(omega*(tg+dth) -ak*yy)*ff
       end do 
       end do
 !
@@ -2318,10 +2317,10 @@
       end if
 !
 !  Collection of electromagnetic fields -> FT29, and /RUN_MD/
-!  Innner region etx( , ,0:mza+1) -> all values etx7( , ,mz)
+!  All region of etx7(mx,my,mz) from innner region etx( , ,0:mza+1) 
 !
-      if(iwrt3.eq.0) then
-!     mxyza= mx*my*mza
+      if(iwrt1.eq.0) then
+!       mxyza= mx*my*mza
         call mpi_allgather &
                   (etx(1,1,nz1(ipar)),mxyza,mpi_double_precision, &
                    etx7,              mxyza,mpi_double_precision, &
@@ -2746,9 +2745,8 @@
 !
         eetx(ll,mm,nn)= etx7(l,m,n)
         eety(ll,mm,nn)= ety7(l,m,n)
-        eetz(ll,mm,nn)= etz7(l,m,n) 
-!
-        bbtx(ll,mm,nn)= btx7(l,m,n)
+        eetz(ll,mm,nn)= etz7(l,m,n) -E0*sin(omega*(tg+dth)-ak*yy)*ff
+        bbtx(ll,mm,nn)= btx7(l,m,n) -E0*cos(omega*tg-ak*yy)*ff
         bbty(ll,mm,nn)= bty7(l,m,n)
         bbtz(ll,mm,nn)= btz7(l,m,n)
         end do
