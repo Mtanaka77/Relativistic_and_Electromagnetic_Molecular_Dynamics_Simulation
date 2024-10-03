@@ -20,22 +20,22 @@
       parameter  (ns0=110600,np0=10120,nq0=np0+5*ns0/2)
 !
       parameter  (sname='Cntemp',cname='cntemp')      ! Cntemp,cntemp
-        parameter  (numbr2='Ca',numbr1='Ca',numbr0='C')
 !
       parameter  (kstart=0,kgrp=1)
-!       parameter  (kstart=1,kgrp=1)
+      parameter  (numbr2='Ca',numbr1='Ca',numbr0='C')
+!     parameter  (kstart=1,kgrp=1)
+!     parameter  (numbr2='Cb',numbr1='Ca',numbr0='C')
 !
-!     parameter  (iflinx=.false.,num_proc=32)      ! 512/32=16
-        parameter  (iflinx=.false.,num_proc=64)    ! 
+      parameter  (iflinx=.false.,num_proc=32)      ! 768/96=8 <--
+!     parameter  (iflinx=.false.,num_proc=64)      ! 768/96=8 <--
 !
-      parameter  (isizeX=50,isizeY=50,isizeZ=128)  ! isizeX 10 Ang !
-      parameter  (Lenx3=500.d0,Leny3=500.d0,Lenz3=1280.d0)
-      parameter  (mx=201,my=201,mz=512)            ! Grid: 2.5 Ang, mz=768
-      parameter  (mxh=101,myh=101,mzh=256)
-!
-!     parameter  (mza=16)                          ! mz=512, 32 ranks, mza=16
-      parameter  (mza=8)                           ! mz=512, 64 ranks, mza=8
+      parameter  (isizeX=50,isizeY=50,isizeZ=192)  ! isizeX 10 Ang !
+      parameter  (mx=201,my=201,mz=768)            ! Grid: 2.5 Ang, mz=768
+      parameter  (Lenx3=500.d0,Leny3=500.d0,Lenz3=1920.d0)
+      parameter  (mza=24)                          ! mz=768, 32 ranks <--
+!     parameter  (mza=12)                          ! mz=768, 64 ranks <--
       parameter  (mxyza=mx*my*mza)
+      parameter  (mxh=101,myh=101,mzh=384)
 ! ----------------------------------------------------------
       parameter  (lxy3= 3*mx*my)
       parameter  (sconv=1.0d-8)
@@ -52,13 +52,14 @@
                   xmin3=-(100/200.d0)*sconv*Lenx3, & ! 
                   ymax3= (100/200.d0)*sconv*Leny3, & !  E*H field
                   ymin3=-(100/200.d0)*sconv*Leny3, & ! 
-                  zmax3= (256/512.d0)*sconv*Lenz3, & !  axial direction 
-                  zmin3=-(256/512.d0)*sconv*Lenz3)   ! 
+                  zmax3= (384/768.d0)*sconv*Lenz3, & !  axial direction 
+                  zmin3=-(384/768.d0)*sconv*Lenz3)   ! 
 !
-      character  praefixs*27,praefixc*24,praefixe*24,    &
+      character  praefixs*33,praefixc*24,praefixe*24,    &
                  praefixi*24,suffix2*2,suffix1*2,suffix0*1
 !     character  praefixs*33,praefixc*32,praefixe*32,    &
 !                praefixi*32,suffix2*2,suffix1*2,suffix0*1
       common/filname/ praefixs,praefixc,praefixe,        &
                  suffix2,suffix1,suffix0
       common/filnam2/ praefixi
+!
