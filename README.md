@@ -22,7 +22,7 @@ One needs files in the simulation: 1) @cnt3em_3pCa.f03 or @a_cnt3-3p7Ca.f03: Mol
 4) p_config_ss.xyz_D150 and P135 of pellet electrons: H, C and Au ions and electrons. 
 The program is written in Fortran 2003/Fortran 2008 (write format in the same line) and MPI of Ver.3 for parallelization.
 
-The description of each subroutine and important lines of @cnt3em_07Aa.f03 and/or @a_cnt3-3p7Ca.f03 and 
+The description of each subroutine and important lines of @cnt3em_07Ca.f03 and/or @a_cnt3-3p7Ca.f03 and 
 the post-processed program @3ddisppC.f03, etc. (to be shown later), are written with many comments of the simulation code. 
 Initial 100 lines of the file @cnt3em_3pCa.f03 or @a_cnt3-3p7Ca.f03 are devoted to give the title, references, 
 summary of subroutines and remarks of the simulation code. 
@@ -78,7 +78,7 @@ The script 'mpif90 @a_cnt3-3p7Ca.f03' needs param_em3p7_Ca.h, Cntemp_config.STAR
 
   % fftw3-3.3.10: ./configure --disable-shared --enable-maintainer-mode --enable-threads --prefix=/opt/fftw3
 
-  % mpif90 -mcmodel=medium -fPIC @cnt3em3_3pCa.f03 -I/opt/fftw3/include -L/opt/fftw3/lib -lfftw3
+  % mpif90 -mcmodel=medium -fPIC @a_cnt3_3p7Ca.f03 -I/opt/fftw3/include -L/opt/fftw3/lib -lfftw3
 
 Two different fortrans, PGI and gfotran, are incompatible with processors of the same name but different styles.
 
