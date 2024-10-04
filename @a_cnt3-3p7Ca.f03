@@ -1,19 +1,21 @@
 !*--------------------------------------------------------------------*
-!  @a_cnt3-3p9Ca.f03                    Dec.24, 2016, Sep.23, 2024    !   
+!  @a_cnt3-3p7Ca.f03                    Dec.24, 2016, Sep.23, 2024    !   
 !                                                                     !
 !  ## Molecular Dynamics in Relativistic Electromagnetic Fields ##    !
 !                                                                     !
-!   MPI+OpenMP: subroutine /forces/; real atomic masses mp/me=1836    !
-!     Open system with central region in XYZ coordinated space;       !
-!     the Z direction is parallelized. Efficiency depends on          !
-!     architectures. Fujitsu is thr best for parallelization.         !
+!   MPI+OpenMP: /forces/; real atomic masses of mp/me=1836            !
+!     Open system with central region in XYZ coordinated space where  !
+!     the Z direction is parallelized. The efficiency depends on      !
+!     architectures,and Fujitsu is the best for parallelization.      !
 !                                                                     !
 !   READ_conf is used in nZ, nZA, intens, lambda                      !
-!   3D filled H(+) by ranff(0.) filling ... moldyn 1150               !
-!   No gap between r>rout and r<rout  ... forces 920,940,1690,1750    !
+!   3D filled H(+) by ranff(0.) filling ... /moldyn/                  !
+!   No gap between r>rout and r<rout  ..... /forces/                  !
 !                                                                     !
 !   Author/maintainer: Motohiko Tanaka, Ph.D.,Professor,              !
 !      Graduate School of Chubu University, Kasugai 487-8501, Japan.  !
+!    https://physique.isc.chubu.ac.jp/ and/or                         1
+!    http://www1.m4.mediacat.ne.jp/dphysique/                         1
 !                                                                     !
 !   GPL-3.0 License, at https://github.com/Mtanaka77/                 !
 !     /Relativistic_Molecular_Dynamics_Simulation/                    !
@@ -31,7 +33,7 @@
 !                                                                     !
 !  Used files :                                                       !
 !  1. @cnt3ems_07Ca.f03:  Molecular dynamics simulation code          !
-!  2. param_em3p7_Ca.h: Common parameters of this simulation          !
+!  2. param_3p1_Ca.h: Common parameters of this simulation          !
 !  3. Cntemp_config.STARTC: Define simulation time, box sizes,        !
 !             atom names and pellet size, injected laser parameters   !
 !  4. p_config_ss.xyz_D150, P135: Initially loaded particles of       !
@@ -99,7 +101,7 @@
       use, intrinsic :: iso_c_binding 
       implicit  none
 !
-      include   'param_em3p7_Ca.h'  ! <- parameter file
+      include   'param_3p1_Ca.h'  ! <- parameter file
       include   'mpif.h'
 !
       integer(C_INT) size,rank,ierror,ipar,igrp,ifDebye
@@ -116,7 +118,7 @@
       ipar = 1 +rank  ! rank's name
       igrp = kgrp
 !
-      if(iflinx) then    ! 27 + 6= 33  sname='Cntemp' in param_em3p7_Ca.h
+      if(iflinx) then    ! 27 + 6= 33  sname='Cntemp' in param_3p1_Ca.h
         praefixs = '/lv01/mtanaka/cntem3-para3/'//sname
         praefixi = '/lv01/mtanaka/cntem3-para3/'//cname  ! read(12) - common by NFS
         praefixc = '/lv01/mtanaka/cntem3-para3/'//cname  ! write(13)
@@ -151,6 +153,8 @@
 !c      
         write(11,103) ipar,igrp
   103   format('My process is #',i3,' of group #',i3)
+!
+        close(11)
       end if
 !
 !*******************************************
@@ -166,8 +170,11 @@
       wtime= walltime2 -walltime0
 !
       if(ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
         write(11,693) ipar,wtime
-  693   format(/,'*ipar, wtime(sec)=',i3,1pe15.7)
+  693   format(/,'*ipar, wtime(sec)=',i3,1pd15.7)
 !
         close(11)
       end if
@@ -206,7 +213,7 @@
       use, intrinsic :: iso_c_binding 
       implicit none
       include 'mpif.h'
-      include 'param_em3p7_Ca.h'
+      include 'param_3p1_Ca.h'
 !
       integer(C_INT) size,cl_first,MPIerror
       real(C_DOUBLE) walltime,walltime0,buffer1,buffer2
@@ -241,7 +248,7 @@
       implicit none
 !
       include    'mpif.h'
-      include    'param_em3p7_Ca.h'
+      include    'param_3p1_Ca.h'
 !
       integer(C_INT) size,ipar,igrp,ifDebye
       real(C_DOUBLE) walltime0,walltime1
@@ -434,29 +441,31 @@
       i1(num_proc)= npq0
 !***
       if(ionode) then
-      write(11,*) 'nz0,nz1,nz2,nz3...'
-      write(11,10) (k,nz0(k),nz1(k),nz2(k),nz3(k),k=1,num_proc)
-   10 format('k= ',i3,'  nz0,nz1,nz2,nz3= ',4i6)
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
 !
-      write(11,*) 'i0,i1,lamx...'
-      write(11,13) (k,i0(k),i1(k),lmax(k),k=1,num_proc)
-   13 format('k= ',i3,' i0,i1,lmax(k)=',2i8,2x,i9)
+        write(11,*) 'nz0,nz1,nz2,nz3...'
+        write(11,10) (k,nz0(k),nz1(k),nz2(k),nz3(k),k=1,num_proc)
+   10   format('k= ',i3,'  nz0,nz1,nz2,nz3= ',4i6)
+!
+        write(11,*) 'i0,i1,lamx...'
+        write(11,13) (k,i0(k),i1(k),lmax(k),k=1,num_proc)
+   13   format('k= ',i3,' i0,i1,lmax(k)=',2i8,2x,i9)
+!
+        close(11)
       end if
 !***
 !
 !* Initial configuration in /READ_CONF/ 
       call READ_CONF (np,ifrefl,praefix8)
 !     +++++++++++++++++++++++++++++++++++
-      if(ionode) write(11,*) 'praefix8=',praefix8
-!
-! Carbon nanotube - str-cnt-mors.c: x,y-axis as a major axis
-!   Use @dat2xyz.f to make CNT along z-axis
 !
 !                 in Angstroms
 ! C    -8.30518   -83.83900   -41.48620
 ! C    -9.00426   -83.12850   -40.47340
 ! ------------------------------------------------------------
       if(kstart.eq.0) then
+!
 !* CNT  60 cycles
 !  All PE's must be executed !
         OPEN (unit=21,file='p_config_ss.xyz_D150',form='formatted')
@@ -490,7 +499,7 @@
 !       ---------
         ns= 2*ns1   ! C + Au
 !       ---------
-          if(ionode) write(11,*) 'ns(C+Au)=',ns
+          write(11,*) 'ns(C+Au)=',ns
 !
 !* Two identical pellets are placed
 !    P135: 5060(half number); sqrt(2.) size of CNT length
@@ -520,7 +529,7 @@
 !       ---------
         np= 2*np1   ! two identical pellets
 !       ---------
-          if(ionode) write(11,*) 'np=',np
+          write(11,*) 'np=',np
 !
 !* Associated electrons are given below
 !  /READ_CONF/ is used
@@ -553,7 +562,7 @@
         xyz(i+ns2,2)= xyz(i,2) +0.1d-8*ranff(0.d0)
         xyz(i+ns2,3)= xyz(i,3)
         end do
-          if(ionode) write(11,*) 'nq=',nq
+          write(11,*) 'nq=',nq
 !
 !**
 !  All ions and associated electrons are listed
@@ -579,12 +588,18 @@
         write(22,'(a6,1p3f12.8)') 'elec 2',xyz(i,1),xyz(i,2),xyz(i,3)
         end do
         close (22)
+!
+        close(11)
 !**
 !--------------------------------------------------------------
       else
         if(ionode) then
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+                status='unknown',position='append',form='formatted')
+!
           write(11,630) 
   630     format(' Restart data are loaded from FT12 and FT17.....',/)
+          close(11)
         end if
 !
 !--------------------------------------------------------------
@@ -593,7 +608,11 @@
 !  Data for this rank are input for (mx,my,0:mza+1) 
 !
         if(ionode) then
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+                status='unknown',position='append',form='formatted')
+!
           write(11,*) 'Restart: ',praefixi//'.12'//suffix1
+          close(11)
         end if
 !
         OPEN (unit=12,file=praefixi//'.12'//suffix1, &
@@ -658,16 +677,6 @@
         end do
         end do
 !
-!         if(ipar.eq.8) then
-!         l= 100
-!         m= 100
-!         do n= nz1(ipar),nz2(ipar)
-!         nw= n -nz1(ipar) +1
-!         write(50,999) l,m,n,nw,btx(l,m,nw),bty(l,m,nw),btz(l,m,nw)
-! 999     format(4i8,1p3d15.5)
-!         end do
-!         end if
-!
 !!      -----------------
 !!      heavy= fchar/nZ     ! added to READ_CONF 
 !!      heavyA= fcharA/nZA  !    1/01/2017
@@ -675,6 +684,9 @@
 !!      -----------------
 !
         if(ionode) then
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+                status='unknown',position='append',form='formatted')
+!
           write(11,640) t,it,is
   640     format(' Starting: t=',1pe11.3,'   it,is=',i7,i5)
 !
@@ -684,6 +696,8 @@
 !
           write(11,645) iwa,iwb,iwc,iwd
   645     format(' iwa, iwb, iwc, iwd=',4i7,/)
+!
+          close(11)
         end if
       end if
 ! ------------------------------------------------------------
@@ -693,14 +707,19 @@
 !                ++
 !     if(N_sp.lt.nq) then
 !       if(ionode) 
-!    *     write(wrt,*) 'Natural N_sp is used... N_sp, old nq=',
-!    *                   N_sp,nq
+!          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+!                status='unknown',position='append',form='formatted')
+!
+!          write(wrt,*) 'Natural N_sp is used... N_sp, old nq=', &
+!                        N_sp,nq
+!          close(11)
 !   ++ (nq,np) defined here ++
 !       nq = N_sp                 ! do not subdivide (e,m)
 !     end if
 !  ------------------------
 !     np= nq - fchar*ns
 !  ------------------------
+!
 !  Define parameters are set
       c1= 2.99792458d+10  ! speed of light
       c2= c1**2
@@ -749,6 +768,9 @@
       Lambda_D= sqrt(Temp_erg /(4*pi*D_sp*e_unit**2)) ! cm
 !
       if(ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
         write(11,600) label,date_now,time_now
   600   format(/,' ## Pellet in CNT (isolated system) ## ',a8,  &
                /,'   date=',a10,'  time=',a8,/)
@@ -774,9 +796,14 @@
           write(11,603) xmax3,ymax3,zmax3
   603     format('# Lx/2, Ly/2, Lz/2 (cm) = ',3f12.5,/)
         end if
+!
+        close(11)
       end if
 !
       if(ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
         write(11,605) dt,itabs
   605   format(' time step: dt=',1pe13.5,/            &
                ' particle list is updated: itabs=',0pi4)
@@ -848,6 +875,8 @@
         write(11,*) '  Intensity: 6*10^17 W/cm^2 -> 2.1d+12 V/m (base)'
         write(11,*) '  Electric field: E0=7.d+7 statV/cm (base) '
         write(11,*) '  '
+!
+        close(11)
       end if
 !--------------------------------------------------------------
 !
@@ -869,12 +898,22 @@
       call init (xyz,ppp,ch,am,ag,istop1,ns,np,nq,nCLp)
 !                *******                 ++ ++ ++ ++++
       if(istop1.ne.0) then
-        if(ionode) write(11,*) ' Stop: call to init...'
+        if(ionode) then
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+                status='unknown',position='append',form='formatted')
+!
+          write(11,*) ' Stop: call to init...'
+          close(11)
+        end if
+!
         stop
       end if
 !
       if(kstart.eq.0) then
         if(ionode) then
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+                status='unknown',position='append',form='formatted')
+!
           write(11,*) 'C and Au, proton, electron, total'
           write(11,*) 'ns,np,nq,nCLp=',ns,np,nq,nCLp
 !
@@ -907,6 +946,8 @@
                           ppp(i,1),ppp(i,2),ppp(i,3),i=nh1+1,nh1+5)
 !
   621     format('i=',i6,1p3e10.2,1x,3e10.2,1x,3e8.1)
+!
+          close(11)
         end if
       end if
 !
@@ -923,8 +964,12 @@
 !* Restart data are saved as files. 
 !
       if(ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
         write(11,*) 'Restart file has entirely one file !!'
         write(11,*) 'It has etx7,ety7,etz7,btx7,bty7,btz7 arrays.'
+        close(11)
 !
         OPEN (unit=12,file=praefixc//'.12'//suffix2, &
               status='replace',form='unformatted')
@@ -975,27 +1020,23 @@
       use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include   'param_em3p7_Ca.h'
+      include   'param_3p1_Ca.h'
       integer(C_INT) igrp,nframe
 !
       logical    ionode
       common/sub_proc/ ionode
 !
-      if(igrp.gt.10) then
-        write(*,*) '*Stop File > 10...'
-        stop
-      end if
-!
 !   --------------------------
       if(.not.ionode) return
 !   --------------------------
-!c
+!
       if(ionode) then
-!c      OPEN (unit=11,file=praefixc//'.06'//suffix2,
-!c     *      status='unknown',position='append',form='formatted')
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
         write(11,*) 'igrp=',igrp,' uses ',             &
                     praefixs//'_config.START'//suffix0
-!c      close(11)
+        close(11)
 !
         OPEN (unit=77,file=praefixc//'.77'//suffix2//'.ps', &
               status='unknown',form='formatted')
@@ -1003,7 +1044,7 @@
         call gopen (nframe) 
         close (77)
       end if
-!c 
+!
       return
       end subroutine FLOPEN
 !
@@ -1017,7 +1058,7 @@
       use omp_lib
       implicit none
 !
-      include 'param_em3p7_Ca.h'
+      include 'param_3p1_Ca.h'
       include 'aslfftw3.f03'  ! for NEC
 !     include 'fftw3.f03'     ! more general
       include 'mpif.h'
@@ -1028,7 +1069,6 @@
       real(C_DOUBLE),dimension(mx,my,mz),save :: qq,psi
       real(C_DOUBLE),dimension(mx,my,mz) :: &
                           qq_c,psi_c,cjx,cjy,cjz,cjx_c,cjy_c,cjz_c
-      real(C_DOUBLE),dimension(mx,my,mza) :: qx
 !
       integer(C_INT),dimension(100) :: nz0,nz1,nz2,nz3,i0,i1
       common/parall/ nz0,nz1,nz2,nz3,i0,i1
@@ -1078,9 +1118,9 @@
       equivalence  (ekin(1),ekin20(1))
 !
       integer*8      ix,iy,iz,ll,mm,nn,l,m,n
-      integer(C_INT) i,j,k,kk,jj,ibox,neigh,it,is,iwa,iwb,iwc,iwd,    &
+      integer(C_INT) i,j,k,kk,jj,ibox,neigh,it,is,iwa,iwb,iwc,iwd,  &
                     iwrt1,iwrt2,iwrt3,iwrta,iwrtb,iwrtc,   &
-                    iwrtd,nskip,nsk,ncoe,wrt2,istop1,istop2,     &
+                    iwrtd,nskip,nsk,ncoe,istop1,istop2,    &
                     istop7,istop8
       common/parm1/ it,is
       common/imemo/ iwa,iwb,iwc,iwd
@@ -1093,7 +1133,6 @@
                     E_C_s,E_C_PME,E_C_r,E_LJ,E_elas,             &
                     E_C_r1,E_C_r2,E_LJ2,                         &
                     vxav,vyav,vzav,rr1,rr0,ph0,ranff
-      real(C_DOUBLE) cpu0,cpu1,walltm0,walltm1
       common/parm2/ pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax
       common/physc/ a_unit,m_unit,e_unit,t_unit,c1,c2,Wrest
       common/ENERGY/ E_C_s,E_C_PME,E_C_r,E_LJ,E_elas
@@ -1139,9 +1178,9 @@
       common/swaves/ E0,ak,ct,omega
 !
 !+++++
-      integer(C_INT) ifeh,item3ab,item3,npar3,ierror,wrt7
+      integer(C_INT) ifeh,item3ab,item3,ierror
       real(C_DOUBLE) Lx3,Ly3,Lz3,hx2,hy2,hz2,hx,hy,hz,p4dt,dV,cdt,  &
-                     xx0,yy0,zz0,xx,yy,zz,prho,fnml,akx,aky,akz
+                     xx,yy,zz,prho,fnml,akx,aky,akz
       common/itre/ item3ab,item3
       common/hx2l/ Lx3,Ly3,Lz3,hx2,hy2,hz2,hx,hy,hz,p4dt,dV,cdt
 !
@@ -1158,22 +1197,26 @@
 !
 !     integer(C_INT) mxyza  ! <- parameter
       real(C_DOUBLE) etxi,etyi,etzi,btxi,btyi,btzi,              &
-                     dd(3),ta(3),r,rscCL,rCL,ccj,pp1,pp2,pp3,    &
+                     ta(3),r,rscCL,rCL,pp1,pp2,pp3,    &
                      chvx,chvy,chvz,unifem1(4),unifem2(4)
 !
       real(C_float) setx,setz,sbtx,sbtz,psi2,delV
-      real(C_DOUBLE) wall1,wall2,wall3,wall4,wall5,wall6,wall7,  &
-                     wall8,wall9
+      real(C_DOUBLE) wall1,wall2,wall3,wall4,wall5,wall6,wall7
 !+++++
       logical ::  first11=.true.,first06=.true.,     &
                   first_es=.true.,read_10=.true.,    &
-                  eq_phase,ifskip_e,ifskip_p,ionode
+                  eq_phase,ionode
       common/sub_proc/ ionode
 !
       if(ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
         write(11,*) 'EM parallelized code  (Feb. 2019, Nov.2020)'
         write(11,*) 'moldyn: Round-robin partitioning is used...' 
         write(11,*)
+!
+        close(11)
       end if
 !
 !--------------------------
@@ -1305,6 +1348,12 @@
 !------------------------------------------------------
 !* The x,y,z data are initialized in FT13 
       if(ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
+        write(11,*) 'Preparation for write(13)...'
+        close(11)
+!
         fchar4 = fchar
         fcharA4 = fcharA
         Temp4  = Temp  
@@ -1315,7 +1364,6 @@
         OPEN (unit=13,file=praefixc//'.13'//suffix2,     &
               status='replace',form='unformatted')
 !
-        write(11,*) 'Preparation for write(13)...'
         write(13) ns,np,nq,fchar4,fcharA4,Temp4,xmax4,ymax4,zmax4
 !
         do i= 1,npio
@@ -1330,10 +1378,15 @@
 !
 !* The plot data are initialized at FT23
       if(ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
+        write(11,*) 'Preparation for write(23)...'
+        close(11)
+!
         OPEN (unit=23,file=praefixc//'.23'//suffix2,    &
               status='unknown',form='unformatted')
 !
-        write(11,*) 'Preparation for write(23)...'
         write(23) ns,np,nq
         write(23) fchar,fcharA,massi
         write(23) am,ch
@@ -1343,11 +1396,15 @@
 !
 !* Field plots are initialized: Half size (mxh,myh,mzh)
       if(ionode) then
-        OPEN (unit=29,file=praefixc//'.29'//suffix2,     &
-              status='unknown',form='unformatted')
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
 !
         write(11,*) 'Preparation for write(29)...'
         write(11,*) '  mxh,myh,mzh=',mxh,myh,mzh 
+        close(11)
+!
+        OPEN (unit=29,file=praefixc//'.29'//suffix2,     &
+              status='unknown',form='unformatted')
 !
         write(29) mxh,myh,mzh
         write(29) Lx3,Ly3,Lz3
@@ -1357,7 +1414,11 @@
 !
       call clocks (walltime1,size,1)  ! initiate clock (sec)
       if(ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
         write(11,*) 'before <moldyn> (sec)=',walltime1 -walltime0
+        close(11)
       end if
 !  
 !-------------------------------------------------------
@@ -1406,12 +1467,17 @@
 !
       if(it.eq.1) then
       if(ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
         write(11,*) '  '
         write(11,*) '*Drive of E*H field...'
         write(11,123) omega,ak,E0
   123   format(' omega (1/sec, c*2*pi/lambda)=',1pd14.7,/,  &
                ' ak (1/cm, 2*pi/lambda)=',d14.7,/,          &
                ' E0 (statV/cm)=',d14.7,/)
+!
+        close(11)
       end if
       end if
 !
@@ -1473,8 +1539,33 @@
         end do
       end if
 !
-!  Envelop: rank= 0,1,2,...
-!***
+!*****************************************
+!* FFTW3 routines are initialized        *
+!*****************************************
+!
+      prho= 4*pi/dV
+      fnml= 8.d0/((mx+1)*(my+1)*(mz+1))
+      gam = 1.25d0 ! 1.5d0
+!
+      if(first_es) then 
+        first_es= .false.
+!
+!  nthreads is used (may or may not)
+!       call fftw_plan_with_nthreads (omp_get_max_threads())
+!
+!  bachward/forward fftw's, 
+!  Old style of the proper order is OK
+!
+        call dfftw_plan_r2r_3d  &
+             (plan,mx,my,mz, qq,qq_c, FFTW_RODFT00,FFTW_RODFT00, &
+              FFTW_RODFT00,FFTW_ESTIMATE) 
+!
+        call dfftw_plan_r2r_3d  &
+             (pinv,mx,my,mz,psi_c,psi,FFTW_RODFT00,FFTW_RODFT00, &
+              FFTW_RODFT00,FFTW_ESTIMATE)
+      end if 
+!
+!
       rank= ipar -1
 !     +++++++++++++++++  
       reg_top= num_proc  ! top of registered node
@@ -1488,13 +1579,11 @@
 !
       p_xyz= 0.800d-4*(-3.d0 +tg/2.6666667d-15)
 !                             ++
-!  Only side borders of etx,ety,etz fields at it= 1
-      if(it.eq.1) then
-        call edges (etx,ety,etz,ipar,rank,reg_top,reg_bot)
-      end if
-!
 !  As confirmation by looking
       if(it.eq.1 .and. ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
         write(11,*) 'Present driving fields... t=',tg
 !
         l= mx/2
@@ -1510,30 +1599,11 @@
                       E0*cos(omega*(tg-dth)-ak*yy)*ff
    25   format(' m=',i3,' yy=',1pe11.3,2x,2e13.5)
         end do
+!
+        close(11)
       end if
 !
-!*****************************************
-!* FFTW3 routines are initialized        *
-!*****************************************
-!
         call clocks (wall1,size,2)
-!
-      prho= 4*pi/dV
-      fnml= 8.d0/((mx+1)*(my+1)*(mz+1))
-      gam = 1.25d0 ! 1.5d0
-!
-      if(first_es) then 
-        first_es= .false.
-!
-!  nthreads is used (may or may not)
-        call fftw_plan_with_nthreads (omp_get_max_threads())
-!
-!  bachward/forward fftw's
-        plan= fftw_plan_r2r_3d  &
-             (mx,my,mz, qq,qq_c, FFTW_RODFT00,FFTW_RODFT00,FFTW_RODFT00,FFTW_ESTIMATE) 
-        pinv= fftw_plan_r2r_3d  &
-             (mx,my,mz,psi_c,psi,FFTW_RODFT00,FFTW_RODFT00,FFTW_RODFT00,FFTW_ESTIMATE)
-      end if 
 !
 !* Electromagnetic fields: B(n+1/2)= B(n-1/2) and E(n)
 !  z-ranges: btx-btz: 1 - mza, and etx-etz: 0 - mza+1
@@ -1657,9 +1727,9 @@
         end do
 !
 !  Smoothing by FFTW3
-        call fftw_execute_r2r (plan,cjx,cjx_c)
-        call fftw_execute_r2r (plan,cjy,cjy_c)
-        call fftw_execute_r2r (plan,cjz,cjz_c)
+        call dfftw_execute_r2r (plan,cjx,cjx_c)
+        call dfftw_execute_r2r (plan,cjy,cjy_c)
+        call dfftw_execute_r2r (plan,cjz,cjz_c)
 !
 !  gam is a damping factor: per (l,m,n) 
         do n= 1,mz
@@ -1685,9 +1755,9 @@
         end do
 !
 !  FFTW back in the real space
-        call fftw_execute_r2r (pinv,cjx_c,cjx)
-        call fftw_execute_r2r (pinv,cjy_c,cjy)
-        call fftw_execute_r2r (pinv,cjz_c,cjz)
+        call dfftw_execute_r2r (pinv,cjx_c,cjx)
+        call dfftw_execute_r2r (pinv,cjy_c,cjy)
+        call dfftw_execute_r2r (pinv,cjz_c,cjz)
       end if
 !
         call clocks (wall3,size,2)
@@ -1796,115 +1866,6 @@
 ! ----------------------------------------------------------------
         call clocks (wall4,size,2)
 !
-!
-!* Finite correction is required for the transverse part
-!  (Read my papers in Comp.Phys.Comm. 2019 and 1993)
-!
-      if(mod(it,5).eq.1) then
-        do n= 1,mz
-        do m= 1,my
-        do l= 1,mx
-        qq(l,m,n)= 0
-        end do
-        end do
-        end do
-!
-        do i= 1,nCLp
-        l= mx*(xyz(i,1)-xmin3)/Lx3 +1.5000d0
-        m= my*(xyz(i,2)-ymin3)/Ly3 +1.5000d0
-        n= mz*(xyz(i,3)-zmin3)/Lz3 +1.5000d0
-!
-        if(l.lt.1 .or. l.gt.mx .or.       & 
-           m.lt.1 .or. m.gt.my .or.       &
-           n.lt.1 .or. n.gt.mz) go to 60
-!
-        qq(l,m,n)= qq(l,m,n) +ch(i)
-   60   end do
-!
-!  - del^2 dphi = 4*pi*rho - div*Etx, Eq.(32) of CPC.2019
-!  match qq( ,n) and etx( ,nw); only a slice is present
-!
-        do nw= 1,mza
-        do m=  1,my
-        do l=  1,mx
-        qx(l,m,nw)= 0
-        end do
-        end do
-        end do
-!
-!  Correction psl= charge - dE/dx
-        do n= nz1(ipar),nz2(ipar)
-        if(n.eq.1 .or. n.eq.mz) go to 62
-!
-        do m= 2,my-1
-        do l= 2,mx-1
-        nw= n -nz1(ipar) +1
-        qx(l,m,nw)= prho*qq(l,m,n)                          &
-                     - (etx(l+1,m,nw) -etx(l-1,m,nw))/hx2  &
-                     - (ety(l,m+1,nw) -ety(l,m-1,nw))/hy2  &
-                     - (etz(l,m,nw+1) -etz(l,m,nw-1))/hz2
-        end do
-        end do
-   62   end do
-!
-!  In the FFTW space
-!  allgather: qx( ,nw) into qq( ,n), always in mza
-        call mpi_allgather (qx,mza,mpi_double_precision,  &
-                            qq,mza,mpi_double_precision,  &
-                            mpi_comm_world,ierror)
-!
-        call fftw_execute_r2r (plan,qq,qq_c)
-!
-        do n= 1,mz 
-        do m= 1,my
-        do l= 1,mx
-        psi_c(l,m,n)= 0
-        end do
-        end do
-        end do
-!
-        do n= 1,mz 
-        do m= 1,my
-        do l= 1,mx
-        if(n.eq.1) go to 65
-        if(m.eq.1) go to 64
-        if(l.eq.1) go to 63
-!
-        akx= pi*(l-1)/Lx3
-        aky= pi*(m-1)/Ly3
-        akz= pi*(n-1)/Lz3
-!
-        gax= gam*(l-1)
-        gay= gam*(m-1)
-        gaz= gam*(n-1)/3.d0
-        gamma= exp(-(gax**2 +gay**2 +gaz**2))
-!
-        fff= fnml*gamma
-        psi_c(l,m,n)= fff*qq_c(l,m,n)/(akx**2 +aky**2 +akz**2)
-   63   end do  
-   64   end do 
-   65   end do 
-!
-        call fftw_execute_r2r (pinv,psi_c,psi)  !! for psi
-!  
-!  Corrected field: etx = old etx - del*dphi
-!  Eq.(31) of Comp.Phys.Comm.2019
-        do n= nz0(ipar),nz3(ipar)  !! nz0-nz3
-        if(n.le.1 .or. n.ge.mz) go to 67
-!
-        do m= 2,my-1
-        do l= 2,mx-1
-        nw= n -nz1(ipar) +1
-        etx(l,m,nw)= etx(l,m,nw) - (psi(l+1,m,n) -psi(l-1,m,n))/hx2
-        ety(l,m,nw)= ety(l,m,nw) - (psi(l,m+1,n) -psi(l,m-1,n))/hy2
-        etz(l,m,nw)= etz(l,m,nw) - (psi(l,m,n+1) -psi(l,m,n-1))/hz2
-        end do
-        end do
-   67   end do
-      end if
-!
-        call clocks (wall5,size,2)
-!
 !  The electrostatic field is added, to have Coulomb forces.
 !  Normalization: 
 !    complex, or R <-> C -> n
@@ -1931,7 +1892,7 @@
         qq(l,m,n)= qq(l,m,n) +ch(i)
    70   end do   
 !
-        call fftw_execute_r2r (plan,qq,qq_c)
+        call dfftw_execute_r2r (plan,qq,qq_c)
 !
         do n= 1,mz 
         do m= 1,my
@@ -1963,7 +1924,7 @@
    74   end do
    75   end do
 !
-        call fftw_execute_r2r (pinv,psi_c,psi)
+        call dfftw_execute_r2r (pinv,psi_c,psi)
       end if
 !
 !  etx: electromagnetic field is properly added
@@ -1995,7 +1956,7 @@
       end do
       end do
 !
-        call clocks (wall6,size,2)
+        call clocks (wall5,size,2)
 !
 !* The electrostatic electric field, EL(n+1/2)
 !   All region (infinite) - "size" 
@@ -2008,7 +1969,7 @@
       E_C_r = E_C_r2
       E_LJ  = E_LJ2
 !
-        call clocks (wall7,size,2)
+        call clocks (wall6,size,2)
 !
 !  Acceleration by E(n+1/2), B(n+1/2) - xyz(,i) becomes local here !!
 !  This includes vx(n) 
@@ -2161,14 +2122,17 @@
       ppp(i,3)= qqq(i,3)
       end do
 !
-        call clocks (wall8,size,2)
+        call clocks (wall7,size,2)
 !
 !* Timing measurement
-!     if(ionode .and. mod(it,5).eq.1) then
-      if(.false.) then
-        write(11,995) wall8-wall1,wall2-wall1,wall3-wall2,wall4-wall3, &
-                      wall5-wall4,wall6-wall5,wall7-wall6,wall8-wall7
-  995   format('*wtime=',f9.4,' 1-7=',7f9.4)
+      if(iwrt1.eq.0 .and. ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
+        write(11,995) wall7-wall1,wall2-wall1,wall3-wall2,wall4-wall3, &
+                      wall5-wall4,wall6-wall5,wall7-wall6
+  995   format('*wtime=',f9.4,'  1-6=',6f9.4)
+        close(11)
       end if
 !
 !* Squeeze inside the pendulum for it=1
@@ -2193,12 +2157,17 @@
 !       ----------------
 !
         if(it.eq.1.and.ionode) then
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+                status='unknown',position='append',form='formatted')
+!
           write(11,*) '    '
           write(11,*) '# Make Coulomb-optimized distributions...'
           write(11,*) ' proton and e (cm)...'
 !         write(11,330) (i,xg(i),yg(i),zg(i),xg(i+np),yg(i+np), &
 !                         zg(i+np),i=ns+1,ns+5)
 ! 330     format(' i=',i7,1p3e13.4,2x,3e13.4)
+!
+          close(11)
         end if
       end if
 !
@@ -2211,9 +2180,14 @@
         end do
 !
         if(ionode) then
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+                status='unknown',position='append',form='formatted')
+!
           if(it.eq.1) write(11,*) 'Errors if npp(1), npp(5) >= 1...'
           write(11,785) it,(npp(k),k=1,7)
   785     format('it=',i6,' npp(1-7)=',6i8,i10)
+!
+          close(11)
         end if
       end if
 !
@@ -2261,14 +2235,19 @@
 !
 !       if(ionode) then
         if(.false.) then
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+                status='unknown',position='append',form='formatted')
+!
           write(11,*) 'Mapping: etx7,ety7,etz7 tg=',tg
 !
           do k= 1,mz,10
-          i= 101
-          j= 101
+          i= mx/2
+          j= my/2
           write(11,860) i,j,k,etx7(i,j,k),ety7(i,j,k),etz7(i,j,k)
   860     format(3i6,1p3d12.4)
           end do
+!
+          close(11)
         end if
       end if
 !
@@ -2297,21 +2276,24 @@
         end do
   880   end do
 !
-        unifem1(1)= sqrt(setx/(mx*my*mza))
-        unifem1(2)= sqrt(setz/(mx*my*mza))
-        unifem1(3)= sqrt(sbtx/(mx*my*mza))
-        unifem1(4)= sqrt(sbtz/(mx*my*mza))
+        unifem1(1)= setx
+        unifem1(2)= setz
+        unifem1(3)= sbtx
+        unifem1(4)= sbtz
 !
         call mpi_allreduce (unifem1,unifem2,4,mpi_double_precision,mpi_sum, &
                             mpi_comm_world,ierror)
 !  Sqrt( **2)
-        setx= unifem2(1)/size
-        setz= unifem2(2)/size   
-        sbtx= unifem2(3)/size   
-        sbtz= unifem2(4)/size
+        setx= unifem2(1)/(mx*my*mz)
+        setz= unifem2(2)/(mx*my*mz)
+        sbtx= unifem2(3)/(mx*my*mz) 
+        sbtz= unifem2(4)/(mx*my*mz)
 !
 !******************************************************************
         if(ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2, &
+              status='unknown',position='append',form='formatted')
+!       it is open until close(11) below
 !
 !  Kinetic energy
         s0= 0
@@ -2335,7 +2317,7 @@
         s2= s2/(nCLp-(ns+np))
 !
 !** 10.28.2016
-        if(it.eq.1 .and. ionode) then
+        if(it.eq.1) then
           write(11,*) ' Wkin_E: s0,s1,s2 (per (p^2/2m))'
           write(11,*)  s0,s1,s2
           write(11,*) ' '
@@ -2363,7 +2345,7 @@
 !
 !       ***********
         time(is)= tg
-        slx(is)= delV*sqrt(psi2/(mx*my*mz))
+        slx(is)= delV*psi2/(mx*my*mz)
 !
 !  Radius of gyration
         rr= 0
@@ -2385,7 +2367,7 @@
         if(r1.le.rcore) ane= ane +1.       ! electrons within r < rcore
         end do
 !          **    *
-        if(it.le.1 .and. ionode) then
+        if(it.le.1) then
           Nele0= ncoe
           write(11,*) '  '
           write(11,*) 'Ne(r<Rion)(0) = ',Nele0
@@ -2476,6 +2458,8 @@
                       etot(is),slx(is),Rgyi(is),Rgye(is),Rgyc(is), &
                       dcpu
   710   format('t=',1pd9.2,14d11.2,2x,d11.3) 
+!
+        close(11)
       end if
 !******************************************************************
       end if
@@ -2486,16 +2470,18 @@
 ! ---------------------- 
       if(iwrt2.eq.0 .and. ionode) then
 !
-        OPEN (unit=77,file=praefixc//'.77'//suffix2//'.ps',      &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         write(11,*) '*plots are made... at tg=',tg
-        ifskip_e= .false.
-        ifskip_p= .false.
-!       ifskip_p= .true.
-!   ppl3 -- bug ??
+        close(11)
+!
+        OPEN (unit=77,file=praefixc//'.77'//suffix2//'.ps',      &
+              status='unknown',position='append',form='formatted')
+!
+!   ppl3 
         call ppl3da (xyz,ch,ag,Rgyi(is),Rgye(is),ns,np,nq,  &
-                     nCLp,igrp,ifskip_e,ifskip_p)
+                     nCLp,igrp)
         call ppl3dz (xyz,ch,ag,Rgyi(is),Rgye(is),ns,np,nq,  &
                      nCLp,igrp)
 !
@@ -2514,14 +2500,19 @@
               status='unknown',position='append',form='unformatted')
         write(23) t,xyz,vvv
         close(23)
-!---
+!
       end if
 !
 !---
 !* dt= 0.5 (every one of 0.5x10^-15) 
 !
       if(iwrt3.eq.0 .and. ionode) then   ! 1.d-15 sec 
+!
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
         write(11,*) 'write(29) tg=',tg
+        close(11)
 !
         OPEN (unit=29,file=praefixc//'.29'//suffix2,               &
               status='unknown',position='append',form='unformatted')
@@ -2557,7 +2548,12 @@
 !* Restart data are saved as files. 
 !
       if(iwrt3.eq.0 .and. ionode) then   ! 1.d-15 sec 
+!
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
         write(11,*) 'Restart file has entirely one file !!'
+        close(11)
 !
         OPEN (unit=12,file=praefixc//'.12'//suffix2, &
               status='replace',form='unformatted')
@@ -2583,16 +2579,7 @@
         close(12)
       end if
 !
-! --------------------------------------- on major nodes --------------
-!
-!  Close and open FT11: iwrt1.eq.0
-!
-      if(iwrt1.eq.0 .and. ionode) then
-        close (11)
-!
-        OPEN (unit=11,file=praefixc//'.06'//suffix2, &
-              status='unknown',position='append',form='formatted')
-      end if
+! ----------------------------------- on the major node --------------
 !  
 !-------------------------------------------------------
 !*  The run must terminate in 5-step intervals 
@@ -2604,9 +2591,14 @@
 !
         if(dcpu.gt.cptot) then
           if(ionode) then
+            OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+                  status='unknown',position='append',form='formatted')
+!
             write(11,*) 'dcpu (real time for execution, min)=',dcpu
             write(11,*) '   cptot (minimum stop time)=',cptot
             write(11,*) '   it=',it,'  t=',t
+!
+            close(11)
           end if
 !
           go to 2000
@@ -2614,11 +2606,17 @@
       end if
 !
       if(istop2.ge.9999 .or. istop8.ge.999999) then 
-        wrt2= 50 +ipar
-        write(wrt2,*) 'Abnormal termination...'
-        write(wrt2,*) '  a) istop1, istop2=',istop1,istop2
-        write(wrt2,*) '  b) istop7, istop8=',istop7,istop8
-        write(wrt2,*) '  ipar,t=',ipar,tg
+        if(ionode) then
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+                status='unknown',position='append',form='formatted')
+!
+          write(11,*) 'Abnormal termination...'
+          write(11,*) '  a) istop1, istop2=',istop1,istop2
+          write(11,*) '  b) istop7, istop8=',istop7,istop8
+          write(11,*) '  ipar,t=',ipar,tg
+          close(11)
+        end if
+!
         go to 2000
       end if
 !
@@ -2631,8 +2629,16 @@
       nppa= npp(5)
       call mpi_allreduce (nppa,istop11,1,mpi_integer,mpi_max, &
                           mpi_comm_world,ierror)
+!
       if(istop10.ge.1 .or. istop11.ge.1) then
-        write(11,*) 'npp(1), npp(5) >= 1. Stop!'
+        if(ionode) then
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+                status='unknown',position='append',form='formatted')
+!
+          write(11,*) 'npp(1), npp(5) >= 1. Stop!'
+          close(11)
+        end if
+!
         go to 2000
       end if
         end if
@@ -2643,8 +2649,14 @@
  2000 continue 
 !
       if(ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
+        write(11,*)
         write(11,*) ' final: t, tmax (sec)=',tg,tmax
         write(11,*) ' final: cpu1, cptot (min)=',dcpu,cptot
+!
+        close(11)
       end if
 !
       return
@@ -2660,7 +2672,7 @@
       implicit none
 !
       include   'mpif.h'
-      include   'param_em3p7_Ca.h'
+      include   'param_3p1_Ca.h'
 !
       real(C_DOUBLE),dimension(mx,my,0:mza+1) :: srx,sry,srz
       real(C_DOUBLE),dimension(mx,my,3) :: senv,recv
@@ -2745,7 +2757,7 @@
       implicit none
 !
       include   'mpif.h'
-      include   'param_em3p7_Ca.h'
+      include   'param_3p1_Ca.h'
 !
       real(C_DOUBLE),dimension(mx,my,3) :: sendbuf,recvbuf
       integer(C_INT) rank,ierror
@@ -2789,7 +2801,7 @@
       implicit none
 !
       include   'mpif.h'
-      include   'param_em3p7_Ca.h'
+      include   'param_3p1_Ca.h'
 !
       real(C_DOUBLE),dimension(mx,my,3) :: sendbuf,recvbuf
       integer(C_INT) rank,ierror
@@ -2831,7 +2843,7 @@
       use, intrinsic :: iso_c_binding 
       implicit none
 !*
-      include    'param_em3p7_Ca.h'
+      include    'param_3p1_Ca.h'
       include    'mpif.h'
 !
       integer(C_INT) size,ipar,igrp,ns,np,nCLp
@@ -2877,10 +2889,9 @@
       common/plupdat/ itabs
 !
 !* afre table
-      integer(C_INT)  naf
-      parameter       (naf=(ns0/num_proc))  ! *0.3)  ! param
-      integer(C_INT)  nafl,iafl,jafl
-      common/afretap/ nafl,iafl(nbxc*naf),jafl(nbxc*naf) !
+      integer(C_INT)  naf, nafl,iafl,jafl
+      parameter      (naf=(ns0/num_proc))  
+      common/afretap/ nafl,iafl(nbxc*naf),jafl(nbxc*naf) 
 !                   hard limit; 700*(55000/50)= 7.7e5
 !
       real(C_DOUBLE) rcut_Clf,rcutlj,prefC_LJ,pref_LJ,        &
@@ -3082,12 +3093,15 @@
           return
         end if
 !
-!       if(ionode .and. iwrt1.eq.0) then
         if(ionode .and. iwrt2.eq.0) then
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+                status='unknown',position='append',form='formatted')
+!
           write(11,780) istop1,istop2,istop7,istop8
   780     format('Information of istop1,2, istop7,8...(by root)',/, &
                  '  istop1,istop2=',2i8,/,                          &
                  '  istop7,istop8=',2i8)
+          close(11)
         end if
 !
 !* LR-forces: all pairs for 'i-th' particle
@@ -3358,7 +3372,7 @@
       use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include 'param_em3p7_Ca.h'
+      include 'param_3p1_Ca.h'
 !
       integer(C_INT) isize2,isize4,icmax,              &
                      i,j,k,n,IPx,IMx,JP,JM,KP,KM,ibind
@@ -3441,7 +3455,7 @@
       implicit none
 !
       include   'mpif.h'
-      include   'param_em3p7_Ca.h'
+      include   'param_3p1_Ca.h'
 !+++++
       real(C_DOUBLE),dimension(mx,my,0:mza+1) :: &
                                srx,sry,srz,ssx,ssy,ssz
@@ -3562,7 +3576,7 @@
       use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include   'param_em3p7_Ca.h'
+      include   'param_3p1_Ca.h'
 !
       integer(C_INT) l,m,n,kk,iterft
 !
@@ -3675,7 +3689,7 @@
       use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include   'param_em3p7_Ca.h'
+      include   'param_3p1_Ca.h'
 !
       integer(C_INT) l,m,n,kk
 !
@@ -3755,7 +3769,7 @@
       use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include    'param_em3p7_Ca.h'
+      include    'param_3p1_Ca.h'
 !
       integer(C_INT) np,ifrefl
 !  
@@ -3801,7 +3815,11 @@
                                                form='formatted')
 !
       if(ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
         write(11,*) 'READ_CONF: Parameter read... start'
+        close(11)
       end if
 !*
       read (08,'(a40,a6)') text1, praefix8   ! String der simulationserkennung
@@ -3818,10 +3836,16 @@
 !
       read (08,'(a40,f12.0)') text1,fchar    ! carbon: charge state
       read (08,'(a40,f12.0)') text1,fcharA   ! Au: charge state: 20 to 80 
+!
         if(ionode) then
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+                status='unknown',position='append',form='formatted')
+!
           write(11,*) 'cptot=',cptot
           write(11,*) 'tmax=',tmax
           write(11,*) 'fchar=',fchar
+!
+          close(11)
         end if
 !
       read (08,'(a40,i12)')   text1,nZ       ! large lump as nZ=1 
@@ -3855,7 +3879,11 @@
 ! -------------------------------
 !
       if(ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
         write(11,*) 'READ_CONF: Parameter read... end'
+        close(11)
       end if
 !
       close(08)
@@ -3870,7 +3898,7 @@
       use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include  'param_em3p7_Ca.h'
+      include  'param_3p1_Ca.h'
 !
       integer(C_INT) ifrefl,itabs
       common/plupdat/ itabs
@@ -3906,42 +3934,56 @@
       common/ionsiz/ R_sp,D_sp,N_sp,massi,Lambda_D,            &
                      ch_ion,wt_ion,rd_CP,rd_HP,ch_el,wt_el,rd_el 
 !----------------------------------------------------------------
-      OPEN (unit=07,file=praefixe//'_config.ENDE'//suffix2,  &
-                                          form='formatted')
+      OPEN (unit=08,file=praefixe//'_config.ENDE'//suffix2,  &
+                                             form='formatted')
 !*********************************************************************
-      write(07,'(34H# Praefix-String................: ,a6)')praefixe
-      write(07,'(34H# Boundary condition.. 0 is open: ,i16)')ifrefl
-      write(07,'(34H# Maximum cpu time of run.......: ,f16.2)')cptot
-      write(07,'(34H# Physikalische Endzeit.........: ,d20.6)')tmax
-      write(07,'(34H# Diskretisierungs-Schritt......: ,d20.6)')dt
-      write(07,'(34H# Write out interval for IWRT1..: ,d20.6)')dtwr 
-      write(07,'(34H# Write out interval for IWRT2..: ,d20.6)')dtwr2
-      write(07,'(34H# Write out interval for IWRT3..: ,d20.6)')dtwr3
+!     write (08,'(a6)')  praefix8   ! String der simulationserkennung
+      write (08,'(i12)')   ifrefl   ! =0,1,2 reflection at open/close/1d open
+      write (08,'(f12.0)') cptot    ! Maximum cpu time for each run (min)
+      write (08,'(d20.0)') tmax     ! Zeit zum Abbruch, 1.d-15 sec
+      write (08,'(d20.0)') dt       ! Zeitschritt, in 1.d-15 sec
+      write (08,'(d20.0)') dtwr     ! Write out interval for IWRT1, 1.d-15 sec 
+      write (08,'(d20.0)') dtwr2    ! Write out for IWRT2
+      write (08,'(d20.0)') dtwr3    ! Write out for IWRT3
+      write (08,'(i12)')   itabs    ! Particle table update interval
 !
-      write(07,'(34H# Number of ita..bs.............: ,i16)')itabs
-      write(07,'(34H# Number of np..................: ,i16)')np
+      write (08,'(i12)')   np       ! Number of protons
 !
-      write(07,'(34H# carbon: charge state..........: ,f16.2)')fchar
-      write(07,'(34H# Gold:   charge state..........: ,f16.2)')fcharA
+      write (08,'(f12.0)') fchar    ! carbon: charge state
+      write (08,'(f12.0)') fcharA   ! Au: charge state: 20 to 80 
 !
-      write(07,'(34H# Number of nZ..................: ,i16)')nZ
-      write(07,'(34H# Number of nZA.................: ,i16)')nZA
-      write(07,'(34H# Mass ratio: proton/electron...: ,d20.6)')massi
+      write (08,'(i12)')   nZ       ! large lump as nZ=1 
+      write (08,'(i12)')   nZA      ! large lump as nZA=4 
+      write (08,'(d20.0)') massi    ! mass ratio: mp/me
 !
-      write(07,'(34H# Laser intensity W/cm^2........: ,d20.6)')intens
-      write(07,'(34H# Wavelength lambda 8.d-7 cm....: ,d20.6)')lambda
+      write (08,'(d20.0)') intens   ! intensity W/cm2; 6.d17
+      write (08,'(d20.0)') lambda   ! wavelength 800 nm= 8.d-7 cm
 !  
-      write(07,'(34H# Size of target (cm)...........: ,d20.6)')R_sp
-      write(07,'(34H# Density of target (cm^-3).....: ,d20.6)')D_sp
+      write (08,'(d20.0)') R_sp     ! in R_sp, cm
+      write (08,'(d20.0)') D_sp
 !   --------------------
-      write(07,'(34H# Ortsraum-Cutoff (Ang).........: ,d20.6)')rcut_Clf
-      write(07,'(34H# LJ-Cutoff (Ang)...............: ,d20.6)')rcutlj
-      write(07,'(34H# epsLJ of C (eV)...............: ,d20.6)')epsCLJ
-      write(07,'(34H# epsLJ of others (eV)..........: ,d20.6)')epsLJ
-      write(07,'(34H# Electron temperature..........: ,d20.6)')Temp
-      write(07,'(34H# Size of rgmax.................: ,d20.6)')rgmax
+!     R_sp= R_sp/1.d-4
+!   --------------------
+!
+      write (08,'(d20.0)') rcut_Clf ! Coulomb cutoff in Angstrom
+      write (08,'(d20.0)') rcutLJ   ! Lennard-Jones cutoff in Angstgrom
+      write (08,'(d20.0)') epsCLJ   ! LJ potential between C in eV
+      write (08,'(d20.0)') epsLJ    ! LJ potential otherwise in eV
+      write (08,'(d20.0)') Temp     ! Electron temperature in eV
+      write (08,'(d20.0)') rgmax
+!
+! -------------------------------
+! Convert from Angstrom to micron: input file
+!   xmax,... are now read from include file
+!
+!     rcut_Clf= sconv*rcut_Clf  ! Ang to cm
+!     rcutLJ  = sconv*rcutLJ    ! Ang to cm
+!
+!     rgmax= sconv*rgmax
+! -------------------------------
 !*********************************************************************
-      close(07)
+!
+      close(08)
 !
       return
       end subroutine WRITE_CONF
@@ -3953,7 +3995,7 @@
       use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include  'param_em3p7_Ca.h'
+      include  'param_3p1_Ca.h'
 !
       integer(C_INT)  npio,i
       real(C_DOUBLE)  xyz(npq0,3)
@@ -3975,7 +4017,7 @@
       use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include  'param_em3p7_Ca.h'
+      include  'param_3p1_Ca.h'
 !
       integer(C_INT) istop,ns,np,nq,nZ,nZA,nCLp
 !
@@ -4060,6 +4102,9 @@
       end do
 !
         if(ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
         write(11,*) ' '
         write(11,*) 'ns/2, fchar, am(1)=',ns/2,fchar,12.d0*wt_ion
         write(11,*) 'ns/2, fchar, am(2)=',ns/2,fcharA,197.d0*wt_ion
@@ -4070,8 +4115,9 @@
         write(11,*) 'nh2,  fchar, am(6)=',nCLp-(ns+2*np+nZ*(ns/2)), &
                       heavyA,heavyA*m_unit
         write(11,*) ' '
-        end if
 !
+        close(11)
+        end if
 !
       cci1= 0
       do i= 1,ns/2
@@ -4104,7 +4150,11 @@
       end do
 !
       cci= cci1+cci2+cci3+cci4+cci5+cci6
+!
       if(ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
         write(11,*) 'Sum of ch(1,2,3,4,5,6)... '
         write(11,*) ' cci1=',cci1
         write(11,*) ' cci2=',cci2
@@ -4114,12 +4164,19 @@
         write(11,*) ' cci6=',cci6
         write(11,*) '  Total cci (< d-13 esu)=',cci
         write(11,*) '      '
+!
+        close(11)
       end if
 !
       if(abs(cci).gt.1.d-10) then
         if(ionode) then
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+                status='unknown',position='append',form='formatted')
+!
           write(11,*) ' cci not equal or smaller than 1.d-10...',cci
           write(11,*) ' Stop: cci is not smaller than 1.d-10...'
+!
+          close(11)
         end if
 !
         istop= 1
@@ -4166,8 +4223,13 @@
       end do
 !
       if(ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
         write(11,*) 'Number of C(+Z), H(+), el...'
         write(11,*) '  ns, np, nq, nCLp=',ns,np,nq,nCLp
+!
+        close(11)
       end if
 !
 !***************
@@ -4192,8 +4254,13 @@
   540 continue                      !  subtract rest energy mc^2
 !
       if(ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
         write(11,541) s1/nq
   541   format(' Kinetic energy of an electron /mc^2=',1pe13.5)
+!
+        close(11)
       end if
 !
       return
@@ -4289,7 +4356,7 @@
       use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include  'param_em3p7_Ca.h'
+      include  'param_3p1_Ca.h'
 !
       real(C_DOUBLE) xyz(npq0,3),vvv(npq0,3),vv
       integer(C_INT) ns,np,nCLp,ILN,i,k,ix,iy,iz
@@ -4440,7 +4507,7 @@
       use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include  'param_em3p7_Ca.h'
+      include  'param_3p1_Ca.h'
 !
       integer(C_INT) ns,np,nq,nCLp,i,k,ix,ILN
       real(C_DOUBLE) vvv(npq0,3),am(npq0),v7
@@ -4616,7 +4683,7 @@
       use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include  'param_em3p7_Ca.h'
+      include  'param_3p1_Ca.h'
 !
       real(C_float) ekin,ppot,ekn1,ekn2,etot,Rgyi,Rgye,          &
                     Rgyf,Rgyc,Rion,Nele,dPot,ecr,elj,            &
@@ -4671,7 +4738,11 @@
       dtwr= 2*dtwr
 !
       if(ionode) then
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+              status='unknown',position='append',form='formatted')
+!
         write(11,*) 'Rehist: new is, dtwr=',is,dtwr
+        close(11)
       end if
 !
       return
@@ -4828,7 +4899,7 @@
       use, intrinsic :: iso_c_binding 
       implicit none
 !
-      real(C_float) f(7003),fmax,fmin
+      real(C_float) f(is),fmax,fmin
       integer(C_INT) is,i
 !
       fmax= -1.e10
@@ -4844,11 +4915,10 @@
 !
 !
 !------------------------------------------------------------------
-      subroutine ppl3da (xyz,ch,ag,Rgy1,Rgy2,ns,np,nq,  &
-                         nCLp,igrp,ifskip_e,ifskip_p)
+      subroutine ppl3da (xyz,ch,ag,Rgy1,Rgy2,ns,np,nq,nCLp,igrp)
 !------------------------------------------------------------------
       use, intrinsic :: iso_c_binding 
-      include    'param_em3p7_Ca.h'
+      include    'param_3p1_Ca.h'
 !
       integer(C_INT) ns,np,nq,nCLp,igrp,nZ,nZA
       common/iroha/ nZ,nZA
@@ -4856,10 +4926,8 @@
       real(C_DOUBLE) xyz(npq0,3),ch(npq0),ag(npq0)
       real(C_float)  Rgy1,Rgy2,rgmax,rmax1,ypp,zpp,amass
 !   
-      logical    ifskip_e,ifskip_p
-!
       real(C_DOUBLE) pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax,  &
-                    Temp,epsCLJ,epsLJ
+                     Temp,epsCLJ,epsLJ
       common/parm2/ pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax
       common/parm4/ phi,tht,dtwr,dtwr2,dtwr3,rgmax
       common/ELSTA/ Temp,epsCLJ,epsLJ
@@ -4984,8 +5052,6 @@
 !
 !* Protons
 !
-      if(.not.ifskip_p) then
-!---
       nskip= (np +1.e-5)/1000
 !---                     ****
 !
@@ -5009,7 +5075,6 @@
       call circle (xx-0.12,yy-0.12,dd,2)
   300 continue
 !---
-      end if
 !
 !* carbon ions
 !
@@ -5062,8 +5127,6 @@
 !
 !* Electrons in pellet
 !
-      if(.not.ifskip_e) then
-!---
       nskip= (np +1.e-5)/1000   ! -e
 !---                     ****
 !
@@ -5113,7 +5176,6 @@
       call circle (xx-0.12,yy-0.12,dd,1)
   600 continue
 !---
-      end if
 !
       call newcolor (0,1.,0.,0.)  ! reset
 !---------------------
@@ -5131,7 +5193,7 @@
 !  View from top (x,y)
 !
       use, intrinsic :: iso_c_binding 
-      include    'param_em3p7_Ca.h'
+      include    'param_3p1_Ca.h'
 !
       integer(C_INT) ns,np,nq,nCLp,igrp,nZ,nZA
       common/iroha/ nZ,nZA
@@ -6431,7 +6493,7 @@
        implicit none
 !
        character    ica*80,ich(80)*1
-       character(*) isymb   !!! NEC: must be hitsuyo
+       character(*) isymb   !!! NEC: must be necessary - hitsuyo
        equivalence (ica,ich(1))
 !
        real(C_float)  x0,y0,h0,ang,x,y,h
