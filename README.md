@@ -86,6 +86,7 @@ Two different fortrans, PGI and gfotran, are incompatible with processors of the
 
   % Execution by mpiexec (with lots of co-processors): Only for a test case. % mpiexec -n 6 a.out &
 
+  One may want to use about 50 processors at least, where the Z-dimension is exactly divided by parallelization. 
 
 ### Post-processing Simulation Analysis ###
 
