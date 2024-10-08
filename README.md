@@ -80,6 +80,8 @@ The script 'mpif90 @cnt3em-3pCa.f03' needs param_em3p7_Ca.h, Cntemp_config.START
 
   % mpif90 -mcmodel=medium -fPIC @a_cnt3_3p7Ca.f03 -I/opt/fftw3/include -L/opt/fftw3/lib -lfftw3
 
+  The parallelization simulation code is utilized, for example. 
+
 Two different fortrans, PGI and gfotran, are incompatible with processors of the same name but different styles.
 
   % Execution by mpiexec (with lots of co-processors): Only for a test case. % mpiexec -n 6 a.out &
