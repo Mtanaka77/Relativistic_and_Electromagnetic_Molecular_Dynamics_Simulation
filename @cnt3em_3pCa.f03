@@ -1,10 +1,11 @@
 !*--------------------------------------------------------------------*
-!  @cnt3ems_3pCa.f03                  Dec.24, 2016, Sep.13, 2024      !   
+!  @cnt3ems_3pCa.f03                    Dec.24, 2016, Sep.13, 2024    !   
 !                                                                     !
 !  ## Molecular Dynamics in Relativistic Electromagnetic Fields ##    !
 !                                                                     !
-!   MPI 3: subroutine /forces/; real atomic mass mp/me=1836           !
+!   MPI ver.3 and FFTW3:                                              !
 !   READ_conf is used in nZ, nZA, intens, lambda                      !
+!     subroutine /forces/ uses real atomic mass M_p/M_e=1836          !
 !                                                                     !
 !  Used files :                                                       !
 !  1. @cnt3-3pCa.f03:  Molecular dynamics simulation code             !
@@ -143,12 +144,10 @@
         OPEN (unit=11,file=praefixc//'.06'//suffix1, &
               status='unknown',form='formatted')
 !
-        write(11,100) size
-  100   format('This run uses ',i3,' ranks',/)
+        write(11,'("This run uses ",i3," ranks",/)') size
 !
-        write(11,103) ipar,igrp
-  103   format('My process is #',i3,' of group #',i3)
-!
+        write(11,'("My process is #",i3," of group #",i3)') &
+                                                 ipar,igrp
         close(11)
       end if
 !
@@ -170,8 +169,8 @@
         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
               status='unknown',position='append',form='formatted')
 !
-        write(11,693) ipar,ctime,wtime
-  693   format(/,'*ipar, ctime, wtime(sec)=',i3,1p2e15.7)
+        write(11,'(/,"*ipar, ctime, wtime(sec)=",i3,1p2d15.7)')  &
+                                                 ipar,ctime,wtime
 !
         close(11)
       end if
@@ -580,8 +579,7 @@
           OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
                 status='unknown',position='append',form='formatted')
 !
-          write(11,630) 
-  630     format(' Restart data are loaded from FT10.....',/)
+          write(11,'(" Restart data are loaded from FT12.....",/)') 
           close(11)
         end if
 !
@@ -628,15 +626,14 @@
           OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
                 status='unknown',position='append',form='formatted')
 !
-          write(11,640) t,it,is
-  640     format(' Starting: t=',1pe11.3,'   it,is=',i7,i5)
+          write(11,'(" Starting: t=",1pd11.3," it,is=",i7,i5)')    &
+                                                             t,it,is
 !
-          nCLp= ns +np +nq  ! just for write out here
-          write(11,643) ns,np,nq,nCLp
-  643     format(' ns,np,nq; nCLp=',i8,i6,i8,2x,i8,/)
+          nCLp= ns +np +nq              ! just for write out here
+          write(11,'(" ns,np,nq; nCLp=",i8,i6,i8,2x,i8,/)')        &
+                                                       ns,np,nq,nCLp
 !
-          write(11,645) iwa,iwb,iwc,iwd
-  645     format(' iwa, iwb, iwc, iwd=',4i7,/)
+          write(11,'(" iwa, iwb, iwc, iwd=",4i7,/)') iwa,iwb,iwc,iwd
           close(11)
 !          
 !         OPEN (unit=50,file='ft50.data',               &
@@ -738,8 +735,8 @@
           write(11,*) ' '
         else
           write(11,*) ' '
-          write(11,603) xmax3,ymax3,zmax3
-  603     format('# Lx/2, Ly/2, Lz/2 (cm) = ',3f12.5,/)
+          write(11,'("# Lx/2, Ly/2, Lz/2 (cm) = ",3f12.5,/)')    &
+                                                 xmax3,ymax3,zmax3
         end if
 !
         close(11)
@@ -750,7 +747,7 @@
               status='unknown',position='append',form='formatted')
 !
         write(11,605) dt,itabs
-  605   format(' time step: dt=',1pe13.5,/,         &
+  605   format(' time step: dt=',1pd13.5,/,         &
                ' particle list update: itabs=',i4)
 !
         write(11,607) ns,np,nq,fcharA,fchar
@@ -763,8 +760,8 @@
 !
         write(11,608) R_sp,D_sp,nq,ch_ion,ch_el,   &
                        wt_ion,wt_el,rd_CP,rd_HP,rd_el
-  608   format(' R_sp(cm)=',1pe12.3,/,              &
-               ' D_sp(/cm^3)=',e12.3,/,             &
+  608   format(' R_sp(cm)=',1pd12.3,/,              &
+               ' D_sp(/cm^3)=',d12.3,/,             &
                ' N_sp=',i10,/,                      &
                ' ',/,                               &
                ' ch_ion/e, ch_el/e=',2d15.7,/,      &
@@ -772,26 +769,26 @@
                ' rd_CP,rd_HP, rd_el/a=',3d15.7,/)
 !
         write(11,609) R_cnt1,Z_cnt1,R_cnt2,Z_cnt2a,Z_cnt2b
-  609   format(' R_cnt1, Z_cnt1(cm)=',1p2e12.3,/,   &
-               ' R_cnt2, Z_cnt2a,Z_cnt2b=',3e12.3,/)
+  609   format(' R_cnt1, Z_cnt1(cm)=',1p2d12.3,/,   &
+               ' R_cnt2, Z_cnt2a,Z_cnt2b=',3d12.3,/)
 !
         write(11,610) Temp,Temp_erg  !/Wrest
-  610   format(' Temp(eV), Temp (erg)=',1p2e15.5,/)
+  610   format(' Temp(eV), Temp (erg)=',1p2d15.5,/)
 !        
         write(11,611) rcut_Clf,prefC_LJ,pref_LJ,pthe,      &
                        p4dt,dV,p4dt/dV,cdt
   611   format('---------------------------------------',/, &
                ' Coulomb(short range): ch(i)*ch(j)/r2  ',/, &
-               '   rcut_Clf=',1pe15.5,/,                    &
+               '   rcut_Clf=',1pd15.5,/,                    &
                '  ',/,                                      &
-               '   prefC_LJ =',e15.5,/,                     &
-               '   pref_LJ =',e15.5,/,                      &
+               '   prefC_LJ =',d15.5,/,                     &
+               '   pref_LJ =',d15.5,/,                      &
                '  ',/,                                      &
-               ' pthe (cm/s)=',e15.5,/,                     &
+               ' pthe (cm/s)=',d15.5,/,                     &
                ' ',/,                                       &
-               ' p4dt =',e15.5,'   dV =',e15.5,/,           &
-               ' p4dt/dV =',e15.5,/,                        &
-               ' cdt =',e15.5,/,                            & 
+               ' p4dt =',d15.5,'   dV =',d15.5,/,           &
+               ' p4dt/dV =',d15.5,/,                        &
+               ' cdt =',d15.5,/,                            & 
                '---------------------------------------',/)
 !
         write(11,613) mx,my,mz,Lx3,Ly3,Lz3,xmax3,xmin3,    &
@@ -838,11 +835,14 @@
       call init (xg,yg,zg,px,py,pz,ch,am,ag,        &
                  ipar,istop,if_start,ns,np,nq,nCLp)
 !                **** ***** no igrp  ++ ++ ++ ++++
+!
       if(istop.ne.0) then
+        if(ionode) then
         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
               status='unknown',position='append',form='formatted')
-        if(ionode) write(11,*) ' Stop: call to init...'
+          write(11,*) ' Stop: call to init...'
         close(11)
+        end if
 !
         stop
       end if
@@ -882,7 +882,7 @@
           write(11,621) (i,ch(i),am(i),ag(i),xg(i),yg(i),zg(i),  &
                           px(i),py(i),pz(i),i=nh1+1,nh1+5)
 !
-  621     format('i=',i6,1p3e10.2,1x,3e10.2,1x,3e8.1)
+  621     format('i=',i6,1p3d10.2,1x,3d10.2,1x,3d8.1)
 !
           close(11)
         end if
@@ -900,8 +900,9 @@
 !* Restart data.
 !
       if(ionode) then
+!
         OPEN (unit=12,file=praefixc//'.12'//suffix1,       &
-                       status='unknown',form='unformatted')
+                        status='replace',form='unformatted')
 !
         write(12) it,is,ns,np,nq,nCLp,itab,item3
         write(12) xg,yg,zg,px,py,pz,ch,am,ag
@@ -921,7 +922,9 @@
         write(12) r_sp,d_sp,n_sp,ch_ion,wt_ion,rd_cp,rd_hp,  &
                   ch_el,wt_el,rd_el 
         write(12) W_1p,Nele0
+!
         close(12)
+      end if
 !
 !!      OPEN (unit=17,file=praefixi//'.17'//suffix1,        &
 !!            status='unkown',form='unformatted')
@@ -931,11 +934,13 @@
 ! 
 !**********************************************************
 !
+      if(ionode) then
+!
         OPEN (unit=77,file=praefixc//'.77'//suffix1//'.ps',      &
               status='unknown',position='append',form='formatted')
-!   ---------------------------          ++++++
+!
         call lplots
-!   ---------------------------
+!
         call plote
         close(77)
       end if
@@ -1211,7 +1216,7 @@
           write(11,132) (i,x0(i),y0(i),z0(i),i=1,5)
           write(11,132) (i,x0(i),y0(i),z0(i),i=ns+1,ns+5)
           write(11,132) (i,x0(i),y0(i),z0(i),i=ns+np+1,ns+np+5)
-  132     format('i=',i6,2x,1p3e11.4)
+  132     format('i=',i6,2x,1p3d11.4)
 !
           close(11)
         end if
@@ -1386,7 +1391,7 @@
       end if
 !  
 !-------------------------------------------------------
-!  dt= 0.0005e-15 -> EM: dx/dt= 4.e10 > 3.e10  Courant cond. safe!
+!  dt= 0.0005d-15 -> EM: dx/dt= 4.d10 > 3.d10  Courant cond. safe!
 !        (100,200,200), (5.,10.,10.) 10^2 Ang^3 -> 5.0 Ang
 !
  1000 continue
@@ -1407,9 +1412,8 @@
       end if
 !
       if(istop.ge.1) then 
-        wrt2= 50 +ipar
-        write(112,*) 'Abnormal termination istop=',istop
-        write(112,*) '  ipar,t=',ipar,tg
+        write(50 +ipar,*) 'Abnormal termination istop=',istop
+        write(50 +ipar,*) '  ipar,t=',ipar,tg
         go to 2000
       end if
 !
@@ -1477,8 +1481,8 @@
         write(11,*) '  '
         write(11,*) '*Drive of E*H field...'
         write(6,123) omega,ak
-  123   format(' omega (1/sec, c*2*pi/lambda)=',1pe14.7,/,  &
-               ' ak (1/cm, 2*pi/lambda)=',e14.7)
+  123   format(' omega (1/sec, c*2*pi/lambda)=',1pd14.7,/,  &
+               ' ak (1/cm, 2*pi/lambda)=',d14.7)
         close(11)
       end if
       end if
@@ -1982,7 +1986,7 @@
 !
         do m=1,my,20
         write(11,999) m,etz(l,m,n),btx(l,m,n),EE(l,m,n),HH(l,m,n)
-  999   format(i4,1p2e13.3,2x,2e13.3)
+  999   format(i4,1p2d13.3,2x,2d13.3)
         end do
 !
         close(11)
@@ -2037,7 +2041,7 @@
           write(11,*) ' proton and e (cm)...'
           write(11,330) (i,xg(i),yg(i),zg(i),xg(i+np),yg(i+np), &
                           zg(i+np),i=ns+1,ns+5)
-  330     format(' i=',i7,1p3e13.4,2x,3e13.4)
+  330     format(' i=',i7,1p3d13.4,2x,3d13.4)
           end if
         end if
 !
@@ -2138,25 +2142,6 @@
 !
 !  real*4
          write(29) t
-!
-!        do n= 1,mz !,2
-!        do m= 1,my !,2
-!        do l= 1,mx !,2
-!        ll= l !2*l -1
-!        mm= m !2*m -1
-!        nn= n !2*n -1
-!
-!        eetx(ll,mm,nn)= etx(l,m,n)
-!        eety(ll,mm,nn)= ety(l,m,n)
-!        eetz(ll,mm,nn)= etz(l,m,n)
-!        bbtx(ll,mm,nn)= btx(l,m,n)
-!        bbty(ll,mm,nn)= bty(l,m,n)
-!        bbtz(ll,mm,nn)= btz(l,m,n)
-!        end do
-!        end do
-!        end do
-!
-!        write(29) eetx,eety,eetz,bbtx,bbty,bbtz  ! real*4, half size
 !
 !  Field minus EE, HH
          do n= 1,mz,2
@@ -2377,7 +2362,7 @@
                       elj(is),sex(is),sez(is),sbx(is),sbz(is),etot(is), &
                       Rgyi(is),Rgye(is),Rgyc(is),slx(is),          &
                       dcpu
-  710   format('t=',1pe9.2,14e11.2,e11.3) 
+  710   format('t=',1pd9.2,14d11.2,d11.3) 
 !
         close(11)
 ! --------------------------------------- on major nodes --------------
@@ -2389,9 +2374,8 @@
 !*  Total potential
 ! ---------------------- 
       if(.not.ifeqlib) then
-!---
-      if(iwrt2.eq.0) then
-      if(ionode) then
+      if(iwrt2.eq.0 .and. ionode) then
+!
         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
               status='unknown',position='append',form='formatted')
         write(11,*) '*plots are made... at tg=',tg
@@ -2415,28 +2399,40 @@
         close(23)
       end if
       end if
-!---
-      end if
 !
 ! -------------------
 !*  Restart data.
 ! -------------------
 !
-!     if(iwrt4.eq.0) then
-!     if(ionode) then
-!!      if(wrt.eq.11) then
-!!         OPEN (unit=11,file=praefixc//'.06'//suffix1,
-!!    *          status='unknown',position='append',form='formatted')
-!!      end if
+      if(.not.ifeqlib) then
+      if(iwrt2.eq.0 .and. ionode) then
 !
-!       OPEN (unit=77,file=praefixc//'.77'//suffix1,             &
-!    *        status='unknown',position='append',form='formatted')
-!       call lplots
-!       close(77)
+        OPEN (unit=12,file=praefixc//'.12'//suffix1,       &
+                        status='replace',form='unformatted')
 !
-!       if(wrt.eq.11) close(wrt)
-!     end if
-!     end if
+        write(12) it,is,ns,np,nq,nCLp,itab,item3
+        write(12) xg,yg,zg,px,py,pz,ch,am,ag
+        write(12) etx,ety,etz,btx,bty,btz
+! 
+        write(12) x0,y0,z0
+        write(12) fchar,fcharA,heavy,heavyA,massi,nZ,nZA
+        write(12) R_cnt1,Z_cnt1,R_cnt2,Z_cnt2a,Z_cnt2b
+!
+        write(12) pi,tg,dt,dth,pthe,tmax
+        write(12) t,phi,tht,dtwr,dtwr2,dtwr3
+        write(12) ekin,ppot,ekn1,ekn2,etot,Rgyi,Rgye,        &
+                  Rgyf,Rgyc,Rion,Nele,dPot,ecr,elj,          &
+                  sex,sez,sbx,sbz,slx,time
+!
+        write(12) iwa,iwb,iwc,iwd
+        write(12) r_sp,d_sp,n_sp,ch_ion,wt_ion,rd_cp,rd_hp,  &
+                  ch_el,wt_el,rd_el 
+        write(12) W_1p,Nele0
+        close(12)
+!
+      end if
+      end if
+! 
 ! --------------------------------------- on major nodes --------------
       GO TO 1000
 !
@@ -2943,7 +2939,7 @@
 !       if(ionode) then
 !       wrt2= 50
 !       write(112,990) it,E_C_r1,E_C_r2,E_C_r1+E_C_r2,E_LJ2
-! 990   format('it=',i4,' r1, r2, sum, LJ2=',1p3e11.3,2x,e11.3)
+! 990   format('it=',i4,' r1, r2, sum, LJ2=',1p3d11.3,2x,d11.3)
 !       end if
 !
       return
@@ -3716,8 +3712,8 @@
         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
               status='unknown',position='append',form='formatted')
 !
-        write(11,541) s1/nq
-  541   format(' Kinetic energy of an electron /mc^2=',1pe13.5)
+        write(11,'(" Kinetic energy of an electron /mc^2=",1pd13.5)') &
+                                                               s1/nq
         close(11)
       end if
 !
