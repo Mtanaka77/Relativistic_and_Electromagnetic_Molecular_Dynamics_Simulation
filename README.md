@@ -17,7 +17,7 @@ electron mass m_unit= 0.9110d-27 g and its charge e_unit= 4.8032d-10 esu.
 The mass of hydrogen, for example, is 1.6726d-24 g.
 
 One needs files in the simulation: 1) @cnt3em_3pCa.f03 or @a_cnt3-3p7Ca.f03: Molecular dynamics simulation code, which is the non-parallel or parallelized simulation code,
-2) param_3p1_Ca.h or param_em3p7_Ca.h: Common parameters of this simulation, 
+2) param_em3p7_Ca.h or param_em3p7_Ca.h: Common parameters of this simulation, 
 3) Cntemp_config.STARTA or Cntemp_config.STARTC: configuring parameters, 
 4) p_config_ss.xyz_D150 and P135 of pellet electrons: H, C and Au ions and electrons. 
 The program is written in Fortran 2003/Fortran 2008 (write format in the same line) and MPI of Ver.3 for parallelization.
@@ -68,7 +68,7 @@ and/or http://www1.m4.mediacat.ne.jp/dphysique/.
 
 Compilation by mpif90: 
 
-The script 'mpif90 @a_cnt3-3p7Ca.f03' needs param_em3p7_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150.
+The script 'mpif90 @cnt3em-3pCa.f03' needs param_em3p7_Ca.h, Cntemp_config.STARTC, p_config_ss.xyz_P135 and p_config_ss.xyz_D150.
 
   % mpif90 -byteswapio -mcmodel=medium -fast @cnt3em3_3pCa.f03 -I/opt/pgi/fftw3/include -L/opt/pgi/fftw3/lib -lfftw3
 
