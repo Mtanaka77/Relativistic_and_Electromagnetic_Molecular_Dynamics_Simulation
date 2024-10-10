@@ -3,9 +3,9 @@
 !                                                                     !
 !  ## Molecular Dynamics in Relativistic Electromagnetic Fields ##    !
 !                                                                     !
-!   MPI 3 and FFTW3 are used:                                         !
-!   READ_conf in nZ, nZA, intens, lambda                              !
-!     subroutine /forces/; real atomic mass Mp/Me=1836                !
+!   MPI ver.3 and FFTW3:                                              !
+!   READ_conf is used in nZ, nZA, intens, lambda                      !
+!     subroutine /forces/ uses real atomic mass M_p/M_e=1836          !
 !                                                                     !
 !  Used files :                                                       !
 !  1. @cnt3-3pCa.f03:  Molecular dynamics simulation code             !
@@ -84,11 +84,9 @@
 !*--------------------------------------------------------------------*
 ! 
       program  cnt3emt
-!
-      use, intrinsic :: iso_c_binding 
       implicit  none
 !
-      include   'param_em3p7_Cc.h'
+      include   'param_em3p7_Ca.h'
       include   'mpif.h'
 !
       integer*4  size,rank,ierror,ipar,igrp,ifDebye
@@ -146,12 +144,10 @@
         OPEN (unit=11,file=praefixc//'.06'//suffix1, &
               status='unknown',form='formatted')
 !
-        write(11,100) size
-  100   format('This run uses ',i3,' ranks',/)
+        write(11,'("This run uses ",i3," ranks",/)') size
 !
-        write(11,103) ipar,igrp
-  103   format('My process is #',i3,' of group #',i3)
-!
+        write(11,'("My process is #",i3," of group #",i3)') &
+                                                 ipar,igrp
         close(11)
       end if
 !
@@ -173,8 +169,8 @@
         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
               status='unknown',position='append',form='formatted')
 !
-        write(11,693) ipar,ctime,wtime
-  693   format(/,'*ipar, ctime, wtime(sec)=',i3,1p2d15.7)
+        write(11,'(/,"*ipar, ctime, wtime(sec)=",i3,1p2d15.7)')  &
+                                                 ipar,ctime,wtime
 !
         close(11)
       end if
@@ -188,7 +184,6 @@
 !------------------------------------------------------------------------
       subroutine date_and_time_7 (date_now,time_now)
 !------------------------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
       implicit none
 !
       integer, dimension(8) :: ipresent_time
@@ -210,10 +205,9 @@
 !------------------------------------------------------
 !*  Measure both cpu and elapsed times 
 !
-      use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include    'param_em3p7_Cc.h'
+      include    'param_em3p7_Ca.h'
       include    'mpif.h'
 !  
       real*8     cputime,walltime,buffer1(2),buffer2(2), &
@@ -268,10 +262,9 @@
 !----------------------------------------------------------------------
       subroutine RUN_MD (size,ipar,igrp,if_start,ifDebye)
 !----------------------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
       implicit  none
 !
-      include    'param_em3p7_Cc.h'
+      include    'param_em3p7_Ca.h'
       include    'mpif.h'
 !
       integer*4  size,ipar,igrp,ifDebye
@@ -586,16 +579,15 @@
           OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
                 status='unknown',position='append',form='formatted')
 !
-          write(11,630) 
-  630     format(' Restart data are loaded from FT12.....',/)
+          write(11,'(" Restart data are loaded from FT12.....",/)') 
           close(11)
         end if
 !
 !------------------------------------------
 !* FT12 must be mounted on NSF volume.
 !------------------------------------------
-        OPEN (unit=12,file=praefixi//'.12'//suffix2,        &
-                             status='old',form='unformatted')
+        OPEN (unit=12,file=praefixi//'.12'//suffix2,      &
+                           status='old',form='unformatted')
 !
         read(12) it,is,ns,np,nq,nCLp,itab,item3           ! nCLp
         read(12) xg,yg,zg,px,py,pz,ch,am,ag
@@ -634,15 +626,14 @@
           OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
                 status='unknown',position='append',form='formatted')
 !
-          write(11,640) t,it,is
-  640     format(' Starting: t=',1pd11.3,'   it,is=',i7,i5)
+          write(11,'(" Starting: t=",1pd11.3," it,is=",i7,i5)')    &
+                                                             t,it,is
 !
-          nCLp= ns +np +nq  ! just for write out here
-          write(11,643) ns,np,nq,nCLp
-  643     format(' ns,np,nq; nCLp=',i8,i6,i8,2x,i8,/)
+          nCLp= ns +np +nq              ! just for write out here
+          write(11,'(" ns,np,nq; nCLp=",i8,i6,i8,2x,i8,/)')        &
+                                                       ns,np,nq,nCLp
 !
-          write(11,645) iwa,iwb,iwc,iwd
-  645     format(' iwa, iwb, iwc, iwd=',4i7,/)
+          write(11,'(" iwa, iwb, iwc, iwd=",4i7,/)') iwa,iwb,iwc,iwd
           close(11)
 !          
 !         OPEN (unit=50,file='ft50.data',               &
@@ -744,8 +735,8 @@
           write(11,*) ' '
         else
           write(11,*) ' '
-          write(11,603) xmax3,ymax3,zmax3
-  603     format('# Lx/2, Ly/2, Lz/2 (cm) = ',3f12.5,/)
+          write(11,'("# Lx/2, Ly/2, Lz/2 (cm) = ",3f12.5,/)')    &
+                                                 xmax3,ymax3,zmax3
         end if
 !
         close(11)
@@ -844,11 +835,14 @@
       call init (xg,yg,zg,px,py,pz,ch,am,ag,        &
                  ipar,istop,if_start,ns,np,nq,nCLp)
 !                **** ***** no igrp  ++ ++ ++ ++++
+!
       if(istop.ne.0) then
+        if(ionode) then
         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
               status='unknown',position='append',form='formatted')
-        if(ionode) write(11,*) ' Stop: call to init...'
+          write(11,*) ' Stop: call to init...'
         close(11)
+        end if
 !
         stop
       end if
@@ -888,7 +882,7 @@
           write(11,621) (i,ch(i),am(i),ag(i),xg(i),yg(i),zg(i),  &
                           px(i),py(i),pz(i),i=nh1+1,nh1+5)
 !
-  621     format('i=',i6,1p3d10.2,1x,3d10.2,1x,3e8.1)
+  621     format('i=',i6,1p3d10.2,1x,3d10.2,1x,3d8.1)
 !
           close(11)
         end if
@@ -906,6 +900,7 @@
 !* Restart data.
 !
       if(ionode) then
+!
         OPEN (unit=12,file=praefixc//'.12'//suffix1,       &
                         status='replace',form='unformatted')
 !
@@ -927,7 +922,9 @@
         write(12) r_sp,d_sp,n_sp,ch_ion,wt_ion,rd_cp,rd_hp,  &
                   ch_el,wt_el,rd_el 
         write(12) W_1p,Nele0
+!
         close(12)
+      end if
 !
 !!      OPEN (unit=17,file=praefixi//'.17'//suffix1,        &
 !!            status='unkown',form='unformatted')
@@ -937,11 +934,13 @@
 ! 
 !**********************************************************
 !
+      if(ionode) then
+!
         OPEN (unit=77,file=praefixc//'.77'//suffix1//'.ps',      &
               status='unknown',position='append',form='formatted')
-!   ---------------------------          ++++++
+!
         call lplots
-!   ---------------------------
+!
         call plote
         close(77)
       end if
@@ -953,10 +952,9 @@
 !----------------------------------------------------------------------
       subroutine FLOPEN (nframe,igrp)
 !----------------------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include   'param_em3p7_Cc.h'
+      include   'param_em3p7_Ca.h'
       integer*4 igrp,nframe
 !
 !      data suffix/'1','2','3','4','5','6','7','8','9','a'/
@@ -1002,8 +1000,7 @@
 !
 !     include 'fftw3.f03'
       include 'aslfftw3.f03'
-!
-      include 'param_em3p7_Cc.h'
+      include 'param_em3p7_Ca.h'
       include 'mpif.h'
 
       type(C_PTR), save :: plan,pinv
@@ -1415,9 +1412,8 @@
       end if
 !
       if(istop.ge.1) then 
-        wrt2= 50 +ipar
-        write(112,*) 'Abnormal termination istop=',istop
-        write(112,*) '  ipar,t=',ipar,tg
+        write(50 +ipar,*) 'Abnormal termination istop=',istop
+        write(50 +ipar,*) '  ipar,t=',ipar,tg
         go to 2000
       end if
 !
@@ -1900,7 +1896,7 @@
 !
 !       call clocks (cp6,wall6,size)
 !
-!  This includes vx(n) ??
+!  This includes vx(n) ?
 !    E(n+1/2), B(n+1/2)
 !
       do i= 1,nCLp
@@ -1919,7 +1915,7 @@
         etxi= 0
         etyi= 0
         etzi= E0*sin(omega*(tg+dth) -ak*yg(i))*ff  ! statV/cm
-        btxi= E0*cos(omega*tg -ak*yg(i))*ff        !  only (etz, btx) extention
+        btxi= E0*cos(omega*(tg+dth) -ak*yg(i))*ff  !  only (etz, btx) extention
         btyi= 0
         btzi= 0
       else
@@ -1941,10 +1937,12 @@
         etzi= ((xx-ll)*etz1(ll+1,m,n) +(1+ll-xx)*etz1(ll,m,n)       &
               +(yy-mm)*etz1(l,mm+1,n) +(1+mm-yy)*etz1(l,mm,n)       &
               +(zz-nn)*etz1(l,m,nn+1) +(1+nn-zz)*etz1(l,m,nn))/3.d0
+              + E0*sin(omega*(tg+dth) -ak*yg(i))*ff
 !
         btxi= ((xx-ll)*btx(ll+1,m,n) +(1+ll-xx)*btx(ll,m,n)         &
               +(yy-mm)*btx(l,mm+1,n) +(1+mm-yy)*btx(l,mm,n)         &
               +(zz-nn)*btx(l,m,nn+1) +(1+nn-zz)*btx(l,m,nn))/3.d0
+              + E0*cos(omega*(tg+dth) -ak*yg(i))*ff
         btyi= ((xx-ll)*bty(ll+1,m,n) +(1+ll-xx)*bty(ll,m,n)         &
               +(yy-mm)*bty(l,mm+1,n) +(1+mm-yy)*bty(l,mm,n)         &
               +(zz-nn)*bty(l,m,nn+1) +(1+nn-zz)*bty(l,m,nn))/3.d0
@@ -2028,8 +2026,8 @@
         yg(i)= rr0*cos(ph0)
         zg(i)= zg(i)
 !
-        xg(i+np)= xg(i) +0.1d-8*ranff(0.) ! elec= H(+): ns+1 -> ns+np+1
-        yg(i+np)= yg(i) +0.1d-8*ranff(0.)
+        xg(i+np)= xg(i) +0.1d-8*ranff(0) ! elec= H(+): ns+1 -> ns+np+1
+        yg(i+np)= yg(i) +0.1d-8*ranff(0)
         zg(i+np)= zg(i)
         end do
 !       ----------------
@@ -2147,25 +2145,6 @@
 !  real*4
          write(29) t
 !
-!        do n= 1,mz !,2
-!        do m= 1,my !,2
-!        do l= 1,mx !,2
-!        ll= l !2*l -1
-!        mm= m !2*m -1
-!        nn= n !2*n -1
-!
-!        eetx(ll,mm,nn)= etx(l,m,n)
-!        eety(ll,mm,nn)= ety(l,m,n)
-!        eetz(ll,mm,nn)= etz(l,m,n)
-!        bbtx(ll,mm,nn)= btx(l,m,n)
-!        bbty(ll,mm,nn)= bty(l,m,n)
-!        bbtz(ll,mm,nn)= btz(l,m,n)
-!        end do
-!        end do
-!        end do
-!
-!        write(29) eetx,eety,eetz,bbtx,bbty,bbtz  ! real*4, half size
-!
 !  Field minus EE, HH
          do n= 1,mz,2
          do m= 1,my,2
@@ -2180,8 +2159,8 @@
 !
          eetx(ll,mm,nn)= etx(l,m,n)
          eety(ll,mm,nn)= ety(l,m,n)
-         eetz(ll,mm,nn)= etz(l,m,n) -E0*sin(omega*(tg+dth)-ak*yy)*ff
-         bbtx(ll,mm,nn)= btx(l,m,n) -E0*cos(omega*tg-ak*yy)*ff
+         eetz(ll,mm,nn)= etz(l,m,n) -E0*sin(omega*(tg+dth) -ak*yy)*ff
+         bbtx(ll,mm,nn)= btx(l,m,n) -E0*cos(omega*(tg+dth) -ak*yy)*ff
          bbty(ll,mm,nn)= bty(l,m,n)
          bbtz(ll,mm,nn)= btz(l,m,n)
          end do
@@ -2385,7 +2364,7 @@
                       elj(is),sex(is),sez(is),sbx(is),sbz(is),etot(is), &
                       Rgyi(is),Rgye(is),Rgyc(is),slx(is),          &
                       dcpu
-  710   format('t=',1pe9.2,14d11.2,d11.3) 
+  710   format('t=',1pd9.2,14d11.2,d11.3) 
 !
         close(11)
 ! --------------------------------------- on major nodes --------------
@@ -2396,7 +2375,6 @@
 ! ---------------------- 
 !*  Total potential
 ! ---------------------- 
-!
       if(.not.ifeqlib) then
       if(iwrt2.eq.0 .and. ionode) then
 !
@@ -2481,10 +2459,9 @@
                          Lx3,Ly3,Lz3,rcut_Clf,rcutlj,prefc_lj,pref_lj, &
                          size,ipar,igrp,n_twice,ns,np,nCLp)
 !---------------------------------------+++++++-------------------------
-      use, intrinsic :: iso_c_binding 
       implicit  none
 !*
-      include    'param_em3p7_Cc.h'
+      include    'param_em3p7_Ca.h'
       include    'mpif.h'
 !
       integer*4  size,ipar,igrp,ns,np,nCLp,n_twice
@@ -2516,8 +2493,8 @@
       common/plupdat/ itabs
 !
 !* afre table
-!     integer*4       naf                       ! naf in
-!     parameter       (naf=(ns0/num_proc)*0.3)  !  param_em3p7_Ca.h
+!     integer*4       naf
+!     parameter       (naf=(ns0/npq0)*0.3)  ! param_em3p7_Ca.h
       integer*4       nafl,iafl,jafl
       common/afretap/ nafl,iafl(nbxc*naf),jafl(nbxc*naf)
 !
@@ -2543,7 +2520,7 @@
       rsccl = 1.0d-8               ! 1 ang= 10^{-8} cm
 !
 !*-------------------------------------------
-!* update particle table infrequentLy3
+!* Update particle table
 !*-------------------------------------------
 !
       itab= itab +1
@@ -2571,7 +2548,7 @@
         end do
 !
 !  Step 1: LR-part for 5 steps
-!* all particles
+!* All particles
 !
         do i = 1,nCLp
         ix= isizeX*(x(i)-xmin3)/Lx3 +1.0001
@@ -2592,7 +2569,7 @@
         istop= 0
 !
         do k= 1,nc3
-        if(ncel(k).gt.nbxs) then  !<-- Large nbxs is necessary
+        if(ncel(k).gt.nbxs) then
           istop= 1
           go to 140
         end if
@@ -2630,7 +2607,6 @@
         if(if_pc) kc= kc +1
 !
         nipl(kk)= nipl0(kk)            ! nipl0 in moldyn
-!
 !       ++++++++++++++
         if(if_pc) then
           do ll= 1,nipl0(kk)
@@ -2718,7 +2694,7 @@
 !$OMP        r,rCL,tt)                               &
 !$OMP REDUCTION(+:fec,E_C_r1)
 !$OMP DO SCHEDULE(STATIC,1)
-!                  +++
+! 
         do i= ipar,nCLp,size 
         ix1= isizeX*(x(i)-xmin3)/Lx3 +1.0001
         iy1= isizeY*(y(i)-ymin3)/Ly3 +1.0001
@@ -2771,7 +2747,6 @@
           istop= istp
           return
         end if
-!
 ! ++++++ initial/every itabs/restart ++++++++++++
       end if
 !
@@ -2792,7 +2767,7 @@
       ffr(i,3)= fec(i,3) 
       end do
 !
-! (a) all particles registerd in lipl() and liplc()
+! (A) all particles registerd in lipl() and liplc()
 !
       do 400 i= ipar,nCLp,size
       kk= kk +1
@@ -2818,7 +2793,7 @@
       forceV = ch(i)*ch(j)/(rcl**2 *r)
       E_C_r2 = E_C_r2 + ch(i)*ch(j)/rcl
 !
-!* short-range forces
+!* Short-range forces
 !
       if(i.le.ns .and. j.le.ns) then   ! strictly, C or Au pair
         rcut= 3.5d-8
@@ -2856,8 +2831,8 @@
         rsi = 1.d0/dmax1(slj,0.81d0)**2
         snt = rsi*rsi*rsi
         rsclj= dmax1(rsclj,r)
-!                                             ++
-        ccel = preflj* snt*(snt-0.5d0)/(rsclj *r)  ! C,Au or H,el
+!                                               ++
+        ccel = preflj* snt*(snt-0.5d0)/(rsclj *r)  ! c,au or h,el
         E_LJ = (preflj/12.d0)*(snt*(snt -1.d0) -addpot)
       end if
 ! 
@@ -2873,7 +2848,7 @@
   600 continue
   400 continue
 !
-! (b) "afreta" particles - the same procedures as loop 400
+! (B) "afreta" particles - the same procedures as loop 400
 !
       do 700 k= 1,nafl
       i= iafl(k)
@@ -2945,7 +2920,7 @@
 !
 !  "allreduce" is required for synchronization at a time
 !
-      npar= 3*npq0
+      npar= npq0*3
       call mpi_allreduce (ffr,ffc,npar,mpi_real8,mpi_sum,  &
                           mpi_comm_world,ierror)
 !
@@ -2976,10 +2951,8 @@
 !----------------------------------------------------------
       subroutine lp_out (z,nCLp,igrp,istop)
 !----------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
       implicit none
-!
-      include  'param_em3p7_Cc.h'
+      include  'param_em3p7_Ca.h'
 !
       real*8     z(npq0)
       integer*4  nCLp,igrp,istop,i,l,k,nskip,ILN,  &
@@ -3047,10 +3020,8 @@
 !*  Indices of the neighboring (27) sub-boxes.
 !   Non-periodic: no folding
 !
-      use, intrinsic :: iso_c_binding 
       implicit none
-!
-      include 'param_em3p7_Cc.h'
+      include 'param_em3p7_Ca.h'
 !
       integer*4   isize2,isize4,icmax,              &
                   i,j,k,n,IPx,IMx,JP,JM,KP,KM,ibind
@@ -3061,26 +3032,26 @@
 !
       icmax= nc3 +1
 !
-      do i = 1,isizeX
+      do 100 i = 1,isizeX
       IPx = i + 1
       IMx = i - 1
-      if(i.eq.1) IMx = icmax        ! must be excluded
-      if(i.eq.isizeX) IPx = icmax   ! - otherwise, double counted
+      if (i.eq.1) IMx = icmax        ! must be excluded
+      if (i.eq.isizeX) IPx = icmax   ! - otherwise, double counted
 !
-      do j = 1,isizeY
+      do 200 j = 1,isizeY
       JP = j + 1
       JM = j - 1
-      if(j.eq.1) JM = icmax
-      if(j.eq.isizeY) JP = icmax
+      if (j.eq.1) JM = icmax
+      if (j.eq.isizeY) JP = icmax
 !
-      do k = 1,isizeZ
+      do 200 k = 1,isizeZ
       KP = k + 1
       KM = k - 1
-      if(k.eq.1) KM = icmax
-      if(k.eq.isizeZ) KP = icmax
+      if (k.eq.1) KM = icmax
+      if (k.eq.isizeZ) KP = icmax
 !
       n = i + isizeX*(j-1 + isizeY*(k-1))
-      ibind( 1,n) = i + j*isizeX + k*isize2 - isize4
+      ibind( 1,n) = i   +  j*isizeX +  k*isize2 - isize4
 !
       ibind( 2,n) = IPx +  j*isizeX +  k*isize2 - isize4
       ibind( 3,n) = IPx + JM*isizeX +  k*isize2 - isize4 
@@ -3109,13 +3080,10 @@
       ibind(25,n) = IMx + JM*isizeX +  k*isize2 - isize4
       ibind(26,n) = IMx +  j*isizeX +  k*isize2 - isize4
       ibind(27,n) = i   + JM*isizeX +  k*isize2 - isize4
-      end do
-      end do
-      end do
-! 200 continue
-! 100 continue
+  200 continue
+  100 continue
 !
-!* Nullify if ibind(,,) is out of bounds
+!* Nullify if ibind() is out of bounds
 !
       do n= 1,nc3
       do k= 1,27
@@ -3130,14 +3098,9 @@
 !------------------------------------------------------------
       subroutine filt3 (srx,sry,srz,EE,HH,ifeh)
 !------------------------------------------------------------
-!  Boundary at 2D cross sections
-!    Store the field, although it is NOT small !
-!    In the external field, srx -> btx, and srz -> etz
-!
-      use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include   'param_em3p7_Cc.h'
+      include   'param_em3p7_Ca.h'
       integer*4 l,m,n,kk,ifeh
 !
       real*8  srx(mx,my,mz),sry(mx,my,mz),srz(mx,my,mz),  &
@@ -3152,7 +3115,11 @@
       c3= 1.d0/(sqrt(3.d0)*del) ! *8 = 8/sq(3)*d=2.31  total= 10.5
       tot= 1/(1.d0+6/del+12/(sqrt(2.d0)*del)+8/(sqrt(3.d0)*del))
 !
-      if(ifeh.eq.1) then  ! EE
+! Boundary at 2D cross sections
+!   Store the field, although it is NOT small !
+!     keep srx -> btx, or srz -> etz
+!
+      if(ifeh.eq.1) then  ! E
         do n= 1,mz
         do m= 1,my
         do l= 1,mx
@@ -3161,7 +3128,7 @@
         end do
         end do
 !
-      else if(ifeh.eq.2) then  ! HH
+      else if(ifeh.eq.2) then  ! H
         do n= 1,mz
         do m= 1,my
         do l= 1,mx
@@ -3260,8 +3227,7 @@
   700 continue
 !
 !  Restoration by getting the old field
-!
-      if(ifeh.eq.1) then  ! EE
+      if(ifeh.eq.1) then  ! E
         do n= 1,mz
         do m= 1,my
         do l= 1,mx
@@ -3270,7 +3236,7 @@
         end do
         end do
 !
-      else if(ifeh.eq.2) then  ! HH
+      else if(ifeh.eq.2) then  ! H
         do n= 1,mz
         do m= 1,my
         do l= 1,mx
@@ -3287,10 +3253,9 @@
 !------------------------------------------------------------
       subroutine filt1 (srx)
 !------------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include   'param_em3p7_Cc.h'
+      include   'param_em3p7_Ca.h'
       integer*4 l,m,n,kk
 !
       real*8  srx(mx,my,mz),ssx(mx,my,mz),  &
@@ -3303,7 +3268,7 @@
       c3= 1.d0/(sqrt(3.d0)*del) ! *8 = 8/sq(3)*d=2.31  total= 10.5
       tot= 1/(1.d0+6/del+12/(sqrt(2.d0)*del)+8/(sqrt(3.d0)*del))
 !
-!*  Boundary at 2D cross sections
+! Boundary at 2D cross sections
 !
       do n= 1,mz
       do l= 1,mx
@@ -3358,7 +3323,6 @@
       go to 100
 !
   700 continue
-!
       return
       end subroutine filt1
 !
@@ -3368,10 +3332,9 @@
                                    ipar1,ipar2)
 !------------------------------------------------------------------------
 ! Reflection by the cylinder
-      use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include    'param_em3p7_Cc.h'
+      include    'param_em3p7_Ca.h'
       integer*4   ipar1,ipar2,i
 !
       real*8     x(npq0),y(npq0),z(npq0),    &
@@ -3400,10 +3363,9 @@
                                      R_cn1,R_cn2,ipar1,ipar2)
 !------------------------------------------------------------------------
 ! Reflection by a hollow cylinder: Z_cn1 < z < Z_cn2
-      use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include    'param_em3p7_Cc.h'
+      include    'param_em3p7_Ca.h'
       integer*4   ipar1,ipar2,i
 !
       real*8     x(npq0),y(npq0),z(npq0),     &
@@ -3431,10 +3393,9 @@
 !--------------------------------------------------------------------
       subroutine READ_CONF (np,ifrefl)  ! data
 !-------------------------- +++++ ++++++ ++ -------------------------
-      use, intrinsic :: iso_c_binding 
       implicit none
 !
-      include    'param_em3p7_Cc.h'
+      include    'param_em3p7_Ca.h'
       integer*4  np,ifrefl
 !  
       integer*4  nZ,nZA
@@ -3546,9 +3507,8 @@
 !-----------------------------------------------------------
       subroutine nonfdP (xg,yg,zg,x4,y4,z4,npio)
 !-----------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
       implicit none
-      include  'param_em3p7_Cc.h'
+      include  'param_em3p7_Ca.h'
 !
       integer*4  npio,i
       real*8     xg(npq0),yg(npq0),zg(npq0)
@@ -3568,10 +3528,8 @@
       subroutine init (x,y,z,px,py,pz,ch,am,ag,           &
                        ipar,istop,if_start,ns,np,nq,nCLp)
 !----------------------****--------------- ++ ++ ++ +++ ------
-      use, intrinsic :: iso_c_binding 
       implicit none
-!
-      include  'param_em3p7_Cc.h'
+      include  'param_em3p7_Ca.h'
 !
       integer*4   ipar,istop,wrt2,ns,np,nq,nZ,nZA,nCLp
       logical     if_start
@@ -3756,8 +3714,8 @@
         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
               status='unknown',position='append',form='formatted')
 !
-        write(11,541) s1/nq
-  541   format(' Kinetic energy of an electron /mc^2=',1pd13.5)
+        write(11,'(" Kinetic energy of an electron /mc^2=",1pd13.5)') &
+                                                               s1/nq
         close(11)
       end if
 !
@@ -3769,7 +3727,6 @@
       subroutine ggauss
 !---------------------------------------------------------------
 !  (-3.,3.) case
-      use, intrinsic :: iso_c_binding 
       implicit none
 !
       real*4  fv,vv0,dv,vv,s,sdv,fun
@@ -3808,7 +3765,6 @@
       function dgaus2 (vmax)
 !---------------------------------------------------------------
 !  vmax dimension
-      use, intrinsic :: iso_c_binding 
       implicit none
 !
       real*4  dgaus2,vmax
@@ -3837,9 +3793,7 @@
       function fun (v)
 !---------------------------------------------------------------
 !  exp(-v**2/2)
-      use, intrinsic :: iso_c_binding 
       implicit none
-!
       real*4 fun,v
 !
       fun= exp(-v**2/2.)
@@ -3851,10 +3805,8 @@
 !-------------------------------------------------------------
       subroutine vdistr (xg,yg,zg,vx,vy,vz,ns,np,nCLp)
 !-------------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
       implicit none
-!
-      include  'param_em3p7_Cc.h'
+      include  'param_em3p7_Ca.h'
 !
       real*8     xg(npq0),yg(npq0),zg(npq0),   &
                  vx(npq0),vy(npq0),vz(npq0),vv
@@ -4002,10 +3954,8 @@
 !-----------------------------------------------------------
       subroutine edistr (vx,vy,vz,am,ns,np,nCLp)
 !-----------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
       implicit none
-!
-      include  'param_em3p7_Cc.h'
+      include  'param_em3p7_Ca.h'
 !
       integer*4  ns,np,nq,nCLp,i,k,ix,ILN
       real*8     vx(npq0),vy(npq0),vz(npq0),am(npq0),v7
@@ -4157,9 +4107,7 @@
 !------------------------------------------------------
       subroutine averg1 (q,qav,is)
 !------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
       implicit none
-!
       real*4 q(5000),qav
       integer*4  is,i
 !
@@ -4178,10 +4126,8 @@
 !------------------------------------------------------
       subroutine rehist
 !------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
       implicit none
-!
-      include  'param_em3p7_Cc.h'
+      include  'param_em3p7_Ca.h'
 !
       real*4        ekin,ppot,ekn1,ekn2,etot,Rgyi,Rgye,          &
                     Rgyf,Rgyc,Rion,Nele,dPot,ecr,elj,            &
@@ -4246,7 +4192,6 @@
 !------------------------------------------------------
       subroutine lplots
 !------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
       implicit none
 !
       real*4        ekin,ppot,ekn1,ekn2,etot,Rgyi,Rgye,          &
@@ -4390,7 +4335,6 @@
 !------------------------------------------------------
       subroutine lplmax (f,fmax,fmin,is)
 !------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
       implicit none
 !
       real*4 f(is),fmax,fmin
@@ -4412,8 +4356,7 @@
       subroutine ppl3da (xg,yg,zg,ch,ag,Rgy1,Rgy2,ns,np,nq,  &
                          nCLp,igrp) !,ifskip_e,ifskip_p)
 !------------------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
-      include    'param_em3p7_Cc.h'
+      include    'param_em3p7_Ca.h'
 !
       integer*4  ns,np,nq,nCLp,igrp,nZ,nZA
       common/iroha/ nZ,nZA
@@ -4694,8 +4637,7 @@
 !------------------------------------------------------------------
 !  View from top (x,y)
 !
-      use, intrinsic :: iso_c_binding 
-      include    'param_em3p7_Cc.h'
+      include    'param_em3p7_Ca.h'
 !
       integer*4  ns,np,nq,nCLp,igrp,nZ,nZA
       common/iroha/ nZ,nZA
@@ -4981,7 +4923,6 @@
 !------------------------------------------------
       integer function iwrta (t,twr)
 !------------------------------------------------
-      use, intrinsic :: iso_c_binding 
       common/imemo/ iwa,iwb,iwc,iwd
 !
       iw= t/twr 
@@ -4999,7 +4940,6 @@
 !------------------------------------------------
       integer function iwrtb (t,twr)
 !------------------------------------------------
-      use, intrinsic :: iso_c_binding 
       common/imemo/ iwa,iwb,iwc,iwd
 !
       iw= t/twr 
@@ -5017,7 +4957,6 @@
 !------------------------------------------------
       integer function iwrtc (t,twr)
 !------------------------------------------------
-      use, intrinsic :: iso_c_binding 
       common/imemo/ iwa,iwb,iwc,iwd
 !
       iw= t/twr 
@@ -5035,7 +4974,6 @@
 !------------------------------------------------
       integer function iwrtd (t,twr)
 !------------------------------------------------
-      use, intrinsic :: iso_c_binding 
       common/imemo/ iwa,iwb,iwc,iwd
 !
       iw= t/twr 
@@ -5064,7 +5002,6 @@
 !------------------------------------------------
 !*  ranf= (0,1)
 !
-      use, intrinsic :: iso_c_binding 
       common/ranfff/ ir,iq
 !
       REAL*8     ranff,INVM
@@ -5096,8 +5033,6 @@
 !   il=1................ linear plot of (x,y)
 !   il=2................ log10 plot of (x,log y)
 !***********************************************************************
-!
-      use, intrinsic :: iso_c_binding 
 !
       dimension  x(npt1),y(npt1),u(npt1),v(npt1)
       dimension  xcm(6),ycm(6),pl(6),pr(6),ql(6),qr(6)
@@ -5329,8 +5264,6 @@
 !-----------------------------------------------------------------------
       subroutine scalex (xcm,ycm,x00,y00,dx,dy,isc)
 !-----------------------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
-!
       common/gscale/ x0(10),y0(10),xl(10),yl(10),dxi(10),dyi(10)
 !
       x0(isc)= x00
@@ -5348,7 +5281,6 @@
 !-----------------------------------------------------------------------
       subroutine plotl (x,y,isc,ipl)
 !-----------------------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
       common/gscale/ x0(10),y0(10),xl(10),yl(10),dxi(10),dyi(10)
 !
       xcm= xl(isc) +dxi(isc)*(x -x0(isc))
@@ -5385,7 +5317,6 @@
 !        n100 = 3 : power of ten format
 !        n100 = othewise : not write out
 !-----------------------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
 !
       real*4 val
       character chr13*13,chr12*12,chr3*3
@@ -5547,7 +5478,6 @@
 !        6   :  2 point dash  --2.0-- - - --2.0--
 !   otherwise:  line          ---------------------
 !-----------------------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
 !
       h1  =  0.05
       h2  =  2.0 * h1
@@ -5680,7 +5610,6 @@
 !-----------------------------------------------------------------------
       subroutine daisho(x  ,nx,xmin1,xmax1)
 !-----------------------------------------------------------------------
-      use, intrinsic :: iso_c_binding 
       dimension x(1)
 !
       xmax1= x(1)
@@ -5714,8 +5643,6 @@
 !---------------------------------------------------------------
        subroutine gopen (nframe)
 !----------------------------------------------------------
-       use, intrinsic :: iso_c_binding 
-!
        common/convsn/ fmag,x0,y0,h0,n0
        common/pages/  ipage,nfrm
 !
@@ -5824,8 +5751,6 @@
 !-----------------------------
        subroutine gclose
 !-----------------------------
-       use, intrinsic :: iso_c_binding 
-!
        call plote
        return
        end
@@ -5834,8 +5759,6 @@
 !-----------------------------
        subroutine plote
 !-----------------------------
-       use, intrinsic :: iso_c_binding 
-!
        write(77,10) 
    10  format('@eop')
        return
@@ -5846,9 +5769,8 @@
        subroutine chart
 !-----------------------------------------
 !*     Four frames in a page (if nfrm=4).
-!
-       use, intrinsic :: iso_c_binding 
        common/pages/ ipage,nfrm
+!
 !
        ipage = ipage +1
        loc= mod(ipage-1,nfrm)
@@ -5914,8 +5836,6 @@
 !------------------------------------
        subroutine factor(fct)
 !------------------------------------
-       use, intrinsic :: iso_c_binding 
-!
        write(77,10) fct,fct
    10  format(f6.2,1x,f6.2,' sc')
        return
@@ -5925,8 +5845,6 @@
 !------------------------------------
        subroutine newpen (ip)
 !------------------------------------
-       use, intrinsic :: iso_c_binding 
-!
        i1=(ip-1)/2
        i2=ip-2*i1
        write(77,*) 'sn'
@@ -5943,8 +5861,6 @@
 !-----------------------------
        subroutine linee
 !-----------------------------
-       use, intrinsic :: iso_c_binding 
-!
        write(77,*) 'st'
        return
        end
@@ -5953,7 +5869,6 @@
 !------------------------------------
        subroutine plot (x0,y0,ip)
 !------------------------------------
-       use, intrinsic :: iso_c_binding 
 !
        x= x0
        y= y0
@@ -5977,8 +5892,6 @@
 !-------------------------------------------------
        subroutine symbol (x0,y0,h0,isymb,ang,n0)
 !-------------------------------------------------
-       use, intrinsic :: iso_c_binding 
-!
        character    ica*80,ich(80)*1
        character(*) isymb   !!! NEC: must be necessary !
        equivalence (ica,ich(1))
@@ -6008,7 +5921,6 @@
 !-----------------------------------------------
        subroutine number (x0,y0,h0,anu,ang,n0)
 !-----------------------------------------------
-       use, intrinsic :: iso_c_binding 
        character  isymb*9
 !
        x= x0
@@ -6075,7 +5987,6 @@
 !-----------------------------------------------
        subroutine number2 (x0,y0,h0,anu,ang,n0)
 !-----------------------------------------------
-       use, intrinsic :: iso_c_binding 
        character  isymb*9
 !
        x= x0
@@ -6109,7 +6020,6 @@
 !---------------------------------------------------
        subroutine sunscl (x,y,h,n)
 !---------------------------------------------------
-       use, intrinsic :: iso_c_binding 
        common/convsn/ fmag,x0,y0,h0,n0
 !
        if(x.eq.999.) then
