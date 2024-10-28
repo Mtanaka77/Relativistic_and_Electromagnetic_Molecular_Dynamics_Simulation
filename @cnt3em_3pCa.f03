@@ -137,12 +137,12 @@
       end if
 !c
       suffix2= numbr2  ! Ca
-      suffix1= numbr1  ! Ca
+      suffix2= numbr1  ! Ca
       suffix0= numbr0  ! C
 !c
 !
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1, &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2, &
               status='unknown',form='formatted')
 !
         write(11,100) size
@@ -169,7 +169,7 @@
       wtime= walltime2 -walltime1
 !
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         write(11,693) ipar,ctime,wtime
@@ -519,7 +519,7 @@
         nes3= i
 !
         if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         write(11,*) 'electron1=',nes1
@@ -579,7 +579,7 @@
 !    These data overwrite definitions made above.
 !
         if(ionode) then
-          OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
                 status='unknown',position='append',form='formatted')
 !
           write(11,630) 
@@ -590,8 +590,8 @@
 !------------------------------------------
 !* FT12 must be mounted on NSF volume.
 !------------------------------------------
-        OPEN (unit=12,file=praefixi//'.10'//suffix2,   &
-              status='old',form='unformatted')
+        OPEN (unit=12,file=praefixi//'.12'//suffix1,   &
+                        status='old',form='unformatted')
 !
         read(12) it,is,ns,np,nq,nCLp,itab,item3           ! nCLp
         read(12) xg,yg,zg,px,py,pz,ch,am,ag
@@ -614,7 +614,7 @@
         close(12)
 !
 !          
-!!      OPEN (unit=17,file=praefixi//'.17'//suffix1,        &
+!!      OPEN (unit=17,file=praefixi//'.17'//suffix2,        &
 !!            status='old',form='unformatted')
 !!                            +++
 !!      read(17) nipl0,lipl0           ! is the same... 
@@ -627,7 +627,7 @@
 !!      -----------------
 !
         if(ionode) then
-          OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
                 status='unknown',position='append',form='formatted')
 !
           write(11,640) t,it,is
@@ -715,7 +715,7 @@
 !
 !
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         write(11,600) label,date_now,time_now
@@ -748,7 +748,7 @@
       end if
 !
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         write(11,605) dt,itabs
@@ -841,7 +841,7 @@
                  ipar,istop,if_start,ns,np,nq,nCLp)
 !                **** ***** no igrp  ++ ++ ++ ++++
       if(istop.ne.0) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
         if(ionode) write(11,*) ' Stop: call to init...'
         close(11)
@@ -851,7 +851,7 @@
 !
       if(if_start) then
         if(ionode) then
-          OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
                 status='unknown',position='append',form='formatted')
 !
           write(11,*) 'ns,np,nq,nCLp=',ns,np,nq,nCLp
@@ -902,8 +902,8 @@
 !* Restart data.
 !
       if(ionode) then
-        OPEN (unit=12,file=praefixc//'.12'//suffix1,       &
-                       status='unknown',form='unformatted')
+        OPEN (unit=12,file=praefixc//'.12'//suffix2,       &
+                        status='replace',form='unformatted')
 !
         write(12) it,is,ns,np,nq,nCLp,itab,item3
         write(12) xg,yg,zg,px,py,pz,ch,am,ag
@@ -925,7 +925,7 @@
         write(12) W_1p,Nele0
         close(12)
 !
-!!      OPEN (unit=17,file=praefixi//'.17'//suffix1,        &
+!!      OPEN (unit=17,file=praefixi//'.17'//suffix2,        &
 !!            status='unkown',form='unformatted')
 !!                            ++++++
 !!      write(17) nipl0,lipl0           ! is the same... 
@@ -933,7 +933,7 @@
 ! 
 !**********************************************************
 !
-        OPEN (unit=77,file=praefixc//'.77'//suffix1//'.ps',      &
+        OPEN (unit=77,file=praefixc//'.77'//suffix2//'.ps',      &
               status='unknown',position='append',form='formatted')
 !   ---------------------------          ++++++
         call lplots
@@ -956,7 +956,7 @@
 !
 !      data suffix/'1','2','3','4','5','6','7','8','9','a'/
 !      common/mldata/ suffix(10)
-!     suffix1= '1'
+!     suffix2= '1'
 !
       if(igrp.gt.10) then
         write(*,*) '*Stop File > 10...'
@@ -968,14 +968,14 @@
 !   --------------------------
 !c
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         write(11,*) 'igrp=',igrp,' uses ',                &
                         praefixs//'_config.START'//suffix0
         close(11)
 !
-        OPEN (unit=77,file=praefixc//'.77'//suffix1//'.ps',      &
+        OPEN (unit=77,file=praefixc//'.77'//suffix2//'.ps',      &
                               status='unknown',form='formatted')
 !                             ! just starts from here
         call gopen (nframe) 
@@ -1146,7 +1146,7 @@
 !
 !
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         write(11,*) 'moldyn: Round-robin partitioning is used...' 
@@ -1207,7 +1207,7 @@
         n_twice= -1      ! restart by two steps 
 !
         if(ionode) then
-          OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
                 status='unknown',position='append',form='formatted')
 !
           write(11,*) 'write x0,y0,z0...'
@@ -1301,7 +1301,7 @@
 !
 !-------------------------------------------------------
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
         write(11,*) 'Preparation for write(13)...'
         close(11)
@@ -1313,7 +1313,7 @@
         ymax4  = ymax3
         zmax4  = zmax3
 !
-        OPEN (unit=13,file=praefixc//'.13'//suffix1,     &
+        OPEN (unit=13,file=praefixc//'.13'//suffix2,     &
               status='unknown',form='unformatted')
 !
         write(13) ns,np,nq,fchar4,fcharA4,Temp4,xmax4,ymax4,zmax4
@@ -1330,14 +1330,14 @@
 !
 !***
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         write(11,*) 'Preparation for write(29)...'
         write(11,*) '  mxh,myh,mzh=',mxh,myh,mzh 
         close(11)
 !
-        OPEN (unit=29,file=praefixc//'.29'//suffix1,     &
+        OPEN (unit=29,file=praefixc//'.29'//suffix2,     &
               status='unknown',form='unformatted')
 !
 !  Half size (mxh,myh,mzh)
@@ -1350,13 +1350,13 @@
 !
 !***
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         write(11,*) 'Preparation for write(30)...'
         close(11)
 !
-        OPEN (unit=30,file=praefixc//'.30'//suffix1,     &
+        OPEN (unit=30,file=praefixc//'.30'//suffix2,     &
               status='unknown',form='unformatted')
 !
         write(30) mxh,myh,mzh
@@ -1367,13 +1367,13 @@
 !
 !* To avoid appending to a stale file
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         write(11,*) 'Preparation for write(23)...'
         close(11)
 !
-        OPEN (unit=23,file=praefixc//'.23'//suffix1,    &
+        OPEN (unit=23,file=praefixc//'.23'//suffix2,    &
               status='unknown',form='unformatted')
 !
         write(23) ns,np,nq
@@ -1385,7 +1385,7 @@
 !
       call clocks (cpu0,walltm0,size)  ! initiate clock (sec)
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         write(11,*) 'before <moldyn> (sec)=',cpu0 -ctime1
@@ -1403,7 +1403,7 @@
       if(tg.gt.tmax) go to 2000      ! final (it,5).eq.0 is ended
       if((dcpu/60.d0).gt.cptot .and. mod(it,5).eq.0) then
         if(ionode) then
-          OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
                 status='unknown',position='append',form='formatted')
 !
           write(11,*) '*Normal stop: previous step it=',it
@@ -1478,7 +1478,7 @@
 !
       if(it.eq.1) then
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         write(11,*) '  '
@@ -1793,14 +1793,14 @@
       if(iwrt3.eq.0 .and. ionode) then
       if(.not.ifeqlib) then
          if(ionode) then
-         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+         OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
                status='unknown',position='append',form='formatted')
 !
          write(11,*) 'write(30)... t=',t
          close(11)
          end if
 !
-         OPEN (unit=30,file=praefixc//'.30'//suffix1,              &
+         OPEN (unit=30,file=praefixc//'.30'//suffix2,              &
               status='unknown',position='append',form='unformatted')
 !
          do n= 1,mz
@@ -1988,7 +1988,7 @@
 !
       if(iwrt2.eq.0 .and. ionode) then
         if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         l= mx/2+1
@@ -2045,7 +2045,7 @@
 !
         if(it.eq.1) then
           if(ionode) then
-          OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
                 status='unknown',position='append',form='formatted')
 !
           write(11,*) '    '
@@ -2064,7 +2064,7 @@
           eq_phase= .false.  ! equil phase ends here
 !
           if(ionode) then
-            OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+            OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
                   status='unknown',position='append',form='formatted')
 !
             write(11,*) 'Initial time at restart...'
@@ -2089,7 +2089,7 @@
           iwd= -1
 !
           if(ionode) then
-            OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+            OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
                   status='unknown',position='append',form='formatted')
 !
             write(11,*) '    '
@@ -2128,7 +2128,7 @@
 !
       if(iwrt1.eq.0 .and. ionode) then
       if(.not.ifeqlib) then
-          OPEN (unit=13,file=praefixc//'.13'//suffix1,             &
+          OPEN (unit=13,file=praefixc//'.13'//suffix2,             &
                 status='unknown',position='append',form='unformatted')
 !
           call nonfdP (xg,yg,zg,x4,y4,z4,npio)
@@ -2142,14 +2142,14 @@
       if(iwrt3.eq.0 .and. ionode) then   ! 1.d-15 sec 
       if(.not.ifeqlib) then
          if(ionode) then
-         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+         OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
                status='unknown',position='append',form='formatted')
 !
          write(11,*) 'write(29) t=',t
          close(11)
          end if
 !
-         OPEN (unit=29,file=praefixc//'.29'//suffix1,             &
+         OPEN (unit=29,file=praefixc//'.29'//suffix2,             &
                status='unknown',position='append',form='unformatted')
 !
 !  Field minus EE, HH
@@ -2189,7 +2189,7 @@
       if(iwrt1.eq.0) then
       if(ionode) then
 !
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 ! --------------------------------------- on major nodes --------------
 !
@@ -2389,12 +2389,12 @@
 !---
       if(iwrt2.eq.0) then
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
         write(11,*) '*plots are made... at tg=',tg
         close(11)
 !
-        OPEN (unit=77,file=praefixc//'.77'//suffix1//'.ps',      &
+        OPEN (unit=77,file=praefixc//'.77'//suffix2//'.ps',      &
               status='unknown',position='append',form='formatted')
 !
         call ppl3da (xg,yg,zg,ch,ag,Rgyi(is),Rgye(is),ns,np,nq,  &
@@ -2406,7 +2406,7 @@
         call edistr (vx,vy,vz,am,ns,np,nCLp)
         close (77)
 !
-        OPEN (unit=23,file=praefixc//'.23'//suffix1,               &
+        OPEN (unit=23,file=praefixc//'.23'//suffix2,               &
               status='unknown',position='append',form='unformatted')
         write(23) t,xg,yg,zg,vx,vy,vz
         close(23)
@@ -2422,11 +2422,11 @@
 !     if(iwrt4.eq.0) then
 !     if(ifedist.eq.0 .and. ionode) then
 !!      if(wrt.eq.11) then
-!!         OPEN (unit=11,file=praefixc//'.06'//suffix1,
+!!         OPEN (unit=11,file=praefixc//'.06'//suffix2,
 !!    *          status='unknown',position='append',form='formatted')
 !!      end if
 !
-!       OPEN (unit=77,file=praefixc//'.77'//suffix1,             &
+!       OPEN (unit=77,file=praefixc//'.77'//suffix2,             &
 !    *        status='unknown',position='append',form='formatted')
 !       call lplots
 !       close(77)
@@ -2440,7 +2440,7 @@
  2000 continue
       if(ionode) then
 !
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         write(11,*)
@@ -2580,7 +2580,7 @@
         if(istp.ge.1) then
           istop= istp
           if(ionode) then
-            OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+            OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
                   status='unknown',position='append',form='formatted')
 !
             call lp_out (z,nCLp,igrp,istop)
@@ -2960,7 +2960,7 @@
       common/srflis2/ nipl(n00),lipl(nbxs,n00),liplc(nbx2,n10),kmax
       real*4     xaxis(2001),yaxis(2001),emax,emin
 !
-      OPEN (unit=77,file=praefixc//'.77'//suffix1//'.ps',      &
+      OPEN (unit=77,file=praefixc//'.77'//suffix2//'.ps',      &
             status='unknown',position='append',form='formatted')
 !
       call symbol (7.0,18.0,0.7,'istop=',0.,6)
@@ -3438,7 +3438,7 @@
                                                form='formatted')
 !
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         write(11,*) 'READ_CONF: Parameter read... start'
@@ -3491,7 +3491,7 @@
 ! -------------------------------
 !
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         write(11,*) 'READ_CONF: Parameter read... end'
@@ -3615,7 +3615,7 @@
       end do
 !
         if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         write(11,*) ' '
@@ -3665,7 +3665,7 @@
 !
       cci= cci1+cci2+cci3+cci4+cci5+cci6
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
         write(11,*) ' cci not equal or smaller than 1.d-10...',cci
 !
@@ -3711,7 +3711,7 @@
   540 continue                      !  subtract rest energy mc^2
 !
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         write(11,541) s1/nq
@@ -4178,7 +4178,7 @@
       dtwr= 2*dtwr
 !
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
               status='unknown',position='append',form='formatted')
 !
         write(11,*) 'Rehist: new is, dtwr=',is,dtwr
