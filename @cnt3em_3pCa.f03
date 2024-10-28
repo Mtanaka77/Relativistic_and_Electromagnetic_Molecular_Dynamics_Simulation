@@ -1709,7 +1709,8 @@
 !           write(11,*) '*threads with 4 (must be .not. 0) are ',ierror
 !         end if
 !
-!    FFTW3 by NEC 2003 
+!    FFTW3: NEC 2003 normalized for the plan and pinv cycle 
+!
         plan= fftw_plan_r2r_3d  &
              (mz,my,mx,qq,qq_c,FFTW_RODFT00,FFTW_RODFT00,FFTW_RODFT00, &
               FFTW_ESTIMATE) 
@@ -1750,9 +1751,9 @@
         do n= 1,mz 
         do m= 1,my
         do l= 1,mx
-        akx= pi*(l-1)/Lx3    ! RODFT00, calculated for l,m,n >= 1
-        aky= pi*(m-1)/Ly3
-        akz= pi*(n-1)/Lz3
+        akx= pi*l/Lx3    ! RODFT00, calculated for l,m,n >= 1
+        aky= pi*m/Ly3
+        akz= pi*n/Lz3
 !
         gam= 5.d0 
         gax= gam*(l-1)/mx
@@ -1760,12 +1761,7 @@
         gaz= gam*(n-1)/mz
         gamma= exp(-(gax**2 +gay**2 +gaz**2))
 !
-        if(l.eq.1 .and. m.eq.1 .and. n.eq.1) then
-          psi_c(l,m,n)= 0
-        else
-          psi_c(l,m,n)= gamma * qq_c(l,m,n)/(akx**2 +aky**2 +akz**2)
-        end if
-!
+        psi_c(l,m,n)= gamma * qq_c(l,m,n)/(akx**2 +aky**2 +akz**2)
         end do
         end do
         end do
@@ -2124,6 +2120,7 @@
 !     else if(ifrefl.eq.2) then
 !       call reflect_2Dbox (xg,yg,zg,px,py,pz,xmax,size,ipar,nCLp)
 !     end if
+!
 !
 !------------------------------
 !*  Diagnosis section.
@@ -3034,19 +3031,19 @@
 !
       icmax= nc3 +1
 !
-      do 100 i = 1,isizeX
+      do i = 1,isizeX
       IPx = i + 1
       IMx = i - 1
       if (i.eq.1) IMx = icmax        ! must be excluded
       if (i.eq.isizeX) IPx = icmax   ! - otherwise, double counted
 !
-      do 200 j = 1,isizeY
+      do j = 1,isizeY
       JP = j + 1
       JM = j - 1
       if (j.eq.1) JM = icmax
       if (j.eq.isizeY) JP = icmax
 !
-      do 200 k = 1,isizeZ
+      do k = 1,isizeZ
       KP = k + 1
       KM = k - 1
       if (k.eq.1) KM = icmax
@@ -3082,8 +3079,9 @@
       ibind(25,n) = IMx + JM*isizeX +  k*isize2 - isize4
       ibind(26,n) = IMx +  j*isizeX +  k*isize2 - isize4
       ibind(27,n) = i   + JM*isizeX +  k*isize2 - isize4
-  200 continue
-  100 continue
+      end do
+      end do
+      end do
 !
 !* Nullify if ibind() is out of bounds
 !
@@ -3408,7 +3406,7 @@
       real*8   intens,lambda
       common/electr/ intens,lambda
 !  
-      character*4 praefix*6,text1*40
+      character  praefix*6,text1*40
 !
       REAL*8   rcut_Clf,rcutlj
       REAL*8   Temp,epsCLJ,epsLJ
@@ -5071,11 +5069,13 @@
     1 npt= npt1
       isc= 1
 !
-      do 5 i=1,6
-    5 pr(i)= pl(i) +xcm(i)
+      do i=1,6
+      pr(i)= pl(i) +xcm(i)
+      end do
 !
-      do 6 j=1,6
-    6 qr(j)= ql(j) +ycm(j)
+      do j=1,6
+      qr(j)= ql(j) +ycm(j)
+      end do
 !
       lab_skip= .false.
       if(il.eq.7) lab_skip= .true.
@@ -5100,8 +5100,10 @@
 !
    10 continue
 !
-      do 23 i=1,npt
-   23 u(i)= x(i)
+      do i=1,npt
+      u(i)= x(i)
+      end do
+!
       xmax= u(npt)
       xmin= u(1)
 !                             ************************************
@@ -5110,25 +5112,25 @@
       if(il.gt.0) then
         v(1)=   y(1)
         v(npt)= y(npt)
-        do 37 i=2,npt-1
+        do i=2,npt-1
         v(i)= y(i)
 !       v(i)= 0.33333*(y(i-1)+y(i)+y(i+1))
-   37   continue
+        end do
       else
-        do 38 i=1,npt
-   38   v(i)= y(i)
+        do i=1,npt
+        end do
       end if
 !                                                *****************
 !                                                **  log. scale **
 !                                                *****************
       if(iabs(il).eq.2) then
-         do 40 i=1,npt
+         do i=1,npt
          if(v(i).gt.0.) then
             v(i)= alog10(v(i))
          else
             v(i)= -10.
          end if
-   40    continue
+        end do
       end if
 !                                **************************************
 !                                ** set a new scale and draw a frame.**
@@ -5137,10 +5139,10 @@
          ymax= -1.e10
          ymin=  1.e10
 !
-         do 50 i= 1,npt
+         do i= 1,npt
          ymax= amax1(ymax,v(i))
          ymin= amin1(ymin,v(i))
-   50    continue
+         end do
 !
          if(ymin.ge.0.) then
            ymax= 1.1*ymax
