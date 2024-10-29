@@ -1,5 +1,5 @@
 !*--------------------------------------------------------------------*
-!  @cnt3ems_3pCa.f03                  Dec.24, 2016, Sep.13, 2024      !   
+!  @cnt3ems_3pCa.f03                    Dec.24, 2016, Sep.13, 2024    !   
 !                                                                     !
 !  ## Molecular Dynamics in Relativistic Electromagnetic Fields ##    !
 !                                                                     !
@@ -995,8 +995,9 @@
       use, intrinsic :: iso_c_binding 
       implicit none
 !
-!     include 'fftw3.f03'
-      include 'aslfftw3.f03'
+!     include 'fftw3.f03'     ! Generic FFTW3
+      include 'aslfftw3.f03'  ! NEC 2003
+!
       include 'param_em3p7_Ca.h'
       include 'mpif.h'
 
@@ -1081,7 +1082,7 @@
       COMMON/ENERGY/ E_C_s,E_C_PME,E_C_r,E_LJ,E_elas
 !
       real*8         Temp,epsCLJ,epsLJ,m_gamma,Pot0,W_1p,Nele0,   &
-                     gamma,gam,gax,gay,gaz
+                     gamma,gam1,gam2,gax,gay,gaz,fnml
       real*8         R_sp,D_sp,N_sp,Lambda_D,massi,               &
                      ch_ion,wt_ion,rd_CP,rd_HP,ch_el,wt_el,rd_el, &
                      R_cn1,R_cn2,Z_cn,Z_cn1,Z_cn2,rcut_Clf,rcutlj
@@ -1710,7 +1711,6 @@
 !         end if
 !
 !    FFTW3: NEC 2003 style for the forwrd and backward cycle 
-!
         plan= fftw_plan_r2r_3d  &
              (mz,my,mx,qq,qq_c,FFTW_RODFT00,FFTW_RODFT00,FFTW_RODFT00, &
               FFTW_ESTIMATE) 
@@ -1733,7 +1733,7 @@
         end do
 !
         prho= 4*pi/dV
-!       fnml= 8.d0/((mx+1)*(my+1)*(mz+1))  !<- FFTW3 original
+        fnml= 8.d0/((mx+1)*(my+1)*(mz+1))  !<- FFTW3 generic
 !
         do i= 1,nCLp
         l= mx*(xg(i)-xmin3)/Lx3 +1.5000d0
@@ -1756,14 +1756,16 @@
         aky= pi*(m-1)/Ly3
         akz= pi*(n-1)/Lz3
 !
-        gam= 5.d0 
-        gax= gam*(l-1)/mx
-        gay= gam*(m-1)/my
-        gaz= gam*(n-1)/mz
+        gam1=  5.d0 
+        gam2= 10.d0 
+        gax= gam1*(l-1)/mx
+        gay= gam2*(m-1)/my
+        gaz= gam1*(n-1)/mz
         gamma= exp(-(gax**2 +gay**2 +gaz**2))
 !
         if(l.eq.1 .and. m.eq.1 .and. n.eq.1) then
           psi_c(l,m,n)= 0
+!
         else
           psi_c(l,m,n)= gamma * qq_c(l,m,n)/(akx**2 +aky**2 +akz**2)
 !         psi_c(l,m,n)= fnml*gamma * qq_c(l,m,n)/(akx**2 +aky**2 +akz**2)
@@ -1780,14 +1782,14 @@
 !  cjx(n+1/2): vx(n+1/2)
 !   Separate: Jt= J -(J*EL)*EL/|ELl^2
 !
-      do n= 2,mz-1  ! except a corner
+      do n= 2,mz-1 
       do m= 2,my-1
       do l= 2,mx-1
       pp1= -(psi(l+1,m,n) -psi(l-1,m,n))/hx2
       pp2= -(psi(l,m+1,n) -psi(l,m-1,n))/hy2
       pp3= -(psi(l,m,n+1) -psi(l,m,n-1))/hz2
       ccj= (cjx(l,m,n)*pp1 +cjy(l,m,n)*pp2 +cjz(l,m,n)*pp3)  &
-                                  /(pp1**2 +pp2**2 +pp3**2)
+                                    /(pp1**2 +pp2**2 +pp3**2)
 !
       cjx(l,m,n)= cjx(l,m,n) -ccj*pp1
       cjy(l,m,n)= cjy(l,m,n) -ccj*pp2
