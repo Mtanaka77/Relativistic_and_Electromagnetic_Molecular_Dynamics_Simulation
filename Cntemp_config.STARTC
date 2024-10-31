@@ -1,11 +1,11 @@
-# Praefix-String......................: Cemp0801
+# Praefix-String......................: Cemp0701
 # Cell boundary 0/1/2 (open/closed/2D):            0
-# Maximum cpu time (min). ca 10 min.. :    170.0
+# Maximum cpu time (min). ca 10 min.. :    300.0
 # Physikalische Endzeit.. 10^-15 sec .:    50.1000d-15
 # Diskretisierungs-Schritt......0.0005:    0.00050d-15
-# Write out interval for IWRT1..0.025.:    0.02500d-15 
-# Write out interval for IWRT2..0.50..:    0.10000d-15 
-# Write out interval for IWRT3..field.:    0.10000d-15 
+# Write out interval for IWRT1..0.025.:           25                    ## 0.01250d-15 
+# Write out interval for IWRT2..0.50..:           25                    ## 0.01250d-15 
+# Write out interval for IWRT3..field.:         1000                    ## 0.50000d-15 
 # Particle table update interval......:            5
 # Number of protons...................:        10120 
 # Charge state of carbon... 6.00......:         6.00
