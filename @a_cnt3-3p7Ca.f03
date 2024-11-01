@@ -285,9 +285,11 @@
       common/parm2/  pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax
       common/physc/  a_unit,m_unit,e_unit,t_unit,c1,c2,Wrest
 !
-      real(c_float)  phi,tht,dtwr1,dtwr2,dtwr3,rgmax,cptot,    &
-                     dtwr20,dtwr30
-      common/parm4/  phi,tht,dtwr1,dtwr2,dtwr3,rgmax
+      integer(c_int)  iiwrt1,iiwrt2,iiwrt3
+      common/ iwrite/ iiwrt1,iiwrt2,iiwrt3
+!
+      real(c_float)  phi,tht,rgmax,cptot
+      common/parm4/  phi,tht,rgmax
       common/parm9/  cptot       ! +++++ from READ_CONF, L.3710
 !
 !
@@ -334,7 +336,7 @@
       common/HEADR2/ t,xp_leng
 !
       namelist/inp1/ phi,tht,cptot
-      namelist/inp2/ dt,tmax,dtwr1,dtwr2,dtwr3
+      namelist/inp2/ dt,tmax,iiwrt1,iiwrt2,iiwrt3
 !
 !**************************************************************
       label='CNT-expl'
@@ -613,8 +615,7 @@
         read(12) R_cnt1,Z_cnt1,R_cnt2,Z_cnt2a,Z_cnt2b
 !
         read(12) pi,tg,dt,dth,pthe,tmax0        ! dth; prefC_LJ,pref_LJ
-        read(12) t,phi,tht,dtwr1,dtwr20,dtwr30
-!                     ! dtwr2,dtwr3 are actually taken from READ_CONF, L.3710
+        read(12) t,phi,tht,iiwrt1,iiwrt2,iiwrt3
         read(12) ekin,ppot,ekn1,ekn2,etot,Rgyi,Rgye,        &
                  Rgyf,Rgyc,Rion,Nele,dPot,ecr,elj,          &
                  sex,sez,sbx,sbz,slx,time
@@ -950,7 +951,7 @@
         write(12) R_cnt1,Z_cnt1,R_cnt2,Z_cnt2a,Z_cnt2b
 !
         write(12) pi,tg,dt,dth,pthe,tmax
-        write(12) t,phi,tht,dtwr1,dtwr2,dtwr3
+        write(12) t,phi,tht,iiwrt1,iiwrt2,iiwrt3
         write(12) ekin,ppot,ekn1,ekn2,etot,Rgyi,Rgye,        &
                   Rgyf,Rgyc,Rion,Nele,dPot,ecr,elj,          &
                   sex,sez,sbx,sbz,slx,time
@@ -1102,13 +1103,16 @@
       common/physc/ a_unit,m_unit,e_unit,t_unit,c1,c2,Wrest
       common/ENERGY/ E_C_s,E_C_PME,E_C_r,E_LJ,E_elas
 !
-      real(c_float) phi,tht,dtwr1,dtwr2,dtwr3,cptot,         &
+      integer(c_int) iiwrt1,iiwrt2,iiwrt3
+      common/iwrite/ iiwrt1,iiwrt2,iiwrt3
+!      
+      real(c_float) phi,tht,cptot,         &
                     fchar4,fcharA4,Temp4,rgmax,              & 
                     xmax4,ymax4,zmax4,dx,dy,dz,              &
                     vm,s0,s1,s2,rcore,rr,r1,ani,ane,         &
                     vmax2,dgaus2
       real(c_double) dcpu
-      common/parm4/ phi,tht,dtwr1,dtwr2,dtwr3,rgmax
+      common/parm4/ phi,tht,rgmax
       common/parm9/ cptot
 !  
       real(c_double) Temp,epsCLJ,epsLJ,m_gamma,Pot0,W_1p,Nele0,   &
@@ -1420,7 +1424,7 @@
       tg= tg + dt
 !
       if(it.eq.1) tg= 0.d0  ! sec
-      t= tg                 ! for dtwr1, write(23)...
+      t= tg                 ! for iiwrt1, write(23)...
 !
 !-------------------------------------
 !  Define the interval of smoothing.
@@ -1430,9 +1434,9 @@
       n_twice = n_twice +1
 !    **********************
 !
-      iwrt1= iwrta(t,dtwr1)    ! time by interval
-      iwrt2= iwrtb(t,dtwr2)   !  general field plot
-      iwrt3= iwrtc(t,dtwr3)   !  write(29), write(30)
+      iwrt1= mod(it,iiwrt1)   ! time by interval
+      iwrt2= mod(it,iiwrt2)   !  general field plot
+      iwrt3= mod(it,iiwrt3)   !  write(29), write(30)
 !
 !* "is" is a plot time starting at >= 1
       if(iwrt1.eq.0) then
@@ -2602,7 +2606,7 @@
         write(12) R_cnt1,Z_cnt1,R_cnt2,Z_cnt2a,Z_cnt2b
 !
         write(12) pi,tg,dt,dth,pthe,tmax
-        write(12) t,phi,tht,dtwr1,dtwr2,dtwr3
+        write(12) t,phi,tht,iiwrt1,iiwrt2,iiwrt3
         write(12) ekin,ppot,ekn1,ekn2,etot,Rgyi,Rgye,        &
                   Rgyf,Rgyc,Rion,Nele,dPot,ecr,elj,          &
                   sex,sez,sbx,sbz,slx,time
@@ -3849,6 +3853,9 @@
       common/cutoffrd/ rcut_Clf,rcutlj
       common/ELSTA/  Temp,epsCLJ,epsLJ
 !
+      integer(c_int)  iiwrt1,iiwrt2,iiwrt3
+      common/ iwrite/ iiwrt1,iiwrt2,iiwrt3
+!
       integer(c_int)  itabs
       common/plupdat/ itabs
 !----------------------------------------------------------------
@@ -3861,8 +3868,8 @@
       real(c_double) pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax
       common/parm2/  pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax
 !
-      real(c_float) phi,tht,dtwr1,dtwr2,dtwr3,rgmax,cptot
-      common/parm4/ phi,tht,dtwr1,dtwr2,dtwr3,rgmax
+      real(c_float) phi,tht,rgmax,cptot
+      common/parm4/ phi,tht,rgmax
       common/parm9/ cptot
 !
       real(c_double) R_sp,D_sp,N_sp,Lambda_D,massi,            &
@@ -3887,9 +3894,9 @@
       read (08,'(a40,f12.0)') text1,cptot    ! Maximum cpu time for each run (min)
       read (08,'(a40,d20.0)') text1,tmax     ! Zeit zum Abbruch, 1.d-15 sec
       read (08,'(a40,d20.0)') text1,dt       ! Zeitschritt, in 1.d-15 sec
-      read (08,'(a40,d20.0)') text1,dtwr1    ! Write out interval for IWRT1, 1.d-15 sec 
-      read (08,'(a40,d20.0)') text1,dtwr2    ! Write out for IWRT2
-      read (08,'(a40,d20.0)') text1,dtwr3    ! Write out for IWRT3
+      read (08,'(a40,i12)')   text1,iiwrt1   ! Write out interval for IWRT1, 1.d-15 sec 
+      read (08,'(a40,i12)')   text1,iiwrt2   ! Write out for IWRT2
+      read (08,'(a40,i12)')   text1,iiwrt3   ! Write out for IWRT3
       read (08,'(a40,i12)')   text1,itabs    ! Particle table update interval
 !
       read (08,'(a40,i12)')   text1,np       ! Number of protons
@@ -3959,8 +3966,10 @@
       implicit none
 !
       include  'param_3p7_Ca.h'
-!
+!  
       integer(c_int) ifrefl,itabs
+      integer(c_int)  iiwrt1,iiwrt2,iiwrt3
+      common/ iwrite/ iiwrt1,iiwrt2,iiwrt3
       common/plupdat/ itabs
 !
       real(c_double) fchar,fcharA
@@ -3981,12 +3990,12 @@
       common/ELSTA/  Temp,epsCLJ,epsLJ
 !----------------------------------------------------------------
       real(c_double) pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax
-      real(c_float)  phi,tht,dtwr1,dtwr2,dtwr3,cptot,rgmax
+      real(c_float)  phi,tht,cptot,rgmax
 !
       real(c_double) Lx3,Ly3,Lz3,hx2,hy2,hz2,hx,hy,hz,p4dt,dV,cdt
       common/hx2l/  Lx3,Ly3,Lz3,hx2,hy2,hz2,hx,hy,hz,p4dt,dV,cdt
       common/parm2/ pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax
-      common/parm4/ phi,tht,dtwr1,dtwr2,dtwr3,rgmax
+      common/parm4/ phi,tht,rgmax
       common/parm9/ cptot
 !
       real(c_double) R_sp,D_sp,N_sp,Lambda_D,massi,            &
@@ -4002,9 +4011,9 @@
       write (08,'(f12.0)') cptot    ! Maximum cpu time for each run (min)
       write (08,'(d20.0)') tmax     ! Zeit zum Abbruch, 1.d-15 sec
       write (08,'(d20.0)') dt       ! Zeitschritt, in 1.d-15 sec
-      write (08,'(d20.0)') dtwr1    ! Write out interval for IWRT1, 1.d-15 sec 
-      write (08,'(d20.0)') dtwr2    ! Write out for IWRT2
-      write (08,'(d20.0)') dtwr3    ! Write out for IWRT3
+      write (08,'(i12)') iiwrt1     ! Write out interval for IWRT1, 1.d-15 sec 
+      write (08,'(i12)') iiwrt2     ! Write out for IWRT2
+      write (08,'(i12)') iiwrt3     ! Write out for IWRT3
       write (08,'(i12)')   itabs    ! Particle table update interval
 !
       write (08,'(i12)')   np       ! Number of protons
@@ -4094,9 +4103,9 @@
       common/parm2/ pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax
       common/physc/ a_unit,m_unit,e_unit,t_unit,c1,c2,Wrest
 !
-      real(c_float) phi,tht,dtwr1,dtwr2,dtwr3,rgmax,vmax2,dgaus2
+      real(c_float) phi,tht,rgmax,vmax2,dgaus2
       integer(c_int) i,j,k
-      common/parm4/ phi,tht,dtwr1,dtwr2,dtwr3,rgmax
+      common/parm4/ phi,tht,rgmax
 !
       real(c_double) R_sp,D_sp,N_sp,Lambda_D,massi,               &
                      ch_ion,wt_ion,rd_CP,rd_HP,ch_el,wt_el,rd_el
@@ -4754,8 +4763,11 @@
       integer(c_int) it,is,k,k1
       common/parm1/  it,is
 !
-      real(c_float) phi,tht,dtwr1,dtwr2,dtwr3,rgmax
-      common/parm4/ phi,tht,dtwr1,dtwr2,dtwr3,rgmax
+      integer(c_int)  iiwrt1,iiwrt2,iiwrt3
+      common/ iwrite/ iiwrt1,iiwrt2,iiwrt3
+!
+      real(c_float) phi,tht,rgmax
+      common/parm4/ phi,tht,rgmax
 !
 !
       do 100 k= 1,is
@@ -4789,13 +4801,13 @@
   100 continue
 !
       is  = is/2
-      dtwr1= 2*dtwr1
+      iiwrt1= 2*iiwrt1
 !
       if(ionode) then
         OPEN (unit=11,file=praefixc//'.06'//suffix1,             &
               status='unknown',position='append',form='formatted')
 !
-        write(11,*) 'Rehist: new is, dtwr1=',is,dtwr1
+        write(11,*) 'Rehist: new is, iiwrt1=',is,iiwrt1
         close(11)
       end if
 !
@@ -4983,7 +4995,7 @@
       real(c_double) pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax,  &
                      Temp,epsCLJ,epsLJ
       common/parm2/ pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax
-      common/parm4/ phi,tht,dtwr1,dtwr2,dtwr3,rgmax
+      common/parm4/ phi,tht,rgmax
       common/ELSTA/ Temp,epsCLJ,epsLJ
 !
       real(c_double) R_sp,D_sp,N_sp,Lambda_D,massi,            &
@@ -5259,7 +5271,7 @@
       real(c_double) pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax,  &
                     Temp,epsCLJ,epsLJ
       common/parm2/ pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax
-      common/parm4/ phi,tht,dtwr1,dtwr2,dtwr3,rgmax
+      common/parm4/ phi,tht,rgmax
       common/ELSTA/ Temp,epsCLJ,epsLJ
 !
       real(c_double) R_sp,D_sp,N_sp,Lambda_D,massi,            &
