@@ -1,5 +1,5 @@
 !*--------------------------------------------------------------------*
-!  @cnt3ems_3pCa.f03                     Dec.24, 2016, Sep.13, 2024   !   
+!  @cnt3ems_3pCa.f03                      Dec.24, 2016, Nov.1, 2024   !   
 !                                                                     !
 !  ## Molecular Dynamics in Relativistic Electromagnetic Fields ##    !
 !                                                                     !
@@ -44,7 +44,7 @@
 !      e_unit= 4.8032d-10 esu, unit charge                            !
 !                                                                     !
 !   In subroutine /READ_CONF/, nZ, nZA, intens, lambda are used.      !
-!    3D filled H(+) by ranff(0.) ... in /moldyn/                      !
+!    3D filled H(+) by ranff(0.d0) ... in /moldyn/                      !
 !    No gap between r>rout and r<rout  ... in /forces/                !
 !                                                                     !
 !   Subroutine descriptions                                           !
@@ -67,7 +67,7 @@
 !         FFTW initialization (one time at a start/restart time)      !
 !         Maxwell equation of electric and magnetic fields            !
 !         current density                                             !   
-!         Poisson equation of longitudinal electric field             !
+!         Poisson equation of electric field (longitudinal)           !
 !         call subroutine /forces/                                    !  
 !         advance position and momentum                               !
 !         diagnosis (in every iwrt1 or iwrt2 steps)                   !
@@ -93,9 +93,9 @@
 !
       logical    if_start
 ! ---------------------------------------------
-!*******************************************
-!*  A global communication group.          *
-!*******************************************
+!**********************************************
+!*  A global communication group.             *
+!**********************************************
 !  Fujitsu FX100: 52 node, 104 rank
 !
       call mpi_init (ierror)
@@ -105,6 +105,16 @@
 !
       ipar = 1 +rank  ! rank's name
       igrp = kgrp
+!  
+      if(ipar.eq.1) then   ! performs i/o if io_pe= 1.
+        ionode= .true.
+      else
+        ionode= .false.
+      end if
+!
+      suffix2= numbr2  ! Ca - new files
+      suffix1= numbr1  ! Ca - old file
+      suffix0= numbr0  ! C  - one character
 !
       if(iflinx) then
         praefixs = '/home2/mtanaka/cntem3/'//sname
@@ -125,18 +135,7 @@
       else
         if_start= .false.
       end if
-!  
-!  size
-      if(ipar.eq.1) then   ! performs i/o if io_pe= 1.
-        ionode= .true.
-      else
-        ionode= .false.
-      end if
-!c
-      suffix2= numbr2  ! Ca - new files
-      suffix1= numbr1  ! Ca - old file
-      suffix0= numbr0  ! C  - one character
-!c
+!
 !
       if(ionode) then
         OPEN (unit=11,file=praefixc//'.06'//suffix2, &
@@ -150,7 +149,6 @@
 !
         close(11)
       end if
-!
 !
 !*******************************************
 !*  A group for intra-task communication.  *
@@ -170,7 +168,7 @@
               status='unknown',position='append',form='formatted')
 !
         write(11,693) ipar,ctime,wtime
-  693   format(/,'*ipar, ctime, wtime(sec)=',i3,1p2e15.7)
+  693   format(/,'*ipar, ctime, wtime(sec)=',i3,1p2d15.7)
 !
         close(11)
       end if
@@ -331,12 +329,12 @@
 !
       real*4        ekin,ppot,ekn1,ekn2,etot,Rgyi,Rgye,          &
                     Rgyf,Rgyc,Rion,Nele,dPot,ecr,elj,            &
-                    sex,sez,sbx,sbz,slx,time
+                    sex,sez,sbx,sbz,time
       common/ehist/ ekin(3000),ppot(3000),ekn1(3000),ekn2(3000), &
                     etot(3000),Rgyi(3000),Rgye(3000),Rgyf(3000), &
                     Rgyc(3000),Rion(3000),Nele(3000),dPot(3000), &
                     ecr(3000),elj(3000),sex(3000),sez(3000),     &
-                    sbx(3000),sbz(3000),slx(3000),time(3000)
+                    sbx(3000),sbz(3000),time(3000)
 !+++
 !     integer*4    mx,my,mz  ! main parameter statement
 !
@@ -485,9 +483,9 @@
 ! Step 2: Electrons around H, carbon and Au
 !
       do i= ns+np+1,ns+2*np
-      xg(i)= xg(i-np) +0.1d-8*ranff(0.) !sgn(1,k)*(rd_CP +rd_el)
-      yg(i)= yg(i-np) +0.1d-8*ranff(0.) !sgn(2,k)*(rd_CP +rd_el)
-      zg(i)= zg(i-np) +0.1d-8*ranff(0.) !+sgn(3,k)*(rd_CP +rd_el)
+      xg(i)= xg(i-np) +0.1d-8*ranff(0.d0) !sgn(1,k)*(rd_CP +rd_el)
+      yg(i)= yg(i-np) +0.1d-8*ranff(0.d0) !sgn(2,k)*(rd_CP +rd_el)
+      zg(i)= zg(i-np) +0.1d-8*ranff(0.d0) !+sgn(3,k)*(rd_CP +rd_el)
       end do
         nes1= i
 !
@@ -498,9 +496,9 @@
       do k= 1,nZ   ! Heavy +(heavy) electrons per C(+Z)
       i= i +1
 !
-      xg(i)= xg(j) +0.1d-8*ranff(0.) !sgn(1,k)*(rd_CP +rd_el)
-      yg(i)= yg(j) +0.1d-8*ranff(0.) !sgn(2,k)*(rd_CP +rd_el)
-      zg(i)= zg(j) +0.1d-8*ranff(0.) !+sgn(3,k)*(rd_CP +rd_el)
+      xg(i)= xg(j) +0.1d-8*ranff(0.d0) !sgn(1,k)*(rd_CP +rd_el)
+      yg(i)= yg(j) +0.1d-8*ranff(0.d0) !sgn(2,k)*(rd_CP +rd_el)
+      zg(i)= zg(j) +0.1d-8*ranff(0.d0) !+sgn(3,k)*(rd_CP +rd_el)
       end do
       end do
         nes2= i
@@ -511,9 +509,9 @@
 !             +++++
       i= i +1
 !
-      xg(i)= xg(j) +0.1d-8*ranff(0.) !sgn(1,k)*(rd_CP +rd_el)
-      yg(i)= yg(j) +0.1d-8*ranff(0.) !sgn(2,k)*(rd_CP +rd_el)
-      zg(i)= zg(j) +0.1d-8*ranff(0.) !sgn(3,k)*(rd_CP +rd_el)
+      xg(i)= xg(j) +0.1d-8*ranff(0.d0) !sgn(1,k)*(rd_CP +rd_el)
+      yg(i)= yg(j) +0.1d-8*ranff(0.d0) !sgn(2,k)*(rd_CP +rd_el)
+      zg(i)= zg(j) +0.1d-8*ranff(0.d0) !sgn(3,k)*(rd_CP +rd_el)
       end do
       end do
         nes3= i
@@ -605,7 +603,7 @@
         read(12) t,phi,tht,iiwrt1,iiwrt2,iiwrt3,iiwrt4
         read(12) ekin,ppot,ekn1,ekn2,etot,Rgyi,Rgye,        &
                  Rgyf,Rgyc,Rion,Nele,dPot,ecr,elj,          &
-                 sex,sez,sbx,sbz,slx,time
+                 sex,sez,sbx,sbz,time
 !
         read(12) iwa,iwb,iwc,iwd
         read(12) r_sp,d_sp,n_sp,ch_ion,wt_ion,rd_cp,rd_hp,  &
@@ -631,7 +629,7 @@
                 status='unknown',position='append',form='formatted')
 !
           write(11,640) t,it,is
-  640     format(' Starting: t=',1pe11.3,'   it,is=',i7,i5)
+  640     format(' Starting: t=',1pd11.3,'   it,is=',i7,i5)
 !
           nCLp= ns +np +nq  ! just for write out here
           write(11,643) ns,np,nq,nCLp
@@ -752,7 +750,7 @@
               status='unknown',position='append',form='formatted')
 !
         write(11,605) dt,itabs
-  605   format(' time step: dt=',1pe13.5,/,         &
+  605   format(' time step: dt=',1pd13.5,/,         &
                ' particle list update: itabs=',i4)
 !
         write(11,607) ns,np,nq,fcharA,fchar
@@ -765,8 +763,8 @@
 !
         write(11,608) R_sp,D_sp,nq,ch_ion,ch_el,   &
                        wt_ion,wt_el,rd_CP,rd_HP,rd_el
-  608   format(' R_sp(cm)=',1pe12.3,/,              &
-               ' D_sp(/cm^3)=',e12.3,/,             &
+  608   format(' R_sp(cm)=',1pd12.3,/,              &
+               ' D_sp(/cm^3)=',d12.3,/,             &
                ' N_sp=',i10,/,                      &
                ' ',/,                               &
                ' ch_ion/e, ch_el/e=',2d15.7,/,      &
@@ -774,26 +772,26 @@
                ' rd_CP,rd_HP, rd_el/a=',3d15.7,/)
 !
         write(11,609) R_cnt1,Z_cnt1,R_cnt2,Z_cnt2a,Z_cnt2b
-  609   format(' R_cnt1, Z_cnt1(cm)=',1p2e12.3,/,   &
-               ' R_cnt2, Z_cnt2a,Z_cnt2b=',3e12.3,/)
+  609   format(' R_cnt1, Z_cnt1(cm)=',1p2d12.3,/,   &
+               ' R_cnt2, Z_cnt2a,Z_cnt2b=',3d12.3,/)
 !
         write(11,610) Temp,Temp_erg  !/Wrest
-  610   format(' Temp(eV), Temp (erg)=',1p2e15.5,/)
+  610   format(' Temp(eV), Temp (erg)=',1p2d15.5,/)
 !        
         write(11,611) rcut_Clf,prefC_LJ,pref_LJ,pthe,      &
                        p4dt,dV,p4dt/dV,cdt
   611   format('---------------------------------------',/, &
                ' Coulomb(short range): ch(i)*ch(j)/r2  ',/, &
-               '   rcut_Clf=',1pe15.5,/,                    &
+               '   rcut_Clf=',1pd15.5,/,                    &
                '  ',/,                                      &
-               '   prefC_LJ =',e15.5,/,                     &
-               '   pref_LJ =',e15.5,/,                      &
+               '   prefC_LJ =',d15.5,/,                     &
+               '   pref_LJ =',d15.5,/,                      &
                '  ',/,                                      &
-               ' pthe (cm/s)=',e15.5,/,                     &
+               ' pthe (cm/s)=',d15.5,/,                     &
                ' ',/,                                       &
-               ' p4dt =',e15.5,'   dV =',e15.5,/,           &
-               ' p4dt/dV =',e15.5,/,                        &
-               ' cdt =',e15.5,/,                            & 
+               ' p4dt =',d15.5,'   dV =',d15.5,/,           &
+               ' p4dt/dV =',d15.5,/,                        &
+               ' cdt =',d15.5,/,                            & 
                '---------------------------------------',/)
 !
         write(11,613) mx,my,mz,Lx3,Ly3,Lz3,xmax3,xmin3,    &
@@ -884,7 +882,7 @@
           write(11,621) (i,ch(i),am(i),ag(i),xg(i),yg(i),zg(i),  &
                           px(i),py(i),pz(i),i=nh1+1,nh1+5)
 !
-  621     format('i=',i6,1p3e10.2,1x,3e10.2,1x,3e8.1)
+  621     format('i=',i6,1p3d10.2,1x,3d10.2,1x,3d8.1)
 !
           close(11)
         end if
@@ -917,7 +915,7 @@
         write(12) t,phi,tht,iiwrt1,iiwrt2,iiwrt3,iiwrt4
         write(12) ekin,ppot,ekn1,ekn2,etot,Rgyi,Rgye,        &
                   Rgyf,Rgyc,Rion,Nele,dPot,ecr,elj,          &
-                  sex,sez,sbx,sbz,slx,time
+                  sex,sez,sbx,sbz,time
 !
         write(12) iwa,iwb,iwc,iwd
         write(12) r_sp,d_sp,n_sp,ch_ion,wt_ion,rd_cp,rd_hp,  &
@@ -1043,13 +1041,12 @@
 !
       real*4        ekin,ppot,ekn1,ekn2,etot,Rgyi,Rgye,          &
                     Rgyf,Rgyc,Rion,Nele,dPot,ecr,elj,            &
-                    sex,sez,sbx,sbz,slx,time,                    &
-                    ekin20(3000*20)
+                    sex,sez,sbx,sbz,time,ekin20(3000*19)
       common/ehist/ ekin(3000),ppot(3000),ekn1(3000),ekn2(3000), &
                     etot(3000),Rgyi(3000),Rgye(3000),Rgyf(3000), &
                     Rgyc(3000),Rion(3000),Nele(3000),dPot(3000), &
                     ecr(3000),elj(3000),sex(3000),sez(3000),     &
-                    sbx(3000),sbz(3000),slx(3000),time(3000)
+                    sbx(3000),sbz(3000),time(3000)
       equivalence  (ekin(1),ekin20(1))
 !
       integer*4     i,j,k,kk,jj,ibox,neigh,it,is,iwa,iwb,iwc,iwd,    &
@@ -1198,7 +1195,7 @@
         end do
         end do
 !
-        do i= 1,3000*20
+        do i= 1,3000*19
         ekin20(i)= 0
         end do
       else
@@ -1216,7 +1213,7 @@
           write(11,132) (i,x0(i),y0(i),z0(i),i=1,5)
           write(11,132) (i,x0(i),y0(i),z0(i),i=ns+1,ns+5)
           write(11,132) (i,x0(i),y0(i),z0(i),i=ns+np+1,ns+np+5)
-  132     format('i=',i6,2x,1p3e11.4)
+  132     format('i=',i6,2x,1p3d11.4)
 !
           close(11)
         end if
@@ -1391,7 +1388,7 @@
       end if
 !  
 !-------------------------------------------------------
-!  dt= 0.0005e-15 -> EM: dx/dt= 4.e10 > 3.e10  Courant cond. safe!
+!  dt= 0.0005e-15 -> EM: dx/dt= 4.d10 > 3.d10  Courant cond. safe!
 !        (100,200,200), (5.,10.,10.) 10^2 Ang^3 -> 5.0 Ang
 !
  1000 continue
@@ -1486,8 +1483,8 @@
         write(11,*) '  '
         write(11,*) '*Drive of E*H field...'
         write(6,123) omega,ak
-  123   format(' omega (1/sec, c*2*pi/lambda)=',1pe14.7,/,  &
-               ' ak (1/cm, 2*pi/lambda)=',e14.7)
+  123   format(' omega (1/sec, c*2*pi/lambda)=',1pd14.7,/,  &
+               ' ak (1/cm, 2*pi/lambda)=',d14.7)
         close(11)
       end if
       end if
@@ -1688,7 +1685,7 @@
       do n= 1,mz
       do m= 1,my
       do l= 1,mx
-      cjx(l,m,n)= cjx(l,m,n)/3.d0  ! just unity for cjx
+      cjx(l,m,n)= cjx(l,m,n)/3.d0  ! just unity for cjx-cjz
       cjy(l,m,n)= cjy(l,m,n)/3.d0
       cjz(l,m,n)= cjz(l,m,n)/3.d0
       end do
@@ -1711,7 +1708,9 @@
 !           write(11,*) '*threads with 4 (must be .not. 0) are ',ierror
 !         end if
 !
-!  FFTW3: NEC 2003 style normalized for the forwrd and backward cycle 
+!    FFTW3: NEC 2003 style normalized for the forwrd and backward cycle 
+!      Generic style of FFTW3 is not normalized (FFTW homepage)
+!
         plan= fftw_plan_r2r_3d  &
              (mz,my,mx,qq,qq_c,FFTW_RODFT00,FFTW_RODFT00,FFTW_RODFT00, &
               FFTW_ESTIMATE) 
@@ -1757,24 +1756,38 @@
         aky= pi*m/Ly3
         akz= pi*n/Lz3
 !
-        gam1= 10.d0 
-        gam2= 20.d0 
+        gam1= 10.d0  ! 7.d0 
+        gam2= 20.d0  !14.d0 
         gax= gam1*(l-1)/mx
         gay= gam1*(m-1)/my
         gaz= gam2*(n-1)/mz
         gamma= exp(-(gax**2 +gay**2 +gaz**2))
 !
         psi_c(l,m,n)= gamma * qq_c(l,m,n)/(akx**2 +aky**2 +akz**2)
-!       psi_c(l,m,n)= fnml*gamma * qq_c(l,m,n)/(akx**2 +aky**2 +akz**2) !<- FFTW3 generic
-        end do
+!       psi_c(l,m,n)= fnml*gamma * qq_c(l,m,n)/(akx**2 +aky**2 +akz**2)
+        end do                               ! FFTW3 generic
         end do
         end do
 !
         call fftw_execute_r2r (pinv,psi_c,psi) 
       end if
 !
+!         if(iwrt1.eq.0 .and. ionode) then
+!         OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
+!               status='unknown',position='append',form='formatted')
+!         n= 1
+!         m= 1
+!         do l= 1,60,3
+!         write(11,990) l,m,n,psi_c(l,m,n)
+! 990     format('l,m,n,psi_c=',3i5,2x,1pd11.4)
+!         end do
+!
+!         close(11)
+!         end if
+!
 !  cjx(n+1/2): vx(n+1/2)
-!   Separate the transverse current: Jt= J -(J*EL)*EL/|ELl^2
+!   Separate the transverse component from the longitudinal one: 
+!   J_trans= J -(J*EL)*EL/|ELl^2
 !
       do n= 2,mz-1 
       do m= 2,my-1
@@ -2004,7 +2017,7 @@
 !
         do m=1,my,20
         write(11,999) m,etz(l,m,n),btx(l,m,n),EE(l,m,n),HH(l,m,n)
-  999   format(i4,1p2e13.3,2x,2e13.3)
+  999   format(i4,1p2d13.3,2x,2d13.3)
         end do
 !
         close(11)
@@ -2035,15 +2048,15 @@
 !       if(.false.) then
 !       ----------------
         do i= ns+1,ns+np
-        rr0= ranff(0.)*rr1  ! cm
-        ph0= 2*pi*ranff(0.)
+        rr0= ranff(0.d0)*rr1  ! cm
+        ph0= 2*pi*ranff(0.d0)
 !
         xg(i)= rr0*sin(ph0)
         yg(i)= rr0*cos(ph0)
         zg(i)= zg(i)
 !
-        xg(i+np)= xg(i) +0.1d-8*ranff(0) ! elec= H(+): ns+1 -> ns+np+1
-        yg(i+np)= yg(i) +0.1d-8*ranff(0)
+        xg(i+np)= xg(i) +0.1d-8*ranff(0.d0) ! elec= H(+): ns+1 -> ns+np+1
+        yg(i+np)= yg(i) +0.1d-8*ranff(0.d0)
         zg(i+np)= zg(i)
         end do
 !       ----------------
@@ -2059,7 +2072,7 @@
           write(11,*) ' proton and e (cm)...'
           write(11,330) (i,xg(i),yg(i),zg(i),xg(i+np),yg(i+np), &
                           zg(i+np),i=ns+1,ns+5)
-  330     format(' i=',i7,1p3e13.4,2x,3e13.4)
+  330     format(' i=',i7,1p3d13.4,2x,3d13.4)
           end if
         end if
 !
@@ -2265,7 +2278,6 @@
 !
 !       ***********
         time(is)= t
-        slx(is)= sqrt(delV*psi2)/(mx*my*mz)
 !
 !
         rr= 0
@@ -2334,7 +2346,6 @@
         sez(is)= setz
         sbx(is)= sbtx
         sbz(is)= sbtz
-!       slx(is)=       at l.2050
 ! 
 !* Gyration radius
 !
@@ -2369,18 +2380,17 @@
 !
           if(ipar.eq.1) then
             write(11,700)
-  700       format(/,'  time:    E_kin0/nC  E_kin1/np  E_kin2/ne ',  &
-                  '  E_coulb    E_LJ       setx       setz      ',   &
-                  ' sbtx      sbtz        E_tot      Rgyi       ',   &
-                  'Rgye       Rgy_C       E_elx       wall(sec)')
+  700       format(/,' time(sec):  E_kin0/nC  E_kin1/np  E_kin2/ne ',  &
+                  ' E_coulb    E_LJ       setx       setz      ',      &
+                  ' sbtx       sbtz       E_tot      Rgyi       ',     &
+                  'Rgye       Rgy_C     wall(sec)')
           end if
         end if
 !
         write(11,710) time(is),ekin(is),ekn1(is),ekn2(is),ecr(is), &
                       elj(is),sex(is),sez(is),sbx(is),sbz(is),etot(is), &
-                      Rgyi(is),Rgye(is),Rgyc(is),slx(is),          &
-                      dcpu
-  710   format('t=',1pe9.2,14e11.2,e11.3) 
+                      Rgyi(is),Rgye(is),Rgyc(is),dcpu
+  710   format('t=',1pd9.2,13d11.2,d11.3) 
 !
         close(11)
 ! --------------------------------------- on major nodes --------------
@@ -2927,7 +2937,7 @@
 !       if(ionode) then
 !       wrt2= 50
 !       write(112,990) it,E_C_r1,E_C_r2,E_C_r1+E_C_r2,E_LJ2
-! 990   format('it=',i4,' r1, r2, sum, LJ2=',1p3e11.3,2x,e11.3)
+! 990   format('it=',i4,' r1, r2, sum, LJ2=',1p3d11.3,2x,d11.3)
 !       end if
 !
       return
@@ -3706,7 +3716,7 @@
               status='unknown',position='append',form='formatted')
 !
         write(11,541) s1/nq
-  541   format(' Kinetic energy of an electron /mc^2=',1pe13.5)
+  541   format(' Kinetic energy of an electron /mc^2=',1pd13.5)
         close(11)
       end if
 !
@@ -3765,7 +3775,7 @@
 !
       common/gaus1/ fv(51),vv0,dv
 !
-      eps= ranff(0.)
+      eps= ranff(0.d0)
       do 100 k=1,51
       k2=k
       if(fv(k).gt.eps) go to 200
@@ -4122,12 +4132,12 @@
 !
       real*4        ekin,ppot,ekn1,ekn2,etot,Rgyi,Rgye,          &
                     Rgyf,Rgyc,Rion,Nele,dPot,ecr,elj,            &
-                    sex,sez,sbx,sbz,slx,time
+                    sex,sez,sbx,sbz,time
       common/ehist/ ekin(3000),ppot(3000),ekn1(3000),ekn2(3000), &
                     etot(3000),Rgyi(3000),Rgye(3000),Rgyf(3000), &
                     Rgyc(3000),Rion(3000),Nele(3000),dPot(3000), &
                     ecr(3000),elj(3000),sex(3000),sez(3000),     &
-                    sbx(3000),sbz(3000),slx(3000),time(3000)
+                    sbx(3000),sbz(3000),time(3000)
 !
       integer*4     it,is,k,k1
       common/parm1/ it,is
@@ -4138,7 +4148,7 @@
       real*4        phi,tht,rgmax
       common/parm4/ phi,tht,rgmax
 !
-      do 100 k= 1,is
+      do k= 1,is
       if(mod(k,2).eq.0) then
 !
       k1= k/2
@@ -4162,11 +4172,10 @@
        sez(k1)= (sez(k-1) + sez(k))/2
        sbx(k1)= (sbx(k-1) + sbx(k))/2
        sbz(k1)= (sbz(k-1) + sbz(k))/2
-       slx(k1)= (slx(k-1) + slx(k))/2
       
       time(k1)= (time(k-1) +time(k))/2
       end if
-  100 continue
+      end do
 !
       is  = is/2
       iiwrt1= 2*iiwrt1
@@ -4190,13 +4199,12 @@
 !
       real*4        ekin,ppot,ekn1,ekn2,etot,Rgyi,Rgye,          &
                     Rgyf,Rgyc,Rion,Nele,dPot,ecr,elj,            &
-                    sex,sez,sbx,sbz,slx,time,ekin0,              &
-                    etot1(3000)
+                    sex,sez,sbx,sbz,time,ekin0,etot1(3000)
       common/ehist/ ekin(3000),ppot(3000),ekn1(3000),ekn2(3000), &
                     etot(3000),Rgyi(3000),Rgye(3000),Rgyf(3000), &
                     Rgyc(3000),Rion(3000),Nele(3000),dPot(3000), &
                     ecr(3000),elj(3000),sex(3000),sez(3000),     &
-                    sbx(3000),sbz(3000),slx(3000),time(3000)
+                    sbx(3000),sbz(3000),time(3000)
 !
       character*8    label,date_now*10
       real*4         t,xp_leng
@@ -4208,8 +4216,7 @@
       real*4       emax0,emin0,emax1,emin1,emax2,emin2,          &
                    pmax,pmin,elmax,elmin,emax,etot0,             &
                    etmax,etmin,Rgyi1,Rgyi2,RTmax,RTmin,rmax,rmin,&
-                   e1max,e1min,e2max,e2min,e3max,e3min,e4max,e4min,&
-                   e5max,e5min,emax3,emin3 
+                   e1max,e1min,e2max,e2min,e3max,e3min,e4max,e4min
       integer*4    ILN,ILG,i
 !
 !     ekin(1)= ekin(3)
@@ -4263,13 +4270,10 @@
       call lplmax (sez,e2max,e2min,is)
       call lplmax (sbx,e3max,e3min,is)
       call lplmax (sbz,e4max,e4min,is)
-      call lplmax (slx,e5max,e5min,is)
       emax1= amax1(e1max,e2max)
       emax2= amax1(e3max,e4max)
-      emax3= e5max
       emin1= amin1(e1min,e2min)
       emin2= amin1(e3min,e4min)
-      emin3= e5min
 !
       ILN= 1
       ILG= 2
@@ -4283,8 +4287,6 @@
       call lplot1 (3,4,is,time,sbz,emax2,emin2,ILN,'sez     ',8, &
                  '        ',8,'        ',8)
 !
-      call lplot1 (3,5,is,time,slx,emax3,emin3,ILN,'slx++slz',8, &
-                 '  time  ',8,'        ',8)
 !------------------------
       CALL CHART
 !------------------------
@@ -4334,8 +4336,8 @@
       real*4 f(is),fmax,fmin
       integer*4  is,i
 !
-      fmax= -1.e10
-      fmin=  1.e10
+      fmax= -1.d10
+      fmin=  1.d10
 !
       do 100 i= 1,is
       fmax= amax1(fmax,f(i))
@@ -4999,7 +5001,7 @@
 !
       common/ranfff/ ir,iq
 !
-      REAL*8     ranff,INVM
+      REAL*8     ranff,x,INVM
       PARAMETER  (MASK=2**30+(2**30-1),INVM= 0.5D0**31)
       PARAMETER  (LAMBDA=48828125)
 !
