@@ -20,12 +20,12 @@
 ! #PBS --venode=16      #  32
 ! #PBS --venum-lhost=8
 ! #PBS -v OMG_NUM_THREADS=8
-
+!
 !     parameter  (iflinx=.false.,num_proc=32)      ! 512/32
         parameter  (iflinx=.false.,num_proc=64)    ! 512/64
 !
       parameter  (sname='Cntemp',cname='cntemp')   ! cntemp
-        parameter  (numbr2='Ga',numbr1='Ga',numbr0='G')  ! Ca, Ca
+      parameter  (numbr2='Ca',numbr1='Ca',numbr0='C')  ! Ca, Ca
 !
       parameter  (kstart=0,kgrp=1)
 !       parameter  (kstart=1,kgrp=1)
@@ -64,7 +64,7 @@
                   zmin3=-(256/512.d0)*sconv*Lenz3)   ! 
 !
 !  /data/sht/tanakam/cntemp + .06a
-!  /home/tanakam/cntem3A/Cntemp + _config.START + C
+!  /home/tanakam/cntem3A/Cntemp + _config.START + A
       character  praefixs*28,praefixc*24,praefixe*24,    &
                  praefixi*24,suffix2*2,suffix1*2,suffix0*1
       common/filname/ praefixs,praefixc,praefixe,        &
