@@ -38,10 +38,10 @@ the Cartesian coordinate space, (1/c)\partial{\textbf E}/\partial t=
 rot{\textbf B} -(4\pi/c){\textbf J}, residing from the longitudinal
 electric field.
 Thus, the Gauss's law, div{\textbf E}=4\pi q, is utilized to obtain the 
-transverse current on the longitudinal component of the electric field, 
-J_transvese= J -(J*EL)*EL/|ELl^2.
-Then, the longitudinal electric field must be solved in the 
-discrete coordinate space (Refs. 1, 2 and 3).
+transverse current on the total one (longitudinal and transverse currents 
+of the electric field, J_transvese= J -(J*EL)*EL/|ELl^2.
+Thus, the Gauss's law must be solved in the discrete coordinate space 
+(Refs. 1, 2 and 3).
 
 On the other hand, the relativistic formulae of velocity and momeutum
 /vec{v}= \vec{p}/(sqrt(m^2 +(px^2 +py^2 +pz^2)/c^2)) is valid
