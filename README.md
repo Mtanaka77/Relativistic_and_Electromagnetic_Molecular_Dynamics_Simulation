@@ -2,8 +2,8 @@
 
 As "Open Internet Access by Molecular Dynamics Simulations", a couple of various codes are shown in https://github.com/Mtanaka77/, which are "Relativistic and Electromagnetic Molecular Dynamics Simulation for Nanoscale Phenomena", "Large-scale Electromagnetic Particle-in-Cell Simulation", "SIESTA on Vector-Parallel Clusters", and "Molecular Dynamics of Water and Ice by TIP5P Code".
 
-This page is discussed on the relativistic and nanoscale molecular dynamics simulations, Computer Physics Communications (2019, Ref. 1). Updated files of a single code @cnt3em_3pCa.f03 and a parallelized one @a_cnt3-3p7Ca.f03 are used. 
-They are compiled by parameters and configuration files which are dated at Sep. 2024.
+This page is discussed on the relativistic and nanoscale molecular dynamics simulations, Computer Physics Communications (2019, Ref. 1). Updated files of a non-parallel code for ex-bz case @cnt3em_3pCa.f03 and a parallelized one for the Z coordinated space  @a_cnt3-3p7Ca.f03 are given here. 
+They are compiled by parameters and configuration files which are dated in Sep. and Nov. of 2024.
 Each simulation code is suitable for a single or parallelized one which really depends on different architectures. 
 
 
