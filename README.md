@@ -41,7 +41,7 @@ electric field.
 Thus, the Gauss's law, div{\textbf E}=4\pi q, is utilized to obtain the 
 transverse current on the total one (longitudinal and transverse currents 
 of the electric field, J_transvese= J -(J*EL)*EL/|ELl^2.
-Thus, the Gauss's law must be solved in the discrete coordinate space 
+Thus, the Gauss's law must be solved in five-step interval for the discrete coordinate space 
 (Refs. 1, 2 and 3).
 
 On the other hand, the relativistic formulae of velocity and momeutum
