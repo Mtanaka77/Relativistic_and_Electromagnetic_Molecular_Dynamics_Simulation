@@ -38,15 +38,15 @@
       parameter  (mx=201,my=201,mz=512)            ! Grid: 2.5 Ang, mz=512
       parameter  (mxh=101,myh=101,mzh=256)
 !
-!     parameter  (mza=16)                          ! mz=512, 16 ranks 
-!       parameter  (mza=8)                        ! mz=512, 32 ranks 
-!     parameter  (mxyza=mx*my*mza)                 ! divided in Z
+      parameter  (mza=16)                          ! mz=512, 32 ranks 
+!       parameter  (mza=8)                         ! mz=512, 64 ranks 
+      parameter  (mxyza=mx*my*mza)                 ! divided in Z
 ! ----------------------------------------------------------
       parameter  (lxy3= 3*mx*my)
       parameter  (sconv=1.0d-8)
 !
       parameter  (npq0=ns0+np0+nq0)
-      parameter  (naf=(ns0/num_proc)*0.3)  !<--
+      parameter  (naf=(ns0/num_proc)*0.3)          ! nafl table
       parameter  (n00=npq0/num_proc+1,n10=ns0/num_proc+1)
 !
 !     parameter  (nbxs=7000,nbxc=5000,nbx2=5000)
