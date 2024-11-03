@@ -1,9 +1,9 @@
-!#  param_3p7_Ca.h
+!  param_3p7_Ca.h
 !
 !  restart: numbr2,numbr1 
 !  EM parallel: num_proc
 !
-!    Give Lengthx in Angstrom, then is converted to cm !!
+!  Give Lengthx in Angstrom, then is converted to cm !!
 !
       integer(C_INT) &
                  ns0,np0,nq0,kstart,kgrp,isizeX,isizeY,isizeZ, &
