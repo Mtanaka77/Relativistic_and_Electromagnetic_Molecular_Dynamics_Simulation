@@ -23,7 +23,7 @@ which is the non-parallel or parallelized simulation code,
 4) p_config_ss.xyz_D150 and P135 of pellet electrons: H, C and Au ions and electrons. 
 The program is written in Fortran 2003/Fortran 2008 (write format in the same line) and MPI of Ver.3 for parallelization.
 
-The description of each subroutine and important lines of @cnt3em_07Ca.f03 and/or @a_cnt3-3p7Ca.f03 and 
+The description of each subroutine and important lines of @cnt3em_3pCa.f03 and/or @a_cnt3-3p7Ca.f03 and 
 the post-processed program @3ddisppC.f03, etc. (to be shown later), are written with many comments of the simulation code. 
 Initial 100 lines of the file @cnt3em_3pCa.f03 or @a_cnt3-3p7Ca.f03 are devoted to give the title, references, 
 summary of subroutines and remarks of the simulation code. 
