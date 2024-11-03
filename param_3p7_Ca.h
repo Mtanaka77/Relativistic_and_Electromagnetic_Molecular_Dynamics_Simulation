@@ -1,4 +1,4 @@
-!  param_3p7_Ca.h
+!  param_3p7_Ca.h with @a_cnt3-3p7Ca.f03
 !
 !  restart: numbr2,numbr1 
 !  EM parallel: num_proc
@@ -65,7 +65,7 @@
                   zmin3=-(256/512.d0)*sconv*Lenz3)   ! 
 !
 !  /data/sht/tanakam/cntemp + .06a
-!  /home/tanakam/cntem3-para3/Cntemp + _config.START + G
+!  /home/tanakam/cntem3-para3/Cntemp + _config.START + C
 !     character  praefixs*28,praefixc*24,praefixe*24,    &
       character  praefixs*33,praefixc*24,praefixe*24,    &
                  praefixi*24,suffix2*2,suffix1*2,suffix0*1
