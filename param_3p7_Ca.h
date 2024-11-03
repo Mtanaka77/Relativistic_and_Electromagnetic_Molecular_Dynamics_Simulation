@@ -1,4 +1,5 @@
-!  param_3p7_Ca.h with @a_cnt3-3p7Ca.f03
+!  param_3p7_Ca.h with @a_cnt3-3p7Ca.f03, 
+!  parallelized in the Z direction
 !
 !  restart: numbr2,numbr1 
 !  EM parallel: num_proc
