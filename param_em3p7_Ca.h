@@ -1,4 +1,5 @@
-!  param_em3p7_Ca.h
+!  param_em3p7_Ca.h 
+!  with @cnt3em_3pCa.f03, non-parallel for Maxwell equations
 !
 !  restart: numbr2,numbr1 
 !  EM parallel: num_proc
