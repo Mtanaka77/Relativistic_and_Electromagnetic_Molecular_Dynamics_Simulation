@@ -38,9 +38,9 @@
       parameter  (mx=201,my=201,mz=512)            ! Grid: 2.5 Ang, mz=512
       parameter  (mxh=101,myh=101,mzh=256)
 !
-      parameter  (mza=16)                          ! mz=512, 32 ranks 
+!     parameter  (mza=16)                          ! mz=512, 32 ranks 
 !       parameter  (mza=8)                         ! mz=512, 64 ranks 
-      parameter  (mxyza=mx*my*mza)                 ! divided in Z
+!     parameter  (mxyza=mx*my*mza)                 ! divided in Z
 ! ----------------------------------------------------------
       parameter  (lxy3= 3*mx*my)
       parameter  (sconv=1.0d-8)
