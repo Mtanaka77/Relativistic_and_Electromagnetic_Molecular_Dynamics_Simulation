@@ -103,7 +103,7 @@ cntemp.77Csa.pdf. They are discussed in the latter half of the CPC paper in 2019
 ### Parallelization of Fields ###
 
 The heavy load of many particles is generally divided on parallel processors which is easily coded. 
-On the other hand, the electromagnetic fields are parallelized for now the one-dimensional case 
+On the other hand, the electromagnetic fields are parallelized for one dimension 
 (the z-direction) where the long axis of pellets is open to eject heavy ions in that direction. 
 Note: Parellization of the Maxwell equation depends on the machines. The Fujitsu by FX100
 and maybe its current one are excellent on parallelization, and the NEC Aurora supercomputer
