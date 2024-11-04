@@ -4,7 +4,7 @@ As "Open Internet Access by Molecular Dynamics Simulations", a couple of various
 
 This page is discussed on the relativistic and nanoscale molecular dynamics simulations, Computer Physics Communications (2019, Ref. 1). Updated files of a non-parallelized code @cnt3em_3pCa.f03 for Maxwell equations, and a parallelized code @a_cnt3-3p7Ca.f03 for the Z coordinate are given in this directory. 
 They are compiled by parameters and configuration files which are dated in Sep. and Nov. of 2024.
-Each simulation code is suitable for a single or parallelized one which really depends on different architectures. 
+Each simulation code is suitable for the non-paralleled or parallelized code which really depends on different architectures. 
 
 
 ### Molecular Dynamics Simulation: CGS Units and Necessary Files ###
