@@ -106,7 +106,7 @@ The heavy load of many particles is generally divided on parallel processors whi
 On the other hand, the electromagnetic fields are parallelized for one dimension 
 (the z-direction) where the long axis of pellets is open to eject heavy ions in that direction. 
 Note: Parellization of the Maxwell equation depends on the machines. The Fujitsu by FX100
-and maybe its current one are excellent on parallelization, and the NEC Aurora supercomputer
+and maybe the current processos are excellent on parallelization, and the NEC Aurora supercomputer
 is slower on the parallelzation of the Maxwell equation.
 
 Finally, the machine run time depends on the physical time and cpu's architecture. 
