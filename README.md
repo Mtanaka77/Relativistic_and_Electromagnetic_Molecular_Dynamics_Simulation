@@ -17,7 +17,7 @@ electron mass m_unit= 0.9110d-27 g and its charge e_unit= 4.8032d-10 esu.
 The mass of hydrogen, for example, is 1.6726d-24 g.
 
 One needs files in the simulation: 1) @cnt3em_3pCa.f03 or @a_cnt3-3p7Ca.f03: Molecular dynamics simulation code, 
-which is the non-parallel or parallelized simulation code,
+which is the non-paralleled or parallelized simulation code,
 2) param_em3p7_Ca.h (non-parallel) or param_3p7_Ca.h (parallel): Common parameters of this simulation, 
 3) Cntemp_config.STARTC: configuring parameters, 
 4) p_config_ss.xyz_D150 and P135 of pellet electrons: H, C and Au ions and electrons. 
