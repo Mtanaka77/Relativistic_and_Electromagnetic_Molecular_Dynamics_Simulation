@@ -1827,14 +1827,6 @@
 !
         call dfftw_execute_r2r (plan,qq,qq_c)
 !
-!       do n= 1,mz 
-!       do m= 1,my
-!       do l= 1,mx
-!       psi_c(l,m,n)= 0
-!       end do
-!       end do
-!       end do
-!
         do n= 1,mz 
         do m= 1,my
         do l= 1,mx
@@ -1853,20 +1845,6 @@
         end do                               ! FFTW3 generic
         end do
         end do
-!
-          if(.false.) then
-!         if(ionode) then
-          OPEN (unit=11,file=praefixc//'.06'//suffix2,             &
-                status='unknown',position='append',form='formatted')
-          n= 1
-          m= 1
-          do l= 1,60,3
-          write(11,990) l,m,n,psi_c(l,m,n)
-  990     format('l,m,n,psi_c=',3i5,2x,1pd11.4)
-          end do
-! 
-          close(11)
-          end if
 !
         call dfftw_execute_r2r (pinv,psi_c,psi)
 !
@@ -2363,19 +2341,6 @@
           write(11,*)  s0,s1,s2
           write(11,*) ' '
         end if
-!
-!  Electrostatic field
-        psi2= 0
-        do n= 2,mz-1
-        do m= 2,my-1
-        do l= 2,mx-1
-        pp1= -(psi(l+1,m,n) -psi(l-1,m,n))/hx2
-        pp2= -(psi(l,m+1,n) -psi(l,m-1,n))/hy2
-        pp3= -(psi(l,m,n+1) -psi(l,m,n-1))/hz2
-        psi2= psi2 +pp1**2 +pp2**2 +pp3**2
-        end do
-        end do
-        end do
 !
 !       ****** per mx*my*mz
         delV= 1.d0/(8*pi)
