@@ -2,42 +2,44 @@
 
 As "Open Internet Access by Molecular Dynamics Simulations", a couple of various codes are shown in https://github.com/Mtanaka77/, which are "Relativistic and Electromagnetic Molecular Dynamics Simulation for Nanoscale Phenomena", "Large-scale Electromagnetic Particle-in-Cell Simulation", "SIESTA on Vector-Parallel Clusters", and "Molecular Dynamics of Water and Ice by TIP5P Code".
 
-This page is discussed on the relativistic and nanoscale molecular dynamics simulations, Computer Physics Communications (2019, Ref. 1). Updated files of a non-parallelized code @cnt3em_3pCa.f03 for Maxwell equations, and a parallelized code @a_cnt3-3p7Ca.f03 for the Z coordinate are given in this directory. 
-They are compiled by parameters and configuration files which are dated in Sep. and Nov. of 2024.
-Each simulation code is suitable for the non-paralleled or parallelized code which really depends on different architectures. 
-
+This page is discussed on the relativistic and nanoscale molecular dynamics simulations, Computer Physics Communications (2019, Ref. 1). Updated files of a non-parallelized code @cnt3em_3pCa.f03 for Maxwell equations, and a parallelized code @a_cnt3-3p7Ca.f03 
+for the z coordinate are given in this directory. 
+They are compiled by parameters and configuration files which are dated in Sep. and Nov. 
+of 2024. Each simulation code is suitable for the non-paralleled or parallelized code 
+which really depends on different architectures. 
 
 ### Molecular Dynamics Simulation: CGS Units and Necessary Files ###
 
 A molecular dynamics simulation code is implemented for relativistic and electromagnetic fields 
 in three dimensions. It is applied to nanoscale particle phenomena such as nanotube accelerators. 
-In the code, Maxwell equations are solved and momentum equations of relativistic particles are advanced in time. 
-Four physical CGS units are used in this code: a_unit= 1.00d-08 cm, t_unit= 1.00d-15 sec, 
-electron mass m_unit= 0.9110d-27 g and its charge e_unit= 4.8032d-10 esu. 
-The mass of hydrogen, for example, is 1.6726d-24 g.
+In the code, Maxwell equations are solved and momentum equations of relativistic particles are advanced in time. Four physical CGS units are used in this code: a_unit= 1.00d-08 cm, 
+t_unit= 1.00d-15 sec, electron mass m_unit= 0.9110d-27 g and its charge 
+e_unit= 4.8032d-10 esu. The mass of hydrogen, for example, is 1.6726d-24 g.
 
-One needs files in the simulation: 1) @cnt3em_3pCa.f03 or @a_cnt3-3p7Ca.f03: Molecular dynamics simulation code, 
-which is the non-paralleled or parallelized simulation code,
-2) param_em3p7_Ca.h (non-parallel) or param_3p7_Ca.h (parallel): Common parameters of this simulation, 
+One needs files in the simulation: 1) @cnt3em_3pCa.f03 or @a_cnt3-3p7Ca.f03: 
+Molecular dynamics simulation code, which is the non-paralleled or parallelized 
+simulation code,
+2) param_em3p7_Ca.h (non-parallel) or param_3p7_Ca.h (parallel): 
+Common parameters of this simulation, 
 3) Cntemp_config.STARTC: configuring parameters, 
 4) p_config_ss.xyz_D150 and P135 of pellet electrons: H, C and Au ions and electrons. 
 The program is written in Fortran 2003/Fortran 2008 (write format in the same line) and MPI of Ver.3 for parallelization.
 
-The description of each subroutine and important lines of @cnt3em_3pCa.f03 and/or @a_cnt3-3p7Ca.f03 and 
-the post-processed program @3ddisppC.f03, etc. (to be shown later), are written with many comments of the simulation code. 
-Initial 100 lines of the file @cnt3em_3pCa.f03 or @a_cnt3-3p7Ca.f03 are devoted to give the title, references, 
-summary of subroutines and remarks of the simulation code. 
-In the major subroutine /moldyn/, (i) the magnetic field is advanced, (ii) current density is calculated 
-and the transverse electric field is advanced, 
-(iii) the correction of the longitudinal electric field is made, (iv) the longitudinal electric field is added, 
-(v) the forces are calculated, and (vi) positions and momenta of particles are advanced toward the next time step.
+The description of each subroutine and important lines of @cnt3em_3pCa.f03 and/or 
+@a_cnt3-3p7Ca.f03 and the post-processed program @3ddisppC.f03, etc. 
+(to be shown later), are written with many comments of the simulation code. 
+Initial 100 lines of the file @cnt3em_3pCa.f03 or @a_cnt3-3p7Ca.f03 are devoted 
+to give the title, references, summary of subroutines and remarks of the simulation code. 
+In the major subroutine /moldyn/, (i) the magnetic field is advanced, (ii) current density is calculated and the transverse electric field is advanced, (iii) the correction of the 
+longitudinal electric field is made, (iv) the longitudinal electric field is added, 
+(v) the forces are calculated, and (vi) positions and momenta of particles are advanced 
+toward the next time step.
 
 ### Gauss's Law, Courant Condition and Realistic Mass Simulation ###
 
-It is noted here that the Ampere's law becomes inaccurate in
-the Cartesian coordinate space, (1/c)\partial{\textbf E}/\partial t=
-rot{\textbf B} -(4\pi/c){\textbf J}, residing from the longitudinal
-electric field.
+It is noted here that the Ampere's law becomes inaccurate in the Cartesian coordinate 
+space, (1/c)\partial{\textbf E}/\partial t=
+rot{\textbf B} -(4\pi/c){\textbf J}, residing from the longitudinal electric field.
 Thus, the Gauss's law, div{\textbf E}=4\pi q, is utilized to obtain the 
 transverse current on the total one (longitudinal and transverse currents 
 of the electric field, J_transvese= J -(J*EL)*EL/|ELl^2.
@@ -85,11 +87,10 @@ The script 'mpif90 @cnt3em-3pCa.f03' needs param_em3p7_Ca.h, Cntemp_config.START
 
   The parallelization simulation code is utilized, for example. 
 Two different fortrans, PGI and gfotran, are incompatible with processors of the same name but different styles.
-One may want to use about 50 processors at least, where the Z-dimension is exactly divided by parallelization. 
+One may want to use about 50 processors at least, where the z-direction is exactly divided by parallelization. 
 
   % Execution by mpiexec (with lots of co-processors): Only for a test case. % mpiexec -n 6 a.out &
  
-
 ### Post-processing Simulation Analysis ###
 
 To analyze simulation results, this program provides the post-processing tool. 
@@ -100,14 +101,16 @@ of H, C, Au ions and electrons from side and top views with energy histories as 
 These graphic outputs by PDF files are shown on the PC screen, either cntemp.77Cfb.pdf or 
 cntemp.77Csa.pdf. They are discussed in the latter half of the CPC paper in 2019 (Ref. 1 below).
 
-### Parallelization of Fields ###
+### Parallelization of Electromagnetic Fields ###
 
 The heavy load of many particles is generally divided on parallel processors which is easily coded. 
 On the other hand, the electromagnetic fields are parallelized for one dimension 
-(the z-direction) where the long axis of pellets is open to eject heavy ions in that direction. 
+(the z-direction) where the long axis of pellets is open to eject heavy ions in that direction.
+Small segments 'do n=nz1(ipar),nz2(ipar)' in the z-direction of each processor node 
+are written in the electric and magnetic fields of the Maxwell equations.   
 Note: Parellization of the Maxwell equation depends on the machines. The Fujitsu by FX100
-and maybe the current processos are excellent on parallelization, and the NEC Aurora supercomputer
-is slower on the parallelzation of the Maxwell equation.
+and maybe the current processos are excellent on parallelization, and the NEC Aurora 
+supercomputer is slower on the parallelzation of the Maxwell equation.
 
 Finally, the machine run time depends on the physical time and cpu's architecture. 
 For the elapsed time of parallel simulation, it executed in 3.2 sec/step for 52 ranks and 
