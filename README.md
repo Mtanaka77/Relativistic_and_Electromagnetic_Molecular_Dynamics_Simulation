@@ -23,7 +23,8 @@ simulation code,
 Common parameters of this simulation, 
 3) Cntemp_config.STARTC: configuring parameters, 
 4) p_config_ss.xyz_D150 and P135 of pellet electrons: H, C and Au ions and electrons. 
-The program is written in Fortran 2003/Fortran 2008 (write format in the same line) and MPI of Ver.3 for parallelization.
+The program is written in Fortran 2003/Fortran 2008 (format is written in the same write line) 
+and MPI of Ver.3 for parallelization.
 
 The description of each subroutine and important lines of @cnt3em_3pCa.f03 and/or 
 @a_cnt3-3p7Ca.f03 and the post-processed program @3ddisppC.f03, etc. 
