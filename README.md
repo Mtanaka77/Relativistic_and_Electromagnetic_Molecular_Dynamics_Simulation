@@ -119,8 +119,9 @@ and maybe the current processos are excellent on parallelization, and the NEC Au
 supercomputer is slower on the parallelzation of the Maxwell equation.
 
 Finally, the machine run time depends on the physical time and cpu's architecture. 
-For the elapsed time of parallel simulation, it executed in 3.2 sec/step for 52 ranks and 
-4.0 10^5 particles (equal to 1 fs for elapsed 1.8 hours) by Fujitsu FX100 Supercomputer.
+For the elapsed time of parallel simulation, it executed in 3.2 sec/step for 
+52 ranks and 4.0 10^5 particles (equal to 1 fs for elapsed 1.8 hours) by 
+Fujitsu FX100 Supercomputer (2019).
 
 ### References: ###
 
