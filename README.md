@@ -1,7 +1,7 @@
 ## Relativistic and Electromagnetic Molecular Dynamics Simulation for Nanoscale Phenomena ##
 
 As "Open Internet Access by Molecular Dynamics Simulations", a couple of various codes are shown in 
-https://github.com/Mtanaka77/, and the simulation codes are, 
+https://github.com/Mtanaka77/. The dynamics simulation codes are, 
 (1) "Relativistic and Electromagnetic Molecular Dynamics Simulation for Nanoscale Phenomena", 
 (2) "Large-scale Electromagnetic Particle-in-Cell Simulation", 
 (3) "SIESTA on Vector-Parallel Clusters", and 
