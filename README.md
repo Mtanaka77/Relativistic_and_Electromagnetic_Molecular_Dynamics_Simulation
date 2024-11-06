@@ -11,7 +11,7 @@ This page is discussed on the relativistic and nanoscale molecular dynamics simu
 for the Maxwell equations especially with the z direction are given in this directory. 
 They are compiled by parameters and configuration files which are dated in Sep. and Nov. 
 of 2024. Each simulation code is suitable for the non-paralleled or parallelized 
-Maxwell equations which really depends on different architectures. 
+Maxwell equations with parallelized particles, which really depends on different architectures. 
 
 ### Molecular Dynamics Simulation: CGS Units and Necessary Files ###
 
