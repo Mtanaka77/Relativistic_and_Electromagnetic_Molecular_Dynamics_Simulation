@@ -46,9 +46,9 @@ toward the next time step.
 It is noted here that the Ampere's law becomes inaccurate in the Cartesian coordinate 
 space, (1/c)\partial{\textbf E}/\partial t=
 rot{\textbf B} -(4\pi/c){\textbf J}, residing from the longitudinal electric field.
-Thus, the Gauss's law, div{\textbf E}=4\pi q, is utilized to obtain the 
+Thus, the Gauss's law, div{\textbf E}=4\pi q, is utilized to separate the 
 transverse current on the total one (longitudinal and transverse currents 
-of the electric field, J_transvese= J -(J*EL)*EL/|ELl^2.
+of the electric field), J_transvese= J -(J*EL)*EL/|ELl^2.
 Thus, the Gauss's law must be solved in five-step interval for the discrete coordinate space 
 (Refs. 1, 2 and 3).
 
