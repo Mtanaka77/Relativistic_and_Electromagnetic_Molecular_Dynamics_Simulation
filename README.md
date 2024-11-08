@@ -108,12 +108,12 @@ of H, C, Au ions and electrons from side and top views with energy histories as 
 These graphic outputs by PDF files are shown on the PC screen, either cntemp.77Cfb.pdf or 
 cntemp.77Csa.pdf. 
 
-The setup of simulations is an monochromatic wave injected along the y-direction, which
-hits the pellets of hydrogen, carbon and Au. These atoms are accelerated to the
-z-direction.
-In the second, electromagnetic circulary-polarized waves are injected.
-Thirdly, complex double pellets are excited by the waves.  
-They are discussed in the latter half of the CPC paper in 2019 (Ref. 1).
+The setup of simulations is firstly a monochromatic wave injected along the y-direction, 
+which hits the pellets of hydrogen, carbon and gold. These atoms are accelerated to the
+z-direction for atoms and the y-direction for electrons.
+In the second case, electromagnetic circulary-polarized waves are injected periodically.
+Thirdly, complex double pellets are excited by the electromagnetic waves.  
+They are discussed in the latter half of the Computer Physics Commun. paper in 2019 (Ref. 1).
 
 ### Parallelization of Electromagnetic Fields ###
 
