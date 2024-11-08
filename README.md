@@ -106,7 +106,14 @@ The velocity distributions in parallel and perpendicular directions, @3dfdispC.f
 in sequential times of ions and electrons. The @3ddisppC.f03 program is time sequential plots 
 of H, C, Au ions and electrons from side and top views with energy histories as well at the end of the run. 
 These graphic outputs by PDF files are shown on the PC screen, either cntemp.77Cfb.pdf or 
-cntemp.77Csa.pdf. They are discussed in the latter half of the CPC paper in 2019 (Ref. 1 below).
+cntemp.77Csa.pdf. 
+
+The setup of simulations is an monochromatic wave injected along the y-direction, which
+hits the pellets of hydrogen, carbon and Au. These atoms are accelerated to the
+z-direction.
+In the second, electromagnetic circulary-polarized waves are injected.
+Thirdly, complex double pellets are excited by the waves.  
+They are discussed in the latter half of the CPC paper in 2019 (Ref. 1).
 
 ### Parallelization of Electromagnetic Fields ###
 
