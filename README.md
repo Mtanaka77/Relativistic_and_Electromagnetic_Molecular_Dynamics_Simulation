@@ -63,11 +63,17 @@ A simulation of the nanotube accelerator is set up by putting pellets of H, C
 and Au atoms and associated electrons at null velocity. 
 Electromagnetic monochromatic waves at the wavelength 800 nm are travelling from 
 the negative direction toward the origin and then go out to the positive direction. 
+The pellet includes a cold pellet of hydrogen, carbon and gold, and electrons.
 The pellets at the origin are irradiated by these waves and are ejected to ion 
 perpenducular and electron parallel directions toward an open space. 
 The fine particle ejection in 3-D and x-y plots are shown newly in cntemp.77Ca-2024a.pdf. 
+
+In the second case, electromagnetic circulary-polarized waves are injected periodically.
+Thirdly, complex double pellets are excited by the electromagnetic waves.  
+
 The final energies for laser intensity 10^22 W/cm^2 are around 30-40 MeV in 20-40 fs, 
-which is shown by animation movies at my homepage, https://physique.isc.chubu.ac.jp/,
+and they are discussed in the latter half of the Computer Physics Commun. in 2019 (Ref. 1).
+Also, it is shown by animation movies at my homepage, https://physique.isc.chubu.ac.jp/,
 and/or http://www1.m4.mediacat.ne.jp/dphysique/.
 
 ### Execution Scripts ###
@@ -107,14 +113,6 @@ in sequential times of ions and electrons. The @3ddisppC.f03 program is time seq
 of H, C, Au ions and electrons from side and top views with energy histories as well at the end of the run. 
 These graphic outputs by PDF files are shown on the PC screen, either cntemp.77Cfb.pdf or 
 cntemp.77Csa.pdf. 
-
-The setup of simulations is firstly a monochromatic wave injected along the y-direction, 
-which hits the cold pellet of hydrogen, carbon and gold, and electrons. 
-These atoms and electrons are accelerated to the z-direction for atoms and the y-direction 
-for electrons.
-In the second case, electromagnetic circulary-polarized waves are injected periodically.
-Thirdly, complex double pellets are excited by the electromagnetic waves.  
-They are discussed in the latter half of the Computer Physics Commun. paper in 2019 (Ref. 1).
 
 ### Parallelization of Electromagnetic Fields ###
 
