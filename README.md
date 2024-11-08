@@ -109,8 +109,9 @@ These graphic outputs by PDF files are shown on the PC screen, either cntemp.77C
 cntemp.77Csa.pdf. 
 
 The setup of simulations is firstly a monochromatic wave injected along the y-direction, 
-which hits the pellets of hydrogen, carbon and gold, and electrons. 
-These atoms are accelerated to the z-direction for atoms and the y-direction for electrons.
+which hits the cold pellet of hydrogen, carbon and gold, and electrons. 
+These atoms and electrons are accelerated to the z-direction for atoms and the y-direction 
+for electrons.
 In the second case, electromagnetic circulary-polarized waves are injected periodically.
 Thirdly, complex double pellets are excited by the electromagnetic waves.  
 They are discussed in the latter half of the Computer Physics Commun. paper in 2019 (Ref. 1).
