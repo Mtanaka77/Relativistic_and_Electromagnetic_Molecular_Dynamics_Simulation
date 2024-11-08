@@ -1,64 +1,88 @@
 ## Relativistic and Electromagnetic Molecular Dynamics Simulation for Nanoscale Phenomena ##
 
-As "Open Internet Access by Molecular Dynamics Simulations", a couple of various codes are shown in 
-https://github.com/Mtanaka77/. The dynamics simulation codes are, 
-(1) "Relativistic and Electromagnetic Molecular Dynamics Simulation for Nanoscale Phenomena", 
-(2) "Large-scale Electromagnetic Particle-in-Cell Simulation", 
-(3) "SIESTA on Vector-Parallel Clusters", and 
-(4) "Molecular Dynamics of Water and Ice by TIP5P Code".
+As "Open Internet Access by Molecular Dynamics Simulations", a couple of 
+various codes are shown in https://github.com/Mtanaka77/. The dynamics 
+simulation codes are, 
+(1) "Relativistic and Electromagnetic Molecular Dynamics Simulation 
+for Nanoscale Phenomena", 
+(2) "Macro-particle Simulation for Magnetic Reconnection", 
+(3) "SIESTA-4.1 on Vector and Parallel Clusters",  
+(4) "Water and Hydrate by Molecular Dynamics TIP5P Simulation", and
+(5) " AlmaLinux by MD and Siesta". 
 
-This page is discussed on the relativistic and nanoscale molecular dynamics simulations, Computer Physics Communications (2019, Ref. 1). Updated files of a non-parallelized code @cnt3em_3pCa.f03 for Maxwell equations, and a parallelized code @a_cnt3-3p7Ca.f03 
-for the Maxwell equations especially with the z direction are given in this directory. 
-They are compiled by parameters and configuration files which are recently updated in Sep. to Nov., 2024. 
+This page is discussed on the relativistic and nanoscale molecular 
+dynamics simulations, Computer Physics Communications (2019, Ref. 1). 
+Updated files of a non-parallelized code @cnt3em_3pCa.f03 for 
+Maxwell equations, and a parallelized code @a_cnt3-3p7Ca.f03 
+for the Maxwell equations with the z direction are given in this directory. 
+They are compiled by parameters and configuration files which are recently 
+updated in Sep. to Nov., 2024. 
 Each simulation code is suitable for the non-paralleled or parallelized 
-Maxwell equations with parallelized particles, which really depends on different architectures. 
+Maxwell equations both with parallelized particles, which really 
+depends on different architectures. 
+
 
 ### Molecular Dynamics Simulation: CGS Units and Necessary Files ###
 
-A molecular dynamics simulation code is implemented for relativistic and electromagnetic fields 
-in three dimensions. It is applied to nanoscale particle phenomena such as nanotube accelerators. 
-In the code, Maxwell equations are solved and momentum equations of relativistic particles are advanced in time. Four physical CGS units are used in this code: a_unit= 1.00d-08 cm, 
+The present molecular dynamics simulation code is implemented for 
+relativistic and electromagnetic fields in three dimensions. 
+It is applied to nanoscale particle phenomena such as nanotube accelerators. 
+In the code, Maxwell equations are solved and momentum equations of 
+relativistic particles are advanced in time. 
+Four physical CGS units are used in this code: a_unit= 1.00d-08 cm, 
 t_unit= 1.00d-15 sec, electron mass m_unit= 0.9110d-27 g and its charge 
 e_unit= 4.8032d-10 esu. The mass of hydrogen, for example, is 1.6726d-24 g.
 
-One needs files in the simulation: 1) @cnt3em_3pCa.f03 or @a_cnt3-3p7Ca.f03: 
-Molecular dynamics simulation code, which is the non-paralleled or parallelized 
-simulation code,
+One needs files in the simulation that is,
+1) @cnt3em_3pCa.f03 or @a_cnt3-3p7Ca.f03: Molecular dynamics simulation code, 
+which is the non-paralleled or parallelized simulation code,
 2) param_em3p7_Ca.h (non-parallel) or param_3p7_Ca.h (parallel): 
 Common parameters of this simulation, 
 3) Cntemp_config.STARTC: configuring parameters, 
-4) p_config_ss.xyz_D150 and P135 of pellet electrons: H, C and Au ions and electrons. 
-The program is written in Fortran 2003/Fortran 2008 (the format is written in the 
-same write line) and MPI of Ver.3 for parallelization.
+4) p_config_ss.xyz_D150 and P135 of pellet atoms (ions and electrons): 
+H, C and Au ions and electrons. 
+The program is written in Fortran 2003/Fortran 2008 (the format is written 
+in the same write line) and MPI of Ver.3 for parallelization.
 
-The description of each subroutine and important lines of @cnt3em_3pCa.f03 and/or 
-@a_cnt3-3p7Ca.f03 and the post-processed program @3ddisppC.f03, etc. 
-(to be shown later), are written with many comments of the simulation code. 
-Initial 100 lines of the file @cnt3em_3pCa.f03 or @a_cnt3-3p7Ca.f03 are devoted 
-to give the title, references, summary of subroutines and remarks of the simulation code. 
-In the major subroutine /moldyn/, (i) the magnetic field is advanced, (ii) current density is calculated and the transverse electric field is advanced, (iii) the correction of the 
-longitudinal electric field is made, (iv) the longitudinal electric field is added, 
-(v) the forces are calculated, and (vi) positions and momenta of particles are advanced 
-toward the next time step.
+The description of each subroutine and important comment lines of 
+@cnt3em_3pCa.f03 and/or @a_cnt3-3p7Ca.f03, and the post-processed program 
+@3ddisppC.f03, etc. (to be shown later), are written with comments 
+and remarks of the simulation. 
+Initial 80-100 lines of the file @cnt3em_3pCa.f03 or @a_cnt3-3p7Ca.f03 
+are devoted to the title, references, summary of subroutines and 
+remarks of the simulation code. 
+The major subroutine /moldyn/ consists of the followings:
+(i) the magnetic field is advanced, 
+(ii) current density is calculated, and separation of the longitudinal
+electric field is made using the Poisson equation,
+(iii) the transverse electric field is advanced, 
+(iv) the forces are calculated for the lontudinal electric field, and 
+(v) positions and momenta of particles are advanced toward the next time step.
+The step (iv) is most time-consuming than other steps..
+
 
 ### Gauss's Law, Courant Condition and Realistic Mass Simulation ###
 
-It is noted here that the Ampere's law becomes inaccurate in the Cartesian coordinate 
-space, (1/c)\partial{\textbf E}/\partial t=
+It is noted here that the Ampere's law becomes inaccurate in 
+the Cartesian coordinate space, (1/c)\partial{\textbf E}/\partial t=
 rot{\textbf B} -(4\pi/c){\textbf J}, residing from the longitudinal electric field.
 Thus, the Gauss's law, div{\textbf E}=4\pi q, is utilized to separate the 
-transverse current on the total one (longitudinal and transverse currents 
-of the electric field), J_transvese= J -(J*EL)*EL/|ELl^2.
-Thus, the Gauss's law must be solved in five-step interval for the discrete coordinate space 
-(Refs. 1, 2 and 3).
+transverse current on the total one (thelongitudinal and transverse currents), 
+J_transvese= J -(J*EL)*EL/|ELl^2.
+Thus, the Gauss's law must be solved in five-step interval for the 
+discrete coordinate space (Refs. 1, 2 and 3).
 
 On the other hand, the relativistic formulae of velocity and momeutum
 /vec{v}= \vec{p}/(sqrt(m^2 +(px^2 +py^2 +pz^2)/c^2)) is valid
 in the nanoscale cases (Ref. 1 and Ref. 2).
-We insist that real mass of hydrogen, carbon and gold atoms, and electrons are used.
+We stress on the use of real mass of hydrogen, carbon and gold atoms, 
+and electrons.
 Also, all the explicit simulation code must satisfy the Courant condition,
 that is, Dx(length)/Dt(time step) > c, the speed of light.
-Otherwise, a simulation is overflown quite shortly.
+Otherwise, simulation steps overflow quite shortly.
+
+
+### Simulation on Nanoscales ###
 
 A simulation of the nanotube accelerator is set up by putting pellets of H, C 
 and Au atoms and associated electrons at null velocity. 
@@ -76,6 +100,7 @@ The final energies for laser intensity 10^22 W/cm^2 are around 30-40 MeV in 20-4
 and they are discussed in the latter half of the Computer Physics Commun. in 2019 (Ref. 1).
 Also, it is shown by animation movies at my homepage, https://physique.isc.chubu.ac.jp/,
 and/or http://www1.m4.mediacat.ne.jp/dphysique/.
+
 
 ### Execution Scripts ###
 
