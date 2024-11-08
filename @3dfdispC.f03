@@ -1,5 +1,6 @@
 !**************************************************************
-!*  Post processing by Linux: pgf95 @3dfdispc.f03             *
+!*  Post processing by Linux: pgf95/gfortran                  *
+!*  % gfortran @3dfdispC.f03 &> log                           *
 !*                                                            * 
 !*    call pplot2 (xg,yg,zg,vx,vy,vz,...) makes sequential    *
 !*    plots of velocity distributions of h,c,au and electrons * 
@@ -8,8 +9,8 @@
 !*  They are quite useful when the simulation results are     *
 !*  analyzed which is written in papers.                      *
 !*                                                            * 
-!*  M. Tanaka, Computer Physics Commun., vol.241, 56 (2019).  *
-!*  Dr. Motohiko Tanaka, Professor, Chubu University, Japan.  * 
+!*  cf: M.Tanaka, Comp.Physics Commun., vol.241, 56 (2019).   *
+!*  Dr.Motohiko Tanaka, Professor, Chubu University, Japan.   * 
 !*                                           Jan. 9, 2016     * 
 !**************************************************************
 !*-------------------------------------------------------------
@@ -25,6 +26,7 @@
 !* $ mpiexec -n 6 a.out &
 !*-------------------------------------------------------------
 !
+      program cntcmpCa
       implicit none
 !
       integer*4   ns0,np0,nq0,npq0,knum_num
@@ -44,7 +46,7 @@
 !  position in 1D xyz, momentum in 1D ppp, velocity in 1D vvv 
 !  relativistic gamma factor
       real*8      xyz(npq0,3),ppp(npq0,3),vvv(npq0,3),m_gamma
-      character   sg*1(npq0)
+      character(len=1) :: sg(npq0)
 !
 !  run name: sname, cnam, the run number like a,A,1,...
       parameter  (sname='cntemp',cname='cntemp',numbr1='C')
@@ -56,7 +58,7 @@
 !  it: time steps, is: the number of sequential plots
       integer*4     ns,np,nq,nCLp,it,is,itskp,nZ,nZa,nframe,knum1,i
       real*4        t,time,tmin,tmax,xp_leng
-      character*8   label,date_now*10,cnam1*8,commt*10,cdate*10,ctime*8
+      character*8   label(8),date_now*10,cnam1*8,commt*10,cdate*10,ctime*8
 !
       common/headr1/ label,date_now
       common/headr2/ time,xp_leng
@@ -64,20 +66,21 @@
       namelist/inp1/ tmin,tmax,itskp
 !
 !  maximum plot (3d)
-      label='cnt-em3q'
+      label(1)='cnt-em3q'
       cnam1=cname//'.'//numbr1
       call date_and_time_7 (date_now,ctime)
 !
       write(6,*) 'type &inp1 tmax, itskp...'
 !     read(5,inp1)
 !--------------------------------------------------
-      praefixs='/lv01/mtanaka/cntem3_para3/'
+!     praefixs='/lv01/mtanaka/cntem3_para3/'
+      praefixs='/home/mtanaka/cntem3-para3/'
 !
-      knum_num= 9 +1  ! files to plots 
+      knum_num= 7 +1 ! g ! 12 +1  ! files to plots 
       itskp= 5 ! 2 ! 1  
 !
       tmin=   0.0d-15
-      tmax=  30.1d-15
+      tmax=  40.1d-15
 !
       write(6,*) ' type cname(6) and numbr1(1)...'
 !     read(5,10) cname,numbr1
@@ -91,6 +94,9 @@
       knum(7)= 'g'
       knum(8)= 'h'
       knum(9)= 'i'
+      knum(10)= 'j'
+      knum(11)= 'k'
+      knum(12)= 'l'
 !
       knum1= 1
       write(6,*) 'read: ',cname//'.23'//numbr1
@@ -199,10 +205,10 @@
 !
       close (77)
       write(06,*) 'write: ',cname//'.77'//numbr1//'fb.ps'
-      write(06,*) '  pgf95 @3dfdispc.f, and ps -> pdf convesion'
+      write(06,*) ' gfortran @3dfdispC.f03, ps->pdf by pspdf ...77Cfb'
 !
       stop
-      end
+      end program cntcmpCa
 !
 !
 !  Parallel and perpendicular velocity distrubations
@@ -225,7 +231,7 @@
       data  ifabs/.true./
 !
       real*4     time,xp_leng,hh
-      character*8    label,date_now*10,cnam1*8,commt*10
+      character*8    label(8),date_now*10,cnam1*8,commt*10
       common/headr1/ label,date_now
       common/headr2/ time,xp_leng
       common/headr3/ cnam1,commt
@@ -233,6 +239,7 @@
 !-------------------------
 !* Radial distributions
 !-------------------------
+! % gfortran @3dfdispC.f03 &> log                           *
 !
       call newcolor (0,1.,0.,0.)
       iplot= mod(is,6)
@@ -242,12 +249,15 @@
       hh= 0.80
 !
       if(iplot.eq.6) then  ! .or. iplot.eq.4) then
-        call symbol (0.1,17.0,hh,label,0.,8)
+!        ++++++++++++++++
+!
+        label(1)= 'Pplot2  '
+        call symbol (0.1,17.0,hh,label(1),0.,8)
         call symbol (5.1,17.0,hh,date_now, 0.,10)
 !
-!       call symbol (10.1,17.0,hh,'     ',0.,8) ! cnam1
-        call symbol (16.9,0.1,hh,'t=',0.,2)
-        call number (999.0,999.0,hh,time,0.,5)
+!       call symbol (10.1,17.0,hh,'     ',0.,8) ! inam1
+        call symbol (15.5,0.1,hh,'right: t=',0.,9)
+        call number (19.7,0.1,hh,time,0.,5)
 !
         call symbol ( 2.0,15.0,hh,'vy-vz plot',0.,10)
       end if
@@ -312,15 +322,20 @@
       call plot (hal(iplot), val2+1.5, 3)
       call newcolor (0,1.,0.,0.)
 !
+! % gfortran @3dfdispC.f03 &> log                           *
       if(iplot.eq.6 .or. iplot.eq.4) then
       call symbol ( 2.0,14.0,hh,'   ',0.,3) ! 'vx='
-      call number (999.0,999.0,hh,hal1,0.,9)  ! 5 digit
-      call symbol ( 8.0,14.0,hh,'proton',0.,6)
-      call symbol ( 6.0, 9.5,hh,'c & au',0.,6)
 !
-      call symbol ( 2.0, 5.0,hh,'vx=',0.,3)
-      call number (999.0,999.0,hh,hal2,0.,9)  ! 5 digit
-      call symbol ( 7.0, 5.0,hh,'electron',0.,8)
+!     call number (999.0,999.0,hh,hal1,0.,9)  ! 5 digit
+      call number ( 5.0,14.0,hh,hal1,0.,9)  ! 5 digit
+      call symbol ( 8.8,14.0,hh,'*protons',0.,8)
+!
+      call symbol ( 6.0, 9.5,hh,'C & Au',0.,6)
+!
+!     call symbol ( 2.0, 5.0,hh,'vx=',0.,3)
+!     call number (999.0,999.0,hh,hal2,0.,9)  ! 5 digit
+      call number ( 5.0,5.0,hh,hal2,0.,9)  ! 5 digit
+      call symbol ( 8.0,5.0,hh,'*electrons',0.,10)
       end if
 !
 !   --------------------------
@@ -329,12 +344,13 @@
 !   --------------------------
 !
 !* Specified plotted particles: C,Au,H and electrons 
+!
       npt1= (ns/2)/1000
       npt2= (ns/2)/1000
       npt3= np/1000 
       npt4= (nZ+nZa)*(ns/2)/1000
 !*
-      do 100 i= ns+1,ns+np,npt3
+      do i= ns+1,ns+np,npt3
       dd= 7*ps*ag(i)  ! cm, 0.08  !  r  g  b
       call newcolor (3,0.,0.,1.)  ! blue
 !
@@ -345,8 +361,9 @@
       if(zz.lt.0. .or. zz.gt.20.) go to 100
       call circle (yy-0.02,zz-0.02,dd,2)
   100 continue
+      end do
 !*     
-      do 150 i= 1,ns/2,npt1
+      do i= 1,ns/2,npt1
       dd= 7*ps*ag(i)  ! 0.08      !  r  g  b
       call newcolor (3,0.,1.,0.)  ! green
 !
@@ -357,8 +374,9 @@
       if(zz.lt.0. .or. zz.gt.20.) go to 150
       call circle (yy-0.02,zz-0.02,dd,2)
   150 continue
+      end do
 !*     
-      do 170 i= ns/2+1,ns,npt2
+      do i= ns/2+1,ns,npt2
       dd= 7*ps*ag(i)  ! 0.08      !  r  g  b
       call newcolor (3,1.,1.,0.)  ! gold
 !
@@ -369,9 +387,10 @@
       if(zz.lt.0. .or. zz.gt.20.) go to 170
       call circle (yy-0.02,zz-0.02,dd,2)
   170 continue
+      end do
 !*     
 !
-      do 200 i= ns+np,nCLp,npt4
+      do i= ns+np,nCLp,npt4
       dd= 7*ps*ag(i)  ! 0.08      !  r  g  b
       call newcolor (3,1.,0.,0.)  ! red
 !
@@ -382,6 +401,7 @@
       if(zz.lt.0. .or. zz.gt.20.) go to 200
       call circle (yy-0.02,zz-0.02,dd,2)
   200 continue
+      end do
 !*     
       call newcolor (0,1.,0.,0.)  ! black
 !
@@ -574,7 +594,8 @@
       dimension  xcm(6),ycm(6),pl(6),pr(6),ql(6),qr(6)
 !
       character*8    lab1,lab2,lab3
-      character*8    label,date_now*10,cax*1
+      character*8    label(8),date_now*10,cax*1
+!
       common/headr1/ label,date_now
       common/headr2/ time,xp_leng
       common/pplcom/ nfine,pl1(10),pr1(10),ql1(10),qr1(10), &
@@ -626,7 +647,7 @@
 !                                              ************************
 !                                              ** label of the page. **
 !                                              ************************
-      call symbol (0.1,18.0,hh,label,0.,8)
+      call symbol (0.1,18.0,hh,label(1),0.,8)
       call symbol (3.1,18.0,hh,date_now, 0.,10)
       call symbol (15.9,0.1,hh,'t =',0.,3)
       call number (999.0,999.0,hh,time,0.,5)
@@ -1428,7 +1449,8 @@
 !-------------------------------------------------
        subroutine symbol (x0,y0,h0,isymb,ang,n0)
 !-------------------------------------------------
-       character isymb*80,ica*80,ich(80)*1
+       character ica*80,ich(80)*1
+       character(*) isymb
        equivalence (ica,ich(1))
 !
        x= x0
