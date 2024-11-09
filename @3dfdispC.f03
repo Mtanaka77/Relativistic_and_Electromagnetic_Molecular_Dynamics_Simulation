@@ -57,7 +57,7 @@
 !  ns,np,nq: number of C+Au, H and electrons, nCLp: total number of particles
 !  it: time steps, is: the number of sequential plots
       integer*4     ns,np,nq,nCLp,it,is,itskp,nZ,nZa,nframe,knum1,i
-      real*4        t,time,tmin,tmax,xp_leng
+      real*4        t,time,tmin,tmax,xp_leng,hh
       character*8   label(8),date_now*10,cnam1*8,commt*10,cdate*10,ctime*8
 !
       common/headr1/ label,date_now
@@ -76,7 +76,8 @@
 !     praefixs='/lv01/mtanaka/cntem3_para3/'
       praefixs='/home/mtanaka/cntem3-para3/'
 !
-      knum_num= 7 +1 ! g ! 12 +1  ! files to plots 
+! % gfortran @3dfdispC.f03 &> log                           *
+      knum_num= 9 !+1 ! 12 +1  ! files to plots 
       itskp= 5 ! 2 ! 1  
 !
       tmin=   0.0d-15
@@ -192,15 +193,20 @@
       end if
       go to 100
 !
-  700 knum1= knum1 +1
-      if(knum1.eq.knum_num) go to 800
+  700 if(knum1.eq.knum_num) go to 800
+      knum1= knum1 +1
 !
       write(6,*) 'read: ',cname//'.23'//numbr1
       open (unit=23,file=cname//'.23'//numbr1//knum(knum1), &  ! 'a'
                     status='old',form='unformatted',err=800) 
       go to 3
 !
-  800 close (23)
+  800 continue
+      hh= 0.80
+      call symbol (15.5,0.1,hh,'right: t=',0.,9)
+      call number (19.7,0.1,hh,time,0.,5)
+!
+      close (23)
       call plote
 !
       close (77)

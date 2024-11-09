@@ -73,8 +73,9 @@
       tmax=  60.1d-15
       knum1= 1  ! it starts at 1 every time
 !
+! % gfortran @3ddisppC.f03 &> log                           *
       praefixs='/home/mtanaka/cntem3-para3'
-      knum_num= 7 ! 12  ! the number of sequential runs
+      knum_num= 9 ! 12  ! the number of sequential runs
 !
       knum(1)= 'a'
       knum(2)= 'b'
@@ -135,8 +136,8 @@
       go to 100
 !
 !  for knum1 > knum_num, then goto 800, otherwise goto 1
-  700 knum1= knum1 +1
-      if(knum1.gt.knum_num) go to 800
+  700 if(knum1.ge.knum_num) go to 800
+      knum1= knum1 +1
 !
       write(06,*) 'knum1=',knum1
       write(06,*) 'read: ',cname//'.13'//numbr1//knum(knum1)
