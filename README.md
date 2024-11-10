@@ -138,7 +138,7 @@ in sequential times of ions and electrons. The @3ddisppC.f03 program is time seq
 of H, C, Au ions and electrons from side and top views with energy histories as well at the end of the run. 
 
 The @3dfv2C.f03 plot makes a kind of animation (100 plots, for example) which tells different distributions 
-of parallel and perpendicular directions.
+of parallel and perpendicular directions of axis.
 These graphic outputs by PDF files are shown on the PC screen, either cntemp.77Cfb.pdf or 
 cntemp.77Csa.pdf. 
 
