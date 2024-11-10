@@ -1,6 +1,8 @@
 !**************************************************************
 !*  CGS system                                                *
-!*  Post processing by Linux: pgf95 @3dfv2c.f03               *
+!*    Post processing by Linux: gfortran @3dfv2C.f03 &> log   *
+!*    Velocity distributions fvz and fxy; the z-direction     *
+!*   along long axis is very interesting.                     *                
 !*                                                            * 
 !*    call vdistr (xg,yg,zg,vx,vy,vz,...) makes sequential    *
 !*    velocity plots of particles of H,C,Au and electrons     *
@@ -9,8 +11,8 @@
 !*  They are quite useful when the simulation results are     *
 !*  analyzed which is written in papers.                      *
 !*                                                            * 
-!*  M. Tanaka, Computer Physics Commun., vol.241, 56 (2019).  *
-!*  Dr. Motohiko Tanaka, Professor, Chubu University, Japan.  * 
+!*   M.Tanaka, Computer Physics Commun., vol.241, 56 (2019).  *
+!*   Dr.Motohiko Tanaka, Professor, Chubu University, Japan.  * 
 !*                                           Jan. 9, 2016     * 
 !**************************************************************
 !*-------------------------------------------------------------
@@ -26,15 +28,19 @@
 !* $ mpiexec -n 6 a.out &
 !*-------------------------------------------------------------
 !
+      program fv2c
       implicit none
 !
       integer*4   ns0,np0,nq0,npq0,knum_num
       character   sname*6,cname*6,numbr1*1,fig_label*32
+!
+      parameter  (sname='cntemp',cname='cntemp',numbr1='C')
 ! 
       parameter  (ns0=110600,np0=10120,nq0=np0+5*ns0/2, &  ! 's,p,t' series
                   npq0=ns0+np0+nq0)
-!     parameter  (ns0=55296,np0=10120,nq0=np0+1*ns0,     ! 'n' series
+!     parameter  (ns0=55296,np0=10120,nq0=np0+1*ns0,       ! 'n' series
 !    *            npq0=ns0+np0+nq0)
+!
       real*8      xg(npq0),yg(npq0),zg(npq0),vx(npq0),vy(npq0),vz(npq0),&
                   px(npq0),py(npq0),pz(npq0),xyz(npq0,3),vvv(npq0,3),  &
                   am(npq0),ch(npq0),ag(npq0),massi,fchar,fchara,       &
@@ -44,35 +50,37 @@
                   max_e1,max_e2,max_e3,max_e4,max_e5,max_e6,dtiwrt1
       integer*4   kk
 !
-      parameter  (sname='cntemp',cname='cntemp',numbr1='c')
-!
       character     praefixs*27,suffix*3,knum(30)*1
 !
       real*4        t,tmin,tmax,axis,time,xp_leng,hh,tiwrt1
       integer*4     ns,np,nq,nclp,it,is,itskp,nz,nza,nframe,knum1,i,k
-      character*8    label,date_now*10,cnam1*8,commt*10,cdate*10,ctime*8
+      character*8    label(8),date_now*10,cnam1*8,commt*10,  &
+                     cdate*10,ctime*8
       common/headr1/ label,date_now
       common/headr2/ time,xp_leng
       common/headr3/ cnam1,commt
       namelist/inp1/ tmin,tmax,itskp
 !
 !  Maximum plot (3D)
-      label='cnt-em3q'
+!   gfortran @3dfv2C.f03 &> log 
+!
+      label(1)='cnt-em3s'
       cnam1=cname//'.'//numbr1
       call date_and_time_7 (date_now,ctime)
 !
       tmin=   0.0d-15
       tmax=  60.1d-15
-      itskp= 1 ! 1 ! 2 
+      itskp=  5   ! 1 ! 2 
 !
-      write(06,*) 'type &inp1 tmax, itskp...'
+      write(06,*) 'type &inp1 tmax, itskp (interval)...'
 !     read(5,inp1)
 !--------------------------------------------------
-      praefixs='/home2/mtanaka/cntem3_data/'
-!               1        01        01
+      praefixs='/home/mtanaka/cntem3-para3/'
+!               1        10        20
       write(6,*) ' type cname(6) and numbr1(1)...'
 !     read(5,10) cname,numbr1
 !  10 format(a6,a1)
+!
       knum(1)= 'a'
       knum(2)= 'b'
       knum(3)= 'c'
@@ -83,7 +91,9 @@
       knum(8)= 'h'
       knum(9)= 'i'
 !
-      knum_num= 9 +1  ! C series, 9 sequence runs
+!   if(itskp.eq.1 .or. t.ge.tiwrt1) then
+      knum_num= 9   ! C series, 9 sequence runs
+!
         dtiwrt1= 0.5d-15
         itskp= 1
 !       ... tiwrt1 +0.5d-15
@@ -135,14 +145,15 @@
 !     sec, cm, cm/sec
 ! 100 read(23,end=700) t,xg,yg,zg,vx,vy,vz
   100 read(23,end=700) t,xyz,vvv
-      write(6,*) 'it,time=',it,t
+!
+      if(mod(it,5).eq.1) write(6,*) 'it,time=',it,t
 !
       it= it +1
 !
       if(t.lt.tmin) go to 100
       if(t.gt.tmax) go to 700
 !
-      if(itskp.eq.1 .or. t.ge.tiwrt1) then
+      if(itskp.le.2 .or. t.ge.tiwrt1) then
         tiwrt1= tiwrt1 +dtiwrt1
 !
         do i= 1,npq0
@@ -157,7 +168,7 @@
 !
         is= is +1
         time= t
-           write(6,*) 'vdistr is,t=',is,t
+!          write(6,*) 'vdistr is,t=',is,t
         call vdistr (xg,yg,zg,vx,vy,vz,npq0,ns,np,nclp)
 !
         s1= 0
@@ -252,8 +263,9 @@
       end if
       go to 100
 !
-  700 knum1= knum1 +1
-      if(knum1.eq.knum_num) go to 800
+!*  gfortran @3dfv2C.f03 &> log 
+  700 if(knum1.ge.knum_num) go to 800
+      knum1= knum1 +1
 !
       write(6,*) 'read: ',cname//'.23'//numbr1
       open (unit=23,file=cname//'.23'//numbr1//knum(knum1), & ! 'a'
@@ -262,8 +274,8 @@
 !
   800 close (23)
 !
-      write(6,*) 'ekin of c, au, h, electron...'
-      write(6,*) '  mostly those of c and au; h is small'
+      write(6,*) 'Ekin of C, Au, H, electron...'
+      write(6,*) '  mostly those of C and Au; H are small'
 !
       write(6,*)
       write(6,*) 'kk, n1,n2,n3,n4+n5+n6'
@@ -273,8 +285,9 @@
   660 format(' is=',i3,1p4e11.3)
 !
       write(6,*)
-      write(6,*) 'average <p**2/2*am> MeV: c, au, h, el...'
-      do kk= 1,is
+      write(6,*) 'average <p**2/2*am> MeV: C, Au, H, el...'
+!
+      do kk= 1,is,5
       write(6,670) kk,ek_MeV(1,kk),ek_MeV(2,kk),ek_MeV(3,kk), &
                    ek_MeV(4,kk),                              &
                    s_ek(1,kk),s_ek(2,kk),s_ek(3,kk),s_ek(4,kk)
@@ -292,16 +305,21 @@
       max_e6= max_e6/MeV
 !
       write(6,673) max_e1,max_e2,max_e3,max_e4,max_e5,max_e6
-  673 format('     max_e=',1p6e10.3)
+  673 format(/,' Maximum energy of C,Au,H,electron(1,2,3)',/, &
+             2x,1p6e10.3)
 !
       call plote
 !
+!  gfortran @3dfv2C.f03 &> log 
       close (77)
-      write(06,*) 'write: ',praefixs//cname//'.77'//numbr1//'ffa'
+!
+      write(06,*)
+      write(06,*) 'gfortran @3dfv2C.f03  -> pspdf ...77Cffa'
+      write(06,*) 'write: ',praefixs//cname//'.77'//numbr1//'ffa.ps'
       write(06,*) '  final time=',t
 !
       stop
-      end
+      end program fv2c
 !
 !
 !-------------------------------------------------------------
@@ -346,18 +364,18 @@
       if(iabs(iz-51).le.50) fvz(iz)= fvz(iz) +1. 
       end do
 !
-!* average over x,y,z
+!* Average over x,y,z
       do k= 1,101
       fvs(k)= (fvx(k) +fvy(k))/2.
       end do
 !
       call lplmax (fvs,fmax1,fmin1,101)
       iln= 1
-      call hplot1 (2,4,101,xsc,fvs,fmax1,fmin1,iln,'fvxy(h+)',8,& 
+      call hplot1 (2,4,101,xsc,fvs,fmax1,fmin1,iln,'fvxy(H+)',8,& 
                    '  vr    ',8,'        ',8)
 !
       call lplmax (fvz,fmax1,fmin1,101)
-      call hplot1 (3,4,101,xsc,fvz,fmax1,fmin1,iln,'fvz(h+) ',8,& 
+      call hplot1 (3,4,101,xsc,fvz,fmax1,fmin1,iln,'fvz(H+) ',8,& 
                    '  vz    ',8,'        ',8)
 !
 !* electrons
@@ -386,7 +404,7 @@
       if(iabs(iz-51).le.50) fvz(iz)= fvz(iz) +1. 
       end do
 !
-!* average over x,y
+!* Average over x,y
       do k= 1,101
       fvs(k)= (fvx(k) +fvy(k))/2.
       end do
@@ -400,7 +418,7 @@
       call hplot1 (3,5,101,xsc,fvz,fmax1,fmin1,iln,'fvz(el) ',8,& 
                    '  vz    ',8,'        ',8)
 !
-!  c
+! C 
       vv= 0 
       do i= 1,ns
 !     do i= 1,ns/2
@@ -428,21 +446,20 @@
       if(iabs(iz-51).le.50) fvz(iz)= fvz(iz) +1. 
       end do
 !
-!* average over x,y
+!* Average over x,y
       do k= 1,101
       fvs(k)= (fvx(k) +fvy(k))/2.
       end do
 !
       call lplmax (fvs,fmax1,fmin1,101)
       iln= 1
-      call hplot1 (2,6,101,xsc,fvs,fmax1,fmin1,iln,'fvxy(ca)',8,&
+      call hplot1 (2,6,101,xsc,fvs,fmax1,fmin1,iln,'fxy(CAu)',8,&
                    '  vr    ',8,'        ',8)
 !
       call lplmax (fvz,fmax1,fmin1,101)
-      call hplot1 (3,6,101,xsc,fvz,fmax1,fmin1,iln,'fvz(cau)',8,&  
+      call hplot1 (3,6,101,xsc,fvz,fmax1,fmin1,iln,'fvz(CAu)',8,&  
                    '  vz    ',8,'        ',8)
-!  c
-! au
+!  C, Au
       if(.false.) then
       vv= 0 
       do i= ns/2+1,ns
@@ -469,7 +486,7 @@
       if(iabs(iz-51).le.50) fvz(iz)= fvz(iz) +1. 
       end do
 !
-!* average over x,y
+!* Average over x,y
       do k= 1,101
       fvs(k)= (fvx(k) +fvy(k))/2.
       end do
@@ -488,21 +505,21 @@
       call chart
 !    ------------
       return
-      end
+      end subroutine vdistr 
 !
 !
 !------------------------------------------------------
       subroutine lplmax (f,fmax,fmin,is)
 !------------------------------------------------------
-      dimension  f(7000)
+      dimension  f(is)
 !
       fmax= -1.e10
       fmin=  1.e10
 !
-      do 100 i= 1,is
+      do i= 1,is
       fmax= amax1(fmax,f(i))
       fmin= amin1(fmin,f(i))
-  100 continue
+      end do
 !
       return
       end
@@ -668,11 +685,11 @@
 !   il=2................ log10 plot of (x,log y)
 !***********************************************************************
 !
-      dimension  x(7000),y(7000),u(7000),v(7000)
+      dimension  x(npt1),y(npt1),u(npt1),v(npt1)
       dimension  xcm(6),ycm(6),pl(6),pr(6),ql(6),qr(6)
 !
       character*8    lab1,lab2,lab3
-      character*8    label,date_now*10,cax*1
+      character*8    label(8),date_now*10,cax*1
       common/headr1/ label,date_now
       common/headr2/ time,xp_leng
       common/pplcom/ nfine,pl1(10),pr1(10),ql1(10),qr1(10), &
@@ -699,14 +716,17 @@
 !-----------------------------------------------------------------------
       iplot=2
 !
-    1 npt= npt1
+    1 continue
+      npt= npt1
       isc= 1
 !
-      do 5 i=1,6
-    5 pr(i)= pl(i) +xcm(i)
+      do i=1,6
+      pr(i)= pl(i) +xcm(i)
+      end do
 !
-      do 6 j=1,6
-    6 qr(j)= ql(j) +ycm(j)
+      do j=1,6
+      qr(j)= ql(j) +ycm(j)
+      end do
 !
       lab_skip= .false.
       if(il.eq.7) lab_skip= .true.
@@ -724,15 +744,17 @@
 !                                              ************************
 !                                              ** label of the page. **
 !                                              ************************
-      call symbol (0.1,18.0,hh,label,0.,8)
-      call symbol (3.1,18.0,hh,date_now, 0.,10)
-      call symbol (15.9,0.1,hh,'t =',0.,3)
-      call number (999.0,999.0,hh,time,0.,5)
+      call symbol (0.1,18.0,hh,label(1),0.,8)
+      call symbol (4.5,18.0,hh,date_now, 0.,10)
+      call symbol (15.1,0.1,hh,'t=',0.,2)
+      call number (17.0,0.1,hh,time,0.,5)
 !
    10 continue
 !
-      do 23 i=1,npt
-   23 u(i)= x(i)
+      do i=1,npt
+      u(i)= x(i)
+      end do
+!
       xmax= u(npt)
       xmin= u(1)
 !                             ************************************
@@ -741,25 +763,27 @@
       if(il.gt.0) then
         v(1)=   y(1)
         v(npt)= y(npt)
-        do 37 i=2,npt-1
+!
+        do i=2,npt-1
         v(i)= y(i)
 !       v(i)= 0.33333*(y(i-1)+y(i)+y(i+1))
-   37   continue
+        end do
       else
-        do 38 i=1,npt
-   38   v(i)= y(i)
+        do i=1,npt
+        v(i)= y(i)
+        end do
       end if
 !                                                *****************
 !                                                **  log. scale **
 !                                                *****************
       if(iabs(il).eq.2) then
-         do 40 i=1,npt
+         do i=1,npt
          if(v(i).gt.0.) then
-            v(i)= alog10(v(i))
+           v(i)= alog10(v(i))
          else
-            v(i)= -10.
+           v(i)= -10.
          end if
-   40    continue
+         end do
       end if
 !                                **************************************
 !                                ** set a new scale and draw a frame.**
@@ -768,10 +792,10 @@
          ymax= -1.e10
          ymin=  1.e10
 !
-         do 50 i= 1,npt
+         do i= 1,npt
          ymax= amax1(ymax,v(i))
          ymin= amin1(ymin,v(i))
-   50    continue
+         end do
 !
          if(ymin.ge.0.) then
            ymax= 1.1*ymax
@@ -784,7 +808,7 @@
 !
       if(ymax.le.ymin) ymax= ymin+1.0
       if(iabs(il).eq.2) then
-         if(ymax.gt.0.0) ymax= ymax+1.0
+        if(ymax.gt.0.0) ymax= ymax+1.0
       end if
 !
       dx= (xmax-xmin)/xcm(i1)
@@ -1526,7 +1550,8 @@
 !-------------------------------------------------
        subroutine symbol (x0,y0,h0,isymb,ang,n0)
 !-------------------------------------------------
-       character isymb*80,ica*80,ich(80)*1
+       character ica*80,ich(80)*1
+       character(*) isymb
        equivalence (ica,ich(1))
 !
        x= x0

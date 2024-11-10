@@ -2,8 +2,8 @@
 !*  Post processing by Linux: pgf95/gfortran                  *
 !*  % gfortran @3dfdispC.f03 &> log                           *
 !*                                                            * 
-!*    call pplot2 (xg,yg,zg,vx,vy,vz,...) makes sequential    *
-!*    plots of velocity distributions of h,c,au and electrons * 
+!*   'call pplot2 (xg,yg,zg,vx,vy,vz,...)' makes sequential   *
+!*   plots of velocity distributions of H,C,Au and electrons  * 
 !*                                                            * 
 !*  Make the ps to pdf conversin, and plot on the PC screen.  *
 !*  They are quite useful when the simulation results are     *
@@ -11,7 +11,7 @@
 !*                                                            * 
 !*  cf: M.Tanaka, Comp.Physics Commun., vol.241, 56 (2019).   *
 !*  Dr.Motohiko Tanaka, Professor, Chubu University, Japan.   * 
-!*                                           Jan. 9, 2016     * 
+!*                                            Jan. 9, 2016    * 
 !**************************************************************
 !*-------------------------------------------------------------
 !*  Fortran 2003 handles such technique as continuity and 
@@ -37,18 +37,18 @@
       parameter  (ns0=110600,np0=10120,nq0=np0+5*ns0/2, & ! 'a,t' series
                   npq0=ns0+np0+nq0)
 !
-!  position x,y,z, velocity vx,vy,vz, mass am. ch charge, shape ag
+!  Position x,y,z, velocity vx,vy,vz, mass am. ch charge, shape ag
 !  c1, c2: speed of light, and its square
       real*8      xg(npq0),yg(npq0),zg(npq0),vx(npq0),vy(npq0),vz(npq0),&
                   am(npq0),ch(npq0),ag(npq0),massi,fchar,fchara,        &
                   c1,c2,rd_cp,rd_hp,rd_el,ssg(npq0),tiwrt1
 !
-!  position in 1D xyz, momentum in 1D ppp, velocity in 1D vvv 
+!  Position in 1D xyz, momentum in 1D ppp, velocity in 1D vvv 
 !  relativistic gamma factor
       real*8      xyz(npq0,3),ppp(npq0,3),vvv(npq0,3),m_gamma
       character(len=1) :: sg(npq0)
 !
-!  run name: sname, cnam, the run number like a,A,1,...
+!  Run name: sname, cnam, the run number like a,A,1,...
       parameter  (sname='cntemp',cname='cntemp',numbr1='C')
 !
       character     praefixs*27,suffix*3,knum(20)*1
@@ -65,7 +65,7 @@
       common/headr3/ cnam1,commt
       namelist/inp1/ tmin,tmax,itskp
 !
-!  maximum plot (3d)
+!  Maximum plot (3d)
       label(1)='cnt-em3q'
       cnam1=cname//'.'//numbr1
       call date_and_time_7 (date_now,ctime)
@@ -77,6 +77,7 @@
       praefixs='/home/mtanaka/cntem3-para3/'
 !
 ! % gfortran @3dfdispC.f03 &> log                           *
+!  Number of many plots in sequences
       knum_num= 9 !+1 ! 12 +1  ! files to plots 
       itskp= 5 ! 2 ! 1  
 !
@@ -86,6 +87,7 @@
       write(6,*) ' type cname(6) and numbr1(1)...'
 !     read(5,10) cname,numbr1
 !  10 format(a6,a1)
+!
       knum(1)= 'a'
       knum(2)= 'b'
       knum(3)= 'c'
@@ -144,7 +146,7 @@
       c1= 2.9979d+10
       c2= 2.9979d+10**2
 !
-!     sec, cm, cm/sec
+!               sec, cm, cm/sec
   100 read(23,end=700) t,xyz,vvv
       write(6,*) 'time=',t
 !
@@ -202,7 +204,7 @@
       go to 3
 !
   800 continue
-      hh= 0.80
+      hh= 0.80    ! End plot at the right corner must be !
       call symbol (15.5,0.1,hh,'right: t=',0.,9)
       call number (19.7,0.1,hh,time,0.,5)
 !
@@ -416,7 +418,7 @@
       end if
       
       return
-      end
+      end subroutine pplot2 
 !
 !
 !------------------------------------------------------------------------

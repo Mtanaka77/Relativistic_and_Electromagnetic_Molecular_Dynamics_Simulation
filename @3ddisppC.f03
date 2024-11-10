@@ -1,11 +1,11 @@
 !**************************************************************
-!*  Post processing output by Linux: pgf95 @3ddisppC.f03      *
+!*  Post processing output by Linux                           *
+!*    call rdistr (x4,y4,z4,...) makes scatter plots of       *
+!*    C,Au,H and electrons at sequential time interval.       * 
+!*                                                            * 
 !*    gfortran @3ddisppC.f03 &> log                           *
 !*                                                            * 
-!*    call rdistr (x4,y4,z4,...) makes scatter plots of       *
-!*    H,C,Au and electrons at sequential time interval.       * 
-!*                                                            * 
-!*   Make the ps to pdf conversin, and plot on a PC screen.   *
+!*   Make the ps to pdf conversin, and plotis on a PC screen. *
 !*  They are quite useful when the simulation results are     *
 !*  analyzed which is written in papers.                      *
 !*                                                            * 
@@ -60,7 +60,7 @@
       common/headr3/ cnam1,commt
       namelist/inp1/ tmin,tmax
 !
-!*  pgf95 @3ddisppC.f03 
+!*  gfortran @3ddisppC.f03 
       label(1)= '3ddisspC'
       cnam1= cname//'.'//numbr1
 !
@@ -73,7 +73,6 @@
       tmax=  60.1d-15
       knum1= 1  ! it starts at 1 every time
 !
-! % gfortran @3ddisppC.f03 &> log                           *
       praefixs='/home/mtanaka/cntem3-para3'
       knum_num= 9 ! 12  ! the number of sequential runs
 !
@@ -90,12 +89,12 @@
       knum(11)= 'k'
       knum(12)= 'l'
 !
-!  the input in FT 13 files followed by numbr1 and a
+!  The input in FT 13 files followed by numbr1 and a
       write(06,*) 'read: ',cname//'.13'//numbr1//'a'
       open (unit=13,file=cname//'.13'//numbr1//'a', & ! 'a'
             status='old',form='unformatted') 
 !
-!  the output of the run, this time cname.77 followed by sa.ps
+!  The output of the run, this time cname.77 followed by sa.ps
       write(06,*) 'write: ',cname//'.77'//numbr1//'sa.ps'
       open (unit=77,file=cname//'.77'//numbr1//'sa.ps')
       nframe= 1
@@ -135,7 +134,7 @@
       end if
       go to 100
 !
-!  for knum1 > knum_num, then goto 800, otherwise goto 1
+!  For knum1 > knum_num, then goto 800, otherwise goto 1
   700 if(knum1.ge.knum_num) go to 800
       knum1= knum1 +1
 !
@@ -152,7 +151,7 @@
       close (77)
       write(06,*) 'write: ',cname//'.77'//numbr1//'sa.ps'
       write(06,*) '  Convert sa.ps to sa.pdf, and make plots'
-      write(06,*) '  pgf95 @3ddisppC.f03 (small endian)'
+      write(06,*) '  gfortran @3ddisppC.f03'
 !
       stop
       end program disppC
