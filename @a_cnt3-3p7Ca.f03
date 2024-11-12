@@ -84,6 +84,9 @@
 !    Fortran 2003 /Fortran 2008 Write output (finished)               !   
 !       write(11,'("This run uses ",i3," ranks",/)') size             !
 !                                                                     !
+!   * Variable dtwr,dtwr2,dtwr3, /imemo/ iwa,iwb,iwc,iwd are not      !
+!     used instead of mod(it,iiwrt1), etc.; read(12) iiwrt1,...       ! 
+!                                                                     !
 !*--------------------------------------------------------------------*
 ! Fortran 2003 version
 !
@@ -116,8 +119,8 @@
         ionode= .false.
       end if
 !
-      suffix2= numbr2  ! Ca - old file 
-      suffix1= numbr1  ! Ca - new file
+      suffix2= numbr2  ! Ca - new file 
+      suffix1= numbr1  ! Ca - old file
       suffix0= numbr0  ! one character - Cntemp_config.STARTC
 !
 !
@@ -136,8 +139,8 @@
       ifDebye= 0       ! =1 if Debye-screening is on (disabled)
 !
       if(ionode) then
-        OPEN (unit=11,file=praefixc//'.06'//suffix2, &
-              status='unknown',form='formatted')
+        OPEN (unit=11,file=praefixc//'.06'//suffix2,            &
+                               status='replace',form='formatted')
 !
         write(11,'("This run uses ",i3," ranks",/)') size
 !      
@@ -271,12 +274,10 @@
       common/srflst0/ cr_table,itab,nipl0,lipl0
       common/plupdat/ itabs
 !
-      integer(c_int) i,it,is,istop1,istop2,iwa,iwb,iwc,iwd,   &
-                     ifrefl,nframe,ierror,ns1,np1,ns2,        &
-                     nh1,nh2,istop7,istop8
+      integer(c_int) i,it,is,istop1,istop2,ifrefl,nframe,ierror, &
+                     ns1,np1,ns2,nh1,nh2,istop7,istop8
       common/parm1/  it,is
       common/abterm/ istop1,istop2,istop7,istop8
-      common/imemo/  iwa,iwb,iwc,iwd
 !
       real(c_double) pi,tg,dt,dth,prefC_LJ,pref_LJ,pthe,tmax, &
                      kJoule,kcal,mol,eV,                      &
@@ -620,7 +621,7 @@
                  Rgyf,Rgyc,Rion,Nele,dPot,ecr,elj,          &
                  sex,sez,sbx,sbz,time
 !
-        read(12) iwa,iwb,iwc,iwd
+!!      read(12) iwa,iwb,iwc,iwd
         read(12) r_sp,d_sp,n_sp,ch_ion,wt_ion,rd_cp,rd_hp,  &
                  ch_el,wt_el,rd_el 
         read(12) W_1p,Nele0
@@ -660,9 +661,6 @@
           nCLp= ns +np +nq  ! just for write out here
           write(11,643) ns,np,nq,nCLp
   643     format(' ns,np,nq; nCLp=',i8,i6,i8,2x,i8,/)
-!
-          write(11,645) iwa,iwb,iwc,iwd
-  645     format(' iwa, iwb, iwc, iwd=',4i7,/)
 !
           close(11)
         end if
@@ -939,8 +937,8 @@
         write(11,*) 'It has etx7,ety7,etz7,btx7,bty7,btz7 arrays.'
         close(11)
 !
-        OPEN (unit=12,file=praefixc//'.12'//suffix2, &
-                  status='replace',form='unformatted')
+        OPEN (unit=12,file=praefixc//'.12'//suffix2,          &
+                          status='replace',form='unformatted')
 !
         write(12) it,is,ns,np,nq,nCLp,itab,item3
         write(12) xyz,ppp,ch,am,ag
@@ -956,7 +954,7 @@
                   Rgyf,Rgyc,Rion,Nele,dPot,ecr,elj,          &
                   sex,sez,sbx,sbz,time
 !
-        write(12) iwa,iwb,iwc,iwd
+!!      write(12) iwa,iwb,iwc,iwd
         write(12) r_sp,d_sp,n_sp,ch_ion,wt_ion,rd_cp,rd_hp,  &
                   ch_el,wt_el,rd_el 
         write(12) W_1p,Nele0
@@ -1003,9 +1001,9 @@
                       praefixs//'_config.START'//suffix0
         close(11)
 !
-        OPEN (unit=77,file=praefixc//'.77'//suffix2//'.ps', &
-              status='unknown',form='formatted')
-!                             ! just starts from here
+        OPEN (unit=77,file=praefixc//'.77'//suffix2//'.ps',      &
+                                status='replace',form='formatted')
+!                               ! just starts from here
         call gopen (nframe) 
         close (77)
       end if
@@ -1084,11 +1082,9 @@
       equivalence  (ekin(1),ekin20(1))
 !
       integer*8      ix,iy,iz,ll,mm,nn,l,m,n
-      integer(c_int) i,j,k,kk,jj,ibox,neigh,it,is,iwa,iwb,iwc,iwd,  &
-                    iwrt1,iwrt2,iwrt3,                              &
+      integer(c_int) i,j,k,kk,jj,ibox,neigh,it,is,iwrt1,iwrt2,iwrt3, &
                     nskip,nsk,ncoe,istop1,istop2,istop7,istop8
       common/parm1/ it,is
-      common/imemo/ iwa,iwb,iwc,iwd
       common/iotim/ iwrt1,iwrt2,iwrt3
       common/abterm/ istop1,istop2,istop7,istop8
 
@@ -1198,10 +1194,6 @@
 !
         is= 0
         it= 0
-        iwa= -1
-        iwb= -1
-        iwc= -1
-        iwd= -1
 !
         do i= 1,nCLp
         x0(i)= xyz(i,1)
@@ -1351,8 +1343,8 @@
         ymax4  = ymax3
         zmax4  = zmax3
 !
-        OPEN (unit=13,file=praefixc//'.13'//suffix2,     &
-              status='replace',form='unformatted')
+        OPEN (unit=13,file=praefixc//'.13'//suffix2,          &
+                          status='replace',form='unformatted')
 !
         write(13) ns,np,nq,fchar4,fcharA4,Temp4,xmax4,ymax4,zmax4
 !
@@ -1374,8 +1366,8 @@
         write(11,*) 'Preparation for write(23)...'
         close(11)
 !
-        OPEN (unit=23,file=praefixc//'.23'//suffix2,    &
-              status='unknown',form='unformatted')
+        OPEN (unit=23,file=praefixc//'.23'//suffix2,         &
+                          status='replace',form='unformatted')
 !
         write(23) ns,np,nq
         write(23) fchar,fcharA,massi
@@ -1393,8 +1385,8 @@
         write(11,*) '  mxh,myh,mzh=',mxh,myh,mzh 
         close(11)
 !
-        OPEN (unit=29,file=praefixc//'.29'//suffix2,     &
-              status='unknown',form='unformatted')
+        OPEN (unit=29,file=praefixc//'.29'//suffix2,          &
+                           status='replace',form='unformatted')
 !
         write(29) mxh,myh,mzh
         write(29) Lx3,Ly3,Lz3
@@ -1432,6 +1424,9 @@
       item3= item3 +1         ! EM smoothing from item3= 1
       n_twice = n_twice +1
 !    **********************
+!
+!     iiwrt1=  25
+!     iiwrt2= 100
 !
       iwrt1= mod(it,iiwrt1)   ! time by interval
       iwrt2= mod(it,iiwrt2)   !  general field plot
@@ -2575,7 +2570,7 @@
                   Rgyf,Rgyc,Rion,Nele,dPot,ecr,elj,          &
                   sex,sez,sbx,sbz,time
 !
-        write(12) iwa,iwb,iwc,iwd
+!!      write(12) iwa,iwb,iwc,iwd
         write(12) r_sp,d_sp,n_sp,ch_ion,wt_ion,rd_cp,rd_hp,  &
                   ch_el,wt_el,rd_el 
         write(12) W_1p,Nele0
@@ -3371,7 +3366,7 @@
             status='unknown',position='append',form='formatted')
 !
       call symbol (7.0,18.0,0.7,'istop=',0.,6)
-      call number (999.,999.,0.7,float(istop),0.,5)
+      call number (999.,999.,0.7,float(istop),0.,100)
 !
       l= 0
       nskip= nc3/2000 +1
@@ -4880,9 +4875,9 @@
 !
 ! page 3
       CALL SYMBOL (3.0,3.0,0.7,'Wion=', 0.,5)
-      call number (6.0,3.0,0.7,ekin0,0.,5)
+      call number (6.0,3.0,0.7,ekin0,0.,101)
       CALL SYMBOL (3.0,2.0,0.7,'W0=', 0.,3)
-      call number (6.0,2.0,0.7,etot0,0.,5)
+      call number (6.0,2.0,0.7,etot0,0.,101)
 !
       call lplmax (Rgyi,Rgyi1,Rgyi2,is)
       call lplot1 (2,4,is,time,Rgyi,Rgyi1,0.0,ILN,'Rgy(H+) ',8, &
@@ -4969,7 +4964,7 @@
 !
       CALL SYMBOL ( 0.5,1.0,HH,date_now, 0.,10)
       CALL SYMBOL (17.0,1.0,HH,'t=', 0.,2)
-      call number (20.0,1.0,HH,t,0.,7)
+      call number (20.0,1.0,HH,t,0.,101)
 !
       Temp4 = Temp
       Dens4 = D_sp
@@ -5034,9 +5029,9 @@
 !
       amass= massi
       CALL SYMBOL (HL+6.5,VD-3.5,HH,'Rmax=', 0.,5)
-      call number (HL+9.0,VD-3.5,HH,rmax1,0.,5)
+      call number (HL+9.0,VD-3.5,HH,rmax1,0.,101)
       CALL SYMBOL (HL+6.5,VD-4.3,HH,'massp=', 0.,6)
-      call number (HL+9.2,VD-4.3,HH,amass,0.,5)
+      call number (HL+9.2,VD-4.3,HH,amass,0.,101)
 !
       do 200 i= 1,3
       if(i.eq.1) then
@@ -5245,7 +5240,7 @@
 !
       CALL SYMBOL ( 0.5,1.0,HH,date_now, 0.,10)
       CALL SYMBOL (17.0,1.0,HH,'t=', 0.,2)
-      call number (20.0,1.0,HH,t,0.,7)
+      call number (20.0,1.0,HH,t,0.,101)
 !
       Temp4 = Temp
       Dens4 = D_sp
@@ -5303,7 +5298,7 @@
 !
       rmax4= rmax1
       CALL SYMBOL (HL+6.5,VD-3.5,HH,'Rmax=', 0.,5)
-      call number (HL+9.0,VD-3.5,HH,rmax4,0.,5)
+      call number (HL+9.0,VD-3.5,HH,rmax4,0.,101)
 !
       do i= 1,2
       if(i.eq.1) then
@@ -5612,8 +5607,8 @@
 !                                              ************************
       call symbol (0.1,18.0,hh,label,0.,8)
       call symbol (3.1,18.0,hh,date_now, 0.,10)
-      call symbol (15.9,0.1,hh,'t =',0.,3)
-      call number (999.0,999.0,hh,time,0.,5)
+      call symbol (15.9,0.1,hh,'t=',0.,2)
+      call number (999.0,999.0,hh,time,0.,101)
 !
    10 continue
 !
@@ -6459,7 +6454,8 @@
 !
        real(c_float) x0,y0,h0,anu,ang,x,y,h
        integer(c_int) n0,n,i
-       character  isymb*9
+       character(len=9) isymb
+!      character(*)  isymb  !*9
 !
        x= x0
        y= y0
@@ -6477,6 +6473,10 @@
        write(77,30) ang
    30  format(f5.1,' ro')
 !
+       write(isymb,101) anu
+  101  format(1pe9.2)
+!      
+       if(.true.) go to 300
        if(abs(anu).gt.1.e+1 .or.  &
           abs(anu).lt.1.e-1) then
         write(isymb,31) anu
@@ -6486,7 +6486,6 @@
    32   format(f7.2)
        end if
 !
-       if(.true.) go to 300
        if(abs(anu).lt.10000.) then  ! 5 digits
          if(abs(anu).gt.0.1) then
            write(isymb,40) anu
