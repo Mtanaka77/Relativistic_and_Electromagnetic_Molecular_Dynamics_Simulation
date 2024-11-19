@@ -150,8 +150,7 @@ On the other hand, the electromagnetic fields are parallelized for one dimension
 Small segments 'do n=nz1(ipar),nz2(ipar)' in the z-direction of each processor node 
 are written in the individual electric and magnetic fields of the Maxwell equations.   
 Note: Parellization of the Maxwell equation depends on the machines. The Fujitsu by FX100
-and maybe the current processos are excellent on parallelization, and the NEC Aurora 
-supercomputer is slower on the parallelzation of the Maxwell equation.
+and maybe the current processos are excellent on parallelization of the Maxwell equations.
 
 Finally, the machine run time depends on the physical time and cpu's architecture. 
 For the elapsed time of parallel simulation, it executed in 3.2 sec/step for 
